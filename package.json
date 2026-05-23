@@ -1,0 +1,55 @@
+{
+  "name": "intelligent-talent-matching-platform",
+  "version": "1.0.0",
+  "description": "The Code for the Intelligent Talent Matching Platform",
+  "main": "build/application.js",
+  "type": "module",
+  "scripts": {
+    "clean": "rimraf build",
+    "build": "npm run clean && prisma generate && tsc && node graceful-transfer.js",
+    "start": "POSTGRES_URL=$POSTGRES_MIGRATION_URL prisma migrate deploy && node build/src/server/application.js",    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
+    "prisma:studio": "prisma studio",
+    "prisma:reset": "prisma migrate reset",
+    "docker:build": "docker compose build",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:restart": "docker compose down && docker compose up -d",
+    "docker:logs": "docker compose logs -f",
+    "docker:ps": "docker compose ps",
+    "docker:rebuild": "docker compose down && docker compose build --no-cache && docker compose up -d",
+    "docker:purge": "docker compose down --rmi all --volumes --remove-orphans",
+    "docker:purge:hard": "docker compose down --rmi all --volumes --remove-orphans && docker system prune -af --volumes"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gab706/Intelligent-Talent-Matching-Platform.git"
+  },
+  "author": "Gabriel Esposito",
+  "license": "PRIVATE",
+  "bugs": {
+    "url": "https://github.com/gab706/Intelligent-Talent-Matching-Platform/issues"
+  },
+  "homepage": "https://github.com/gab706/Intelligent-Talent-Matching-Platform#readme",
+  "dependencies": {
+    "@prisma/client": "^7.8.0",
+    "body-parser": "^2.2.2",
+    "chalk": "^5.6.2",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.4.2",
+    "ejs": "^5.0.2",
+    "express": "^5.2.1",
+    "pg": "^8.21.0",
+    "uuid": "^14.0.0"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.9.1",
+    "prisma": "^7.8.0",
+    "rimraf": "^6.1.3",
+    "tsx": "^4.22.3",
+    "typescript": "^6.0.3"
+  }
+}

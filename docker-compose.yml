@@ -1,0 +1,81 @@
+services:
+  application:
+    build: .
+    container_name: itmp-app
+    restart: unless-stopped
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT}
+      PORT: ${PORT}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_DEFAULT_DB: ${POSTGRES_DEFAULT_DB}
+      POSTGRES_SHADOW_DB: ${POSTGRES_SHADOW_DB}
+      POSTGRES_APPLICATION_USERNAME: ${POSTGRES_APPLICATION_USERNAME}
+      POSTGRES_APPLICATION_PASSWORD: ${POSTGRES_APPLICATION_PASSWORD}
+      POSTGRES_MIGRATION_USERNAME: ${POSTGRES_MIGRATION_USERNAME}
+      POSTGRES_MIGRATION_PASSWORD: ${POSTGRES_MIGRATION_PASSWORD}
+      POSTGRES_URL: postgresql://${POSTGRES_APPLICATION_USERNAME}:${POSTGRES_APPLICATION_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DEFAULT_DB}
+      POSTGRES_MIGRATION_URL: postgresql://${POSTGRES_MIGRATION_USERNAME}:${POSTGRES_MIGRATION_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DEFAULT_DB}
+      POSTGRES_SHADOW_URL: postgresql://${POSTGRES_MIGRATION_USERNAME}:${POSTGRES_MIGRATION_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_SHADOW_DB}
+    ports:
+      - "127.0.0.1:${PORT}:${PORT}"
+    networks:
+      app_subnet:
+        ipv4_address: 172.28.0.10
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: itmp-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DEFAULT_DB}
+      POSTGRES_SHADOW_DB: ${POSTGRES_SHADOW_DB}
+      POSTGRES_USER: ${POSTGRES_SUPERADMIN_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_SUPERADMIN_PASSWORD}
+      POSTGRES_APPLICATION_USERNAME: ${POSTGRES_APPLICATION_USERNAME}
+      POSTGRES_APPLICATION_PASSWORD: ${POSTGRES_APPLICATION_PASSWORD}
+      POSTGRES_MIGRATION_USERNAME: ${POSTGRES_MIGRATION_USERNAME}
+      POSTGRES_MIGRATION_PASSWORD: ${POSTGRES_MIGRATION_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      app_subnet:
+        ipv4_address: 172.28.0.20
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_SUPERADMIN_USERNAME} -d ${POSTGRES_DEFAULT_DB}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: itmp-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "127.0.0.1:5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      app_subnet:
+        ipv4_address: 172.28.0.30
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+networks:
+  app_subnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
+
+volumes:
+  postgres_data:
+  pgadmin_data:
