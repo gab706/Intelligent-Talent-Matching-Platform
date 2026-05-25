@@ -13,6 +13,19 @@
     --max-width: 1180px;
 }
 
+body.dark-mode {
+    --bg: #070b16;
+    --surface: #0f172a;
+    --surface-soft: #172033;
+    --surface-muted: #0b1120;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --border: #263247;
+    --primary: #60a5fa;
+    --primary-dark: #3b82f6;
+    --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+}
+
 * {
     box-sizing: border-box;
 }
@@ -27,19 +40,6 @@ body {
     background: var(--bg);
     color: var(--text);
     line-height: 1.5;
-}
-
-body.dark-mode {
-    --bg: #070b16;
-    --surface: #0f172a;
-    --surface-soft: #172033;
-    --surface-muted: #0b1120;
-    --text: #f8fafc;
-    --muted: #94a3b8;
-    --border: #263247;
-    --primary: #60a5fa;
-    --primary-dark: #3b82f6;
-    --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
 }
 
 a {
@@ -270,24 +270,105 @@ body.dark-mode .theme-toggle {
 }
 
 .hero-search {
-    width: min(100%, 980px);
+    width: min(100%, 760px);
     min-height: 78px;
-    display: grid;
-    grid-template-columns: minmax(360px, 1.35fr) 1px minmax(260px, 0.9fr) auto;
+    display: flex;
     align-items: stretch;
+    justify-content: center;
     gap: 0;
     padding: 8px;
     background: var(--surface);
     border: 1px solid var(--text);
     border-radius: 20px;
     box-shadow: var(--shadow);
+    transition:
+            width 360ms cubic-bezier(0.16, 1, 0.3, 1),
+            border-color 180ms ease,
+            box-shadow 180ms ease;
+}
+
+.hero-search.is-location-visible {
+    width: min(100%, 980px);
+}
+
+.hero-search.is-submit-visible {
+    width: min(100%, 1080px);
 }
 
 .search-field {
     min-width: 0;
+    min-height: 60px;
     display: flex;
     align-items: center;
     padding: 0 20px;
+}
+
+.search-field-keywords {
+    flex: 1 1 auto;
+}
+
+.search-field-location {
+    flex: 0 0 0;
+    max-width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transform: translateX(-8px);
+    border-left: 0 solid transparent;
+    transition:
+            flex-basis 360ms cubic-bezier(0.16, 1, 0.3, 1),
+            max-width 360ms cubic-bezier(0.16, 1, 0.3, 1),
+            padding 360ms cubic-bezier(0.16, 1, 0.3, 1),
+            opacity 220ms ease,
+            transform 360ms cubic-bezier(0.16, 1, 0.3, 1),
+            border-left-color 180ms ease;
+}
+
+.hero-search.is-location-visible .search-field-location {
+    flex-basis: 300px;
+    max-width: 300px;
+    padding-left: 20px;
+    padding-right: 20px;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
+    border-left: 1px solid var(--border);
+}
+
+.search-submit {
+    flex: 0 0 0;
+    max-width: 0;
+    min-height: 60px;
+    align-self: center;
+    padding-left: 0;
+    padding-right: 0;
+    border-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    pointer-events: none;
+    transform: translateX(-8px);
+    transition:
+            flex-basis 360ms cubic-bezier(0.16, 1, 0.3, 1),
+            max-width 360ms cubic-bezier(0.16, 1, 0.3, 1),
+            padding 360ms cubic-bezier(0.16, 1, 0.3, 1),
+            opacity 220ms ease,
+            transform 360ms cubic-bezier(0.16, 1, 0.3, 1),
+            background 180ms ease,
+            box-shadow 180ms ease;
+}
+
+.hero-search.is-submit-visible .search-submit {
+    flex-basis: 132px;
+    max-width: 132px;
+    padding-left: 26px;
+    padding-right: 26px;
+    border-width: 1px;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
 }
 
 .search-field-inner {
@@ -301,6 +382,7 @@ body.dark-mode .theme-toggle {
     color: var(--text);
     font-size: 0.78rem;
     font-weight: 800;
+    white-space: nowrap;
 }
 
 .search-input-row {
@@ -328,21 +410,6 @@ body.dark-mode .theme-toggle {
 
 .search-input-row input::placeholder {
     color: var(--muted);
-}
-
-.search-divider {
-    width: 1px;
-    align-self: center;
-    height: 42px;
-    background: var(--border);
-}
-
-.search-submit {
-    min-height: 60px;
-    align-self: center;
-    border-radius: 14px;
-    padding: 0 30px;
-    white-space: nowrap;
 }
 
 .hero-centre {
@@ -590,9 +657,15 @@ h1 {
 /* RESPONSIVE */
 
 @media (max-width: 1080px) {
-    .hero-search {
-        width: min(100%, 900px);
-        grid-template-columns: minmax(300px, 1.2fr) 1px minmax(220px, 0.8fr) auto;
+    .hero-search,
+    .hero-search.is-location-visible,
+    .hero-search.is-submit-visible {
+        width: min(100%, 940px);
+    }
+
+    .hero-search.is-location-visible .search-field-location {
+        flex-basis: 270px;
+        max-width: 270px;
     }
 }
 
@@ -601,24 +674,54 @@ h1 {
         display: none;
     }
 
-    .hero-search {
-        grid-template-columns: 1fr;
+    .hero-search,
+    .hero-search.is-location-visible,
+    .hero-search.is-submit-visible {
+        width: 100%;
+        flex-direction: column;
         gap: 8px;
         padding: 12px;
     }
 
-    .search-divider {
+    .search-field,
+    .hero-search.is-location-visible .search-field-location {
+        width: 100%;
+        max-width: 100%;
+        flex: none;
+        min-height: 62px;
+        padding: 0 16px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        opacity: 1;
+        transform: none;
+    }
+
+    .search-field-location {
         display: none;
     }
 
-    .search-field {
-        min-height: 62px;
-        border: 1px solid var(--border);
-        border-radius: 14px;
+    .hero-search.is-location-visible .search-field-location {
+        display: flex;
+    }
+
+    .search-submit,
+    .hero-search.is-submit-visible .search-submit {
+        width: 100%;
+        max-width: 100%;
+        flex: none;
+        min-height: 56px;
+        padding: 0 24px;
+        border-width: 1px;
+        opacity: 1;
+        transform: none;
     }
 
     .search-submit {
-        width: 100%;
+        display: none;
+    }
+
+    .hero-search.is-submit-visible .search-submit {
+        display: inline-flex;
     }
 
     .quick-links {
@@ -691,10 +794,6 @@ h1 {
     .quick-links {
         padding-left: 16px;
         padding-right: 16px;
-    }
-
-    .search-field {
-        padding: 0 14px;
     }
 
     .footer-inner,

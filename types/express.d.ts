@@ -4,7 +4,7 @@ declare global {
 	namespace Express {
 		interface Response {
 			payload: {
-				name?: string;
+				theme?: number;
 			};
 		}
 	}

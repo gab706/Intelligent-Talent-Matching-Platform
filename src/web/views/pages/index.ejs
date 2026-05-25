@@ -36,7 +36,7 @@
     <link rel="stylesheet" href="/css/global.css" />
 </head>
 
-<body>
+<body <%= theme === 1 ? 'class="dark-mode"' : '' %>>
 
 <header class="site-header">
     <nav class="navbar" aria-label="Main navigation">
@@ -166,87 +166,48 @@
             aria-labelledby="hero-title"
     >
 
-        <form
-                class="hero-search"
-                action="/jobs"
-                method="get"
-                role="search"
-        >
-
+        <form class="hero-search" action="/jobs" method="get" role="search" data-progressive-search>
             <div class="search-field search-field-keywords">
-
                 <div class="search-field-inner">
-                    <span class="search-label">
+                    <label for="search-keywords" class="search-label">
                         Job title, skills, keyword, or company
-                    </span>
+                    </label>
 
                     <div class="search-input-row">
-                        <i
-                                class="fa-solid fa-magnifying-glass"
-                                aria-hidden="true"
-                        ></i>
-
-                        <label
-                                for="search-keywords"
-                                class="sr-only"
-                        >
-                            Job title, skills, keyword, or company
-                        </label>
+                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
 
                         <input
                                 id="search-keywords"
                                 name="q"
                                 type="search"
-                                placeholder="Software engineer, cyber security, React developer..."
+                                autocomplete="off"
                         />
                     </div>
                 </div>
-
             </div>
 
-            <div
-                    class="search-divider"
-                    aria-hidden="true"
-            ></div>
-
-            <div class="search-field search-field-location">
-
+            <div class="search-field search-field-location" data-location-field>
                 <div class="search-field-inner">
-                    <span class="search-label">
+                    <label for="search-location" class="search-label">
                         Location
-                    </span>
+                    </label>
 
                     <div class="search-input-row">
-                        <i
-                                class="fa-solid fa-location-dot"
-                                aria-hidden="true"
-                        ></i>
-
-                        <label
-                                for="search-location"
-                                class="sr-only"
-                        >
-                            Location
-                        </label>
+                        <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
 
                         <input
                                 id="search-location"
                                 name="location"
                                 type="search"
-                                placeholder="City, suburb, state, or remote"
+                                autocomplete="off"
                         />
                     </div>
                 </div>
-
             </div>
 
-            <button
-                    class="btn btn-primary search-submit"
-                    type="submit"
-            >
+            <button class="btn btn-primary search-submit" type="submit" data-search-submit>
                 Find jobs
             </button>
-
         </form>
 
         <div class="hero-centre">

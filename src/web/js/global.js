@@ -32,3 +32,27 @@ if (themeToggleButton) {
         localStorage.setItem("theme", nextTheme);
     });
 }
+
+const progressiveSearch = document.querySelector("[data-progressive-search]");
+
+if (progressiveSearch) {
+    const keywordInput = progressiveSearch.querySelector("#search-keywords");
+    const locationInput = progressiveSearch.querySelector("#search-location");
+
+    const updateSearchState = () => {
+        const hasKeyword = keywordInput.value.trim().length > 0;
+        const hasLocation = locationInput.value.trim().length > 0;
+
+        progressiveSearch.classList.toggle("is-location-visible", hasKeyword);
+        progressiveSearch.classList.toggle("is-submit-visible", hasKeyword && hasLocation);
+
+        if (!hasKeyword) {
+            locationInput.value = "";
+        }
+    };
+
+    keywordInput.addEventListener("input", updateSearchState);
+    locationInput.addEventListener("input", updateSearchState);
+
+    updateSearchState();
+}

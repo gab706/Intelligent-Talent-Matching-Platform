@@ -4,7 +4,7 @@ import path from 'node:path';
 import fs from 'node:fs/promises';
 import PublicHelper from './helpers/PublicHelper.js';
 
-type Helper = (
+type Handler = (
 	req: Request,
 	res: Response,
 	next: NextFunction
@@ -17,10 +17,10 @@ const __dirname = path.dirname(__filename);
 
 const viewsDir = path.join(__dirname, '../../src/web/views/pages');
 const helpersDir = path.join(__dirname, './helpers');
+const workersDir = path.join(__dirname, './workers');
 
-router.get('/', (_req: Request, res: Response) => {
-	res.redirect('/index');
-});
+router.get('/', (_req: Request, res: Response) =>
+	res.redirect('/index'));
 
 async function fileExists(filePath: string): Promise<boolean> {
 	try {
@@ -31,12 +31,12 @@ async function fileExists(filePath: string): Promise<boolean> {
 	}
 }
 
-async function loadHelper(helperPath: string): Promise<Helper | null> {
-	if (!(await fileExists(helperPath)))
+async function loadHandler(handlerPath: string): Promise<Handler | null> {
+	if (!(await fileExists(handlerPath)))
 		return null;
-	
-	const module = await import(pathToFileURL(helperPath).href);
-	
+
+	const module = await import(pathToFileURL(handlerPath).href);
+
 	return typeof module.default === 'function'
 		? module.default
 		: null;
@@ -47,20 +47,20 @@ async function registerPageRoute(fullPath: string): Promise<void> {
 		.relative(viewsDir, fullPath)
 		.replace(/\\/g, '/')
 		.replace(/\.ejs$/, '');
-	
+
 	const route = `/${relativePath}`;
 	const viewPath = `pages/${relativePath}`;
 	const helperPath = path.join(helpersDir, `${relativePath}.js`);
-	
+
 	router.get(route, PublicHelper, async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const helper = await loadHelper(helperPath);
-			
+			const helper = await loadHandler(helperPath);
+
 			if (helper) {
 				await helper(req, res, next);
 				return;
 			}
-			
+
 			return res.render(viewPath, {
 				...res.payload
 			});
@@ -70,22 +70,71 @@ async function registerPageRoute(fullPath: string): Promise<void> {
 	});
 }
 
-async function discoverRoutes(dir: string = viewsDir): Promise<void> {
+async function registerWorkerRoute(fullPath: string): Promise<void> {
+	const relativePath = path
+		.relative(workersDir, fullPath)
+		.replace(/\\/g, '/')
+		.replace(/\.(js|ts)$/, '');
+
+	const route = `/${relativePath}`;
+
+	router.post(route, async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const worker = await loadHandler(fullPath);
+
+			if (!worker) {
+				return res.status(500).json({
+					error: 'Worker file does not export a default handler.'
+				});
+			}
+
+			await worker(req, res, next);
+			return;
+		} catch (err) {
+			return next(err);
+		}
+	});
+}
+
+async function discoverPageRoutes(dir: string = viewsDir): Promise<void> {
 	const entries = await fs.readdir(dir, { withFileTypes: true });
-	
+
 	for (const entry of entries) {
 		const fullPath = path.join(dir, entry.name);
-		
+
 		if (entry.isDirectory()) {
-			await discoverRoutes(fullPath);
+			await discoverPageRoutes(fullPath);
 			continue;
 		}
-		
-		if (entry.name.endsWith('.ejs'))
+
+		if (entry.name.endsWith('.ejs')) {
 			await registerPageRoute(fullPath);
+		}
 	}
 }
 
-await discoverRoutes();
+async function discoverWorkerRoutes(dir: string = workersDir): Promise<void> {
+	if (!(await fileExists(dir))) {
+		return;
+	}
+
+	const entries = await fs.readdir(dir, { withFileTypes: true });
+
+	for (const entry of entries) {
+		const fullPath = path.join(dir, entry.name);
+
+		if (entry.isDirectory()) {
+			await discoverWorkerRoutes(fullPath);
+			continue;
+		}
+
+		if (entry.name.endsWith('.js') || entry.name.endsWith('.ts')) {
+			await registerWorkerRoute(fullPath);
+		}
+	}
+}
+
+await discoverPageRoutes();
+await discoverWorkerRoutes();
 
 export default router;
