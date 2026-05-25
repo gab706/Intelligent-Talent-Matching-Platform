@@ -42,6 +42,15 @@ app.use(express.static(webPath, {
 
 app.use(cookieParser());
 
+app.use(express.urlencoded({
+	extended: true,
+	limit: '1mb'
+}));
+
+app.use(express.json({
+	limit: '1mb'
+}));
+
 app.use((req: Request, res, next: NextFunction) => {
 	res.set({
 		'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
@@ -62,15 +71,19 @@ app.use((_req: Request, res, next: NextFunction) => {
 
 app.use(session({
 	name: 'itmp.sid',
+
 	store: new PgSession({
 		pool: sessionPostgresPool,
 		tableName: 'sessions',
 		createTableIfMissing: true
 	}),
+
 	secret: process.env.SESSION_SECRET,
+
 	resave: false,
 	saveUninitialized: false,
 	rolling: true,
+
 	cookie: {
 		httpOnly: true,
 		secure: process.env.ENVIRONMENT === 'production',
@@ -101,9 +114,6 @@ app.use('/partials', (req: Request, res, next: NextFunction) => {
 
 	return partialsStatic(req, res, next);
 });
-
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
 
 app.use(router);
 

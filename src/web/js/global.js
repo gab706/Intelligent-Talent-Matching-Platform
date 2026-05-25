@@ -4,7 +4,8 @@ if (themeToggleButton) {
     const themeIcon = themeToggleButton.querySelector("i");
 
     const applyTheme = (theme) => {
-        if (theme === "dark") {
+        const normalisedTheme = theme?.toUpperCase?.();
+        if (normalisedTheme === "DARK") {
             document.body.classList.add("dark-mode");
 
             themeIcon.classList.remove("fa-sun");
@@ -17,19 +18,30 @@ if (themeToggleButton) {
         }
     };
 
-    const savedTheme = localStorage.getItem("theme") || "light";
-
-    applyTheme(savedTheme);
-
-    themeToggleButton.addEventListener("click", () => {
+    themeToggleButton.addEventListener("click", async () => {
         const isDarkMode =
             document.body.classList.contains("dark-mode");
 
-        const nextTheme = isDarkMode ? "light" : "dark";
+        const nextTheme =
+            isDarkMode
+                ? "LIGHT"
+                : "DARK";
 
         applyTheme(nextTheme);
 
-        localStorage.setItem("theme", nextTheme);
+        try {
+            await fetch('/user/update-theme', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    theme: nextTheme
+                })
+            });
+        } catch (err) {
+            console.error(err);
+        }
     });
 }
 

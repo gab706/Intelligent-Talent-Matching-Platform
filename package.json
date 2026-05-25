@@ -34,6 +34,7 @@
   },
   "homepage": "https://github.com/gab706/Intelligent-Talent-Matching-Platform#readme",
   "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "body-parser": "^2.2.2",
     "chalk": "^5.6.2",

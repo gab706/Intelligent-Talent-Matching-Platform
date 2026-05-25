@@ -131,4 +131,5 @@ dist
 .pnp.*
 
 build
-.idea
+.idea!/prisma/generated/
+/prisma/generated/

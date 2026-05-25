@@ -6,99 +6,27 @@
 
     <title>TalentMatch | Intelligent Talent Matching Platform</title>
 
-    <meta
-            name="description"
-            content="TalentMatch helps candidates find jobs and employers find candidates using intelligent profile and job matching."
-    />
+    <meta name="description" content="TalentMatch helps candidates find jobs and employers find candidates using intelligent profile and job matching." />
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-            rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-    <!-- Font Awesome -->
-    <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/modern-normalize@2.0.0/modern-normalize.min.css" />
 
-    <!-- CSS Reset -->
-    <link
-            rel="stylesheet"
-            href="https://cdn.jsdelivr.net/npm/modern-normalize@2.0.0/modern-normalize.min.css"
-    />
-
-    <!-- Local CSS -->
     <link rel="stylesheet" href="/css/global.css" />
 </head>
 
-<body <%= theme === 1 ? 'class="dark-mode"' : '' %>>
+<body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
 
 <header class="site-header">
     <nav class="navbar" aria-label="Main navigation">
 
-        <a
-                href="/"
-                class="navbar-brand"
-                aria-label="TalentMatch home"
-        >
+        <a href="/index" class="navbar-brand" aria-label="TalentMatch Home">
             <span class="brand-logo-wrapper">
-                <svg
-                        class="brand-logo"
-                        viewBox="0 0 64 64"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        aria-hidden="true"
-                >
-                    <circle
-                            cx="20"
-                            cy="22"
-                            r="8"
-                            stroke="currentColor"
-                            stroke-width="4"
-                    />
-
-                    <circle
-                            cx="44"
-                            cy="22"
-                            r="8"
-                            stroke="currentColor"
-                            stroke-width="4"
-                    />
-
-                    <circle
-                            cx="32"
-                            cy="46"
-                            r="8"
-                            stroke="currentColor"
-                            stroke-width="4"
-                    />
-
-                    <path
-                            d="M27 26L37 42"
-                            stroke="currentColor"
-                            stroke-width="4"
-                            stroke-linecap="round"
-                    />
-
-                    <path
-                            d="M37 26L27 42"
-                            stroke="currentColor"
-                            stroke-width="4"
-                            stroke-linecap="round"
-                    />
-
-                    <path
-                            d="M28 22H36"
-                            stroke="currentColor"
-                            stroke-width="4"
-                            stroke-linecap="round"
-                    />
-                </svg>
+                <img src="/images/Icon.svg" alt="TalentMatch Logo" class="brand-logo" />
             </span>
 
             <span class="brand-name-group">
@@ -113,22 +41,21 @@
         </a>
 
         <div class="navbar-right">
-
             <ul class="navbar-links">
                 <li>
-                    <a href="/jobs">
-                        Find jobs
+                    <a href="/candidate/find-a-job">
+                        Find Jobs
                     </a>
                 </li>
 
                 <li>
-                    <a href="/candidates">
-                        Find candidates
+                    <a href="/employer/find-a-candidate">
+                        Find Candidates
                     </a>
                 </li>
 
                 <li>
-                    <a href="/companies">
+                    <a href="/candidate/companies">
                         Companies
                     </a>
                 </li>
@@ -141,19 +68,10 @@
             </ul>
 
             <div class="navbar-actions">
-                <button
-                        class="theme-toggle"
-                        type="button"
-                        aria-label="Toggle dark mode"
-                        data-theme-toggle
-                >
-                    <i
-                            class="fa-solid fa-sun"
-                            aria-hidden="true"
-                    ></i>
+                <button class="theme-toggle" type="button" aria-label="Toggle dark mode" data-theme-toggle>
+                    <i class="fa-solid fa-sun" aria-hidden="true"></i>
                 </button>
             </div>
-
         </div>
 
     </nav>
@@ -161,12 +79,9 @@
 
 <main>
 
-    <section
-            class="hero-minimal"
-            aria-labelledby="hero-title"
-    >
+    <section class="hero-minimal" aria-labelledby="hero-title">
 
-        <form class="hero-search" action="/jobs" method="get" role="search" data-progressive-search>
+        <form class="hero-search" action="/candidate/search" method="get" role="search" data-progressive-search>
             <div class="search-field search-field-keywords">
                 <div class="search-field-inner">
                     <label for="search-keywords" class="search-label">
@@ -175,13 +90,7 @@
 
                     <div class="search-input-row">
                         <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-
-                        <input
-                                id="search-keywords"
-                                name="q"
-                                type="search"
-                                autocomplete="off"
-                        />
+                        <input id="search-keywords" name="q" type="search" autocomplete="off" />
                     </div>
                 </div>
             </div>
@@ -195,12 +104,7 @@
                     <div class="search-input-row">
                         <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
 
-                        <input
-                                id="search-location"
-                                name="location"
-                                type="search"
-                                autocomplete="off"
-                        />
+                        <input id="search-location" name="location" type="search" autocomplete="off" />
                     </div>
                 </div>
             </div>
@@ -211,7 +115,6 @@
         </form>
 
         <div class="hero-centre">
-
             <p class="eyebrow">
                 Intelligent Talent Matching Platform
             </p>
@@ -227,22 +130,14 @@
             </p>
 
             <div class="hero-actions">
-                <a
-                        href="/register"
-                        class="btn btn-primary hero-cta"
-                >
+                <a href="/register" class="btn btn-primary hero-cta">
                     Get started
-
-                    <i
-                            class="fa-solid fa-arrow-right"
-                            aria-hidden="true"
-                    ></i>
+                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                 </a>
             </div>
 
             <div class="hero-secondary-actions">
-
-                <a href="/jobs">
+                <a href="/candidate/find-a-job">
                     Browse jobs
                 </a>
 
@@ -250,7 +145,7 @@
                     ·
                 </span>
 
-                <a href="/candidates">
+                <a href="/employer/find-a-candidate">
                     Browse candidates
                 </a>
 
@@ -259,7 +154,7 @@
                 </span>
 
                 <a href="/login">
-                    Sign in
+                    Login
                 </a>
 
             </div>
@@ -268,19 +163,9 @@
 
     </section>
 
-    <section
-            class="quick-links"
-            aria-label="Quick platform actions"
-    >
-
-        <a
-                href="/register?type=candidate"
-                class="quick-link-card"
-        >
-            <i
-                    class="fa-solid fa-user-tie"
-                    aria-hidden="true"
-            ></i>
+    <section class="quick-links" aria-label="Quick platform actions">
+        <a href="/register?type=candidate" class="quick-link-card">
+            <i class="fa-solid fa-user-tie" aria-hidden="true"></i>
 
             <div class="quick-link-content">
                 <strong>
@@ -293,14 +178,8 @@
             </div>
         </a>
 
-        <a
-                href="/register?type=employer"
-                class="quick-link-card"
-        >
-            <i
-                    class="fa-solid fa-building"
-                    aria-hidden="true"
-            ></i>
+        <a href="/register?type=employer" class="quick-link-card">
+            <i class="fa-solid fa-building" aria-hidden="true"></i>
 
             <div class="quick-link-content">
                 <strong>
@@ -313,14 +192,8 @@
             </div>
         </a>
 
-        <a
-                href="/membership"
-                class="quick-link-card"
-        >
-            <i
-                    class="fa-solid fa-star"
-                    aria-hidden="true"
-            ></i>
+        <a href="/membership" class="quick-link-card" >
+            <i class="fa-solid fa-star" aria-hidden="true"></i>
 
             <div class="quick-link-content">
                 <strong>
@@ -332,9 +205,7 @@
                 </span>
             </div>
         </a>
-
     </section>
-
 </main>
 
 <footer class="site-footer">
@@ -343,63 +214,9 @@
 
         <section class="footer-column footer-brand-column">
 
-            <a
-                    href="/"
-                    class="navbar-brand footer-brand"
-            >
+            <a href="/index" class="navbar-brand footer-brand">
                 <span class="brand-logo-wrapper">
-                    <svg
-                            class="brand-logo"
-                            viewBox="0 0 64 64"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                            aria-hidden="true"
-                    >
-                        <circle
-                                cx="20"
-                                cy="22"
-                                r="8"
-                                stroke="currentColor"
-                                stroke-width="4"
-                        />
-
-                        <circle
-                                cx="44"
-                                cy="22"
-                                r="8"
-                                stroke="currentColor"
-                                stroke-width="4"
-                        />
-
-                        <circle
-                                cx="32"
-                                cy="46"
-                                r="8"
-                                stroke="currentColor"
-                                stroke-width="4"
-                        />
-
-                        <path
-                                d="M27 26L37 42"
-                                stroke="currentColor"
-                                stroke-width="4"
-                                stroke-linecap="round"
-                        />
-
-                        <path
-                                d="M37 26L27 42"
-                                stroke="currentColor"
-                                stroke-width="4"
-                                stroke-linecap="round"
-                        />
-
-                        <path
-                                d="M28 22H36"
-                                stroke="currentColor"
-                                stroke-width="4"
-                                stroke-linecap="round"
-                        />
-                    </svg>
+                    <img src="/images/Icon.svg" alt="TalentMatch Logo" class="brand-logo" />
                 </span>
 
                 <span class="brand-name-group">
@@ -429,15 +246,15 @@
                 Platform
             </h2>
 
-            <a href="/jobs">
-                Find jobs
+            <a href="/candidate/find-a-job">
+                Find Jobs
             </a>
 
-            <a href="/candidates">
-                Find candidates
+            <a href="/employer/find-a-candidate">
+                Find Candidates
             </a>
 
-            <a href="/companies">
+            <a href="/candidate/companies">
                 Companies
             </a>
 
