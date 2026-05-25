@@ -1,14 +1,572 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en-AU">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>TalentMatch | Intelligent Talent Matching Platform</title>
+
+    <meta
+            name="description"
+            content="TalentMatch helps candidates find jobs and employers find candidates using intelligent profile and job matching."
+    />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+
+    <!-- CSS Reset -->
+    <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/modern-normalize@2.0.0/modern-normalize.min.css"
+    />
+
+    <!-- Local CSS -->
     <link rel="stylesheet" href="/css/global.css" />
 </head>
+
 <body>
-    <h1>Hello <%= name %></h1>
+
+<header class="site-header">
+    <nav class="navbar" aria-label="Main navigation">
+
+        <a
+                href="/"
+                class="navbar-brand"
+                aria-label="TalentMatch home"
+        >
+            <span class="brand-logo-wrapper">
+                <svg
+                        class="brand-logo"
+                        viewBox="0 0 64 64"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
+                >
+                    <circle
+                            cx="20"
+                            cy="22"
+                            r="8"
+                            stroke="currentColor"
+                            stroke-width="4"
+                    />
+
+                    <circle
+                            cx="44"
+                            cy="22"
+                            r="8"
+                            stroke="currentColor"
+                            stroke-width="4"
+                    />
+
+                    <circle
+                            cx="32"
+                            cy="46"
+                            r="8"
+                            stroke="currentColor"
+                            stroke-width="4"
+                    />
+
+                    <path
+                            d="M27 26L37 42"
+                            stroke="currentColor"
+                            stroke-width="4"
+                            stroke-linecap="round"
+                    />
+
+                    <path
+                            d="M37 26L27 42"
+                            stroke="currentColor"
+                            stroke-width="4"
+                            stroke-linecap="round"
+                    />
+
+                    <path
+                            d="M28 22H36"
+                            stroke="currentColor"
+                            stroke-width="4"
+                            stroke-linecap="round"
+                    />
+                </svg>
+            </span>
+
+            <span class="brand-name-group">
+                <span class="brand-title">
+                    TalentMatch
+                </span>
+
+                <span class="brand-subtitle">
+                    ITMP Platform
+                </span>
+            </span>
+        </a>
+
+        <div class="navbar-right">
+
+            <ul class="navbar-links">
+                <li>
+                    <a href="/jobs">
+                        Find jobs
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/candidates">
+                        Find candidates
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/companies">
+                        Companies
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/membership">
+                        Membership
+                    </a>
+                </li>
+            </ul>
+
+            <div class="navbar-actions">
+                <button
+                        class="theme-toggle"
+                        type="button"
+                        aria-label="Toggle dark mode"
+                        data-theme-toggle
+                >
+                    <i
+                            class="fa-solid fa-sun"
+                            aria-hidden="true"
+                    ></i>
+                </button>
+            </div>
+
+        </div>
+
+    </nav>
+</header>
+
+<main>
+
+    <section
+            class="hero-minimal"
+            aria-labelledby="hero-title"
+    >
+
+        <form
+                class="hero-search"
+                action="/jobs"
+                method="get"
+                role="search"
+        >
+
+            <div class="search-field search-field-keywords">
+
+                <div class="search-field-inner">
+                    <span class="search-label">
+                        Job title, skills, keyword, or company
+                    </span>
+
+                    <div class="search-input-row">
+                        <i
+                                class="fa-solid fa-magnifying-glass"
+                                aria-hidden="true"
+                        ></i>
+
+                        <label
+                                for="search-keywords"
+                                class="sr-only"
+                        >
+                            Job title, skills, keyword, or company
+                        </label>
+
+                        <input
+                                id="search-keywords"
+                                name="q"
+                                type="search"
+                                placeholder="Software engineer, cyber security, React developer..."
+                        />
+                    </div>
+                </div>
+
+            </div>
+
+            <div
+                    class="search-divider"
+                    aria-hidden="true"
+            ></div>
+
+            <div class="search-field search-field-location">
+
+                <div class="search-field-inner">
+                    <span class="search-label">
+                        Location
+                    </span>
+
+                    <div class="search-input-row">
+                        <i
+                                class="fa-solid fa-location-dot"
+                                aria-hidden="true"
+                        ></i>
+
+                        <label
+                                for="search-location"
+                                class="sr-only"
+                        >
+                            Location
+                        </label>
+
+                        <input
+                                id="search-location"
+                                name="location"
+                                type="search"
+                                placeholder="City, suburb, state, or remote"
+                        />
+                    </div>
+                </div>
+
+            </div>
+
+            <button
+                    class="btn btn-primary search-submit"
+                    type="submit"
+            >
+                Find jobs
+            </button>
+
+        </form>
+
+        <div class="hero-centre">
+
+            <p class="eyebrow">
+                Intelligent Talent Matching Platform
+            </p>
+
+            <h1 id="hero-title">
+                Your next match starts here.
+            </h1>
+
+            <p class="hero-description">
+                Create a profile to receive smarter job and candidate
+                recommendations based on skills, experience,
+                working preferences, and intelligent matching logic.
+            </p>
+
+            <div class="hero-actions">
+                <a
+                        href="/register"
+                        class="btn btn-primary hero-cta"
+                >
+                    Get started
+
+                    <i
+                            class="fa-solid fa-arrow-right"
+                            aria-hidden="true"
+                    ></i>
+                </a>
+            </div>
+
+            <div class="hero-secondary-actions">
+
+                <a href="/jobs">
+                    Browse jobs
+                </a>
+
+                <span aria-hidden="true">
+                    ·
+                </span>
+
+                <a href="/candidates">
+                    Browse candidates
+                </a>
+
+                <span aria-hidden="true">
+                    ·
+                </span>
+
+                <a href="/login">
+                    Sign in
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <section
+            class="quick-links"
+            aria-label="Quick platform actions"
+    >
+
+        <a
+                href="/register?type=candidate"
+                class="quick-link-card"
+        >
+            <i
+                    class="fa-solid fa-user-tie"
+                    aria-hidden="true"
+            ></i>
+
+            <div class="quick-link-content">
+                <strong>
+                    Candidate profiles
+                </strong>
+
+                <span>
+                    Build your profile and receive recommendations
+                </span>
+            </div>
+        </a>
+
+        <a
+                href="/register?type=employer"
+                class="quick-link-card"
+        >
+            <i
+                    class="fa-solid fa-building"
+                    aria-hidden="true"
+            ></i>
+
+            <div class="quick-link-content">
+                <strong>
+                    Employer accounts
+                </strong>
+
+                <span>
+                    Post jobs and discover suitable candidates
+                </span>
+            </div>
+        </a>
+
+        <a
+                href="/membership"
+                class="quick-link-card"
+        >
+            <i
+                    class="fa-solid fa-star"
+                    aria-hidden="true"
+            ></i>
+
+            <div class="quick-link-content">
+                <strong>
+                    Membership access
+                </strong>
+
+                <span>
+                    Unlock unlimited intelligent recommendations
+                </span>
+            </div>
+        </a>
+
+    </section>
+
+</main>
+
+<footer class="site-footer">
+
+    <div class="footer-inner">
+
+        <section class="footer-column footer-brand-column">
+
+            <a
+                    href="/"
+                    class="navbar-brand footer-brand"
+            >
+                <span class="brand-logo-wrapper">
+                    <svg
+                            class="brand-logo"
+                            viewBox="0 0 64 64"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true"
+                    >
+                        <circle
+                                cx="20"
+                                cy="22"
+                                r="8"
+                                stroke="currentColor"
+                                stroke-width="4"
+                        />
+
+                        <circle
+                                cx="44"
+                                cy="22"
+                                r="8"
+                                stroke="currentColor"
+                                stroke-width="4"
+                        />
+
+                        <circle
+                                cx="32"
+                                cy="46"
+                                r="8"
+                                stroke="currentColor"
+                                stroke-width="4"
+                        />
+
+                        <path
+                                d="M27 26L37 42"
+                                stroke="currentColor"
+                                stroke-width="4"
+                                stroke-linecap="round"
+                        />
+
+                        <path
+                                d="M37 26L27 42"
+                                stroke="currentColor"
+                                stroke-width="4"
+                                stroke-linecap="round"
+                        />
+
+                        <path
+                                d="M28 22H36"
+                                stroke="currentColor"
+                                stroke-width="4"
+                                stroke-linecap="round"
+                        />
+                    </svg>
+                </span>
+
+                <span class="brand-name-group">
+                    <span class="brand-title">
+                        TalentMatch
+                    </span>
+
+                    <span class="brand-subtitle">
+                        ITMP Platform
+                    </span>
+                </span>
+            </a>
+
+            <p class="footer-description">
+                Intelligent recruitment matching for candidates
+                and employers using profile and job relevance scoring.
+            </p>
+
+        </section>
+
+        <nav
+                class="footer-column"
+                aria-label="Platform links"
+        >
+
+            <h2>
+                Platform
+            </h2>
+
+            <a href="/jobs">
+                Find jobs
+            </a>
+
+            <a href="/candidates">
+                Find candidates
+            </a>
+
+            <a href="/companies">
+                Companies
+            </a>
+
+            <a href="/membership">
+                Membership
+            </a>
+
+        </nav>
+
+        <nav
+                class="footer-column"
+                aria-label="Support links"
+        >
+
+            <h2>
+                Support
+            </h2>
+
+            <a href="/help">
+                Help centre
+            </a>
+
+            <a href="/contact">
+                Contact us
+            </a>
+
+            <a href="/privacy">
+                Privacy policy
+            </a>
+
+            <a href="/terms">
+                Terms of service
+            </a>
+
+        </nav>
+
+        <nav
+                class="footer-column"
+                aria-label="Account links"
+        >
+
+            <h2>
+                Account
+            </h2>
+
+            <a href="/login">
+                Sign in
+            </a>
+
+            <a href="/register">
+                Create account
+            </a>
+
+            <a href="/membership">
+                Upgrade membership
+            </a>
+
+            <a href="/settings">
+                Account settings
+            </a>
+
+        </nav>
+
+    </div>
+
+    <div class="footer-bottom">
+
+        <p class="footer-meta">
+            &copy; <%= new Date().getFullYear() %>
+            TalentMatch. All rights reserved.
+        </p>
+
+        <div class="footer-legal-links">
+            <a href="/privacy">
+                Privacy
+            </a>
+
+            <a href="/terms">
+                Terms
+            </a>
+
+            <a href="/cookies">
+                Cookies
+            </a>
+        </div>
+
+    </div>
+
+</footer>
+<script src="/js/global.js"></script>
+
 </body>
 </html>
