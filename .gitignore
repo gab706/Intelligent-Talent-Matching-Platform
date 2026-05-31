@@ -133,3 +133,6 @@ dist
 build
 .idea!/prisma/generated/
 /prisma/generated/
+.idea/jsLibraryMappings.xml
+.idea/vcs.xml
+.idea/workspace.xml
