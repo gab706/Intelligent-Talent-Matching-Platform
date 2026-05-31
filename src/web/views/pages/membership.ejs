@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Membership | Intelligent Talent Matching Platform</title>
+    <meta name="description" content="TalentMatch helps candidates find jobs and employers find candidates using intelligent profile and job matching." />
+    <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/membership.css" />
+    <script src="/lib/js/jquery.min.js"></script>
+</head>
+<body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
+<%- include('../partials/public-header/public-header'); %>
+<main class="membership-page">
+    <section class="membership-page__hero" aria-labelledby="membership-title">
+        <div class="membership-page__hero-inner">
+            <p class="membership-page__eyebrow">
+                Account Types
+            </p>
+            <h1 id="membership-title" class="membership-page__title">
+                Choose how you use TalentMatch.
+            </h1>
+            <p class="membership-page__description">
+                TalentMatch supports candidate, employer, and flexible account use.
+                Each option is designed around a different recruitment workflow.
+            </p>
+        </div>
+    </section>
+    <section class="membership-page__pathways" aria-label="Candidate and employer account types">
+        <article class="membership-page__pathway">
+            <div class="membership-page__pathway-header">
+                  <span class="membership-page__pathway-icon">
+                  <i class="fas fa-user-tie" aria-hidden="true"></i>
+                  </span>
+                <div class="membership-page__pathway-copy">
+                    <h2 class="membership-page__pathway-title">
+                        Candidate Account
+                    </h2>
+                    <p class="membership-page__pathway-summary">
+                        For users looking for jobs, building a professional profile,
+                        and receiving job recommendations.
+                    </p>
+                    <ul class="membership-page__check-list">
+                        <li>
+                            <i class="fas fa-check" aria-hidden="true"></i>
+                            <span>Create and manage a candidate profile</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check" aria-hidden="true"></i>
+                            <span>Add education, work experience, and skills</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check" aria-hidden="true"></i>
+                            <span>Search and browse job postings</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check" aria-hidden="true"></i>
+                            <span>Receive recommended jobs</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check" aria-hidden="true"></i>
+                            <span>Save jobs and apply for available roles</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check" aria-hidden="true"></i>
+                            <span>Update profile details and preferences</span>
+                        </li>
+                    </ul>
+                    <a href="/register/candidate" class="membership-page__action">
+                        Continue as candidate
+                    </a>
+                </div>
+            </div>
+        </article>
+        <article class="membership-page__pathway membership-page__pathway--employer">
+            <div class="membership-page__pathway-header">
+                  <span class="membership-page__pathway-icon">
+                  <i class="fas fa-building" aria-hidden="true"></i>
+                  </span>
+                <div class="membership-page__pathway-copy">
+                    <h2 class="membership-page__pathway-title">
+                        Employer Account
+                    </h2>
+                    <p class="membership-page__pathway-summary">
+                        For organisations posting jobs, reviewing applicants,
+                        and discovering candidates through intelligent matching.
+                    </p>
+                    <ul class="membership-page__check-list">
+                        <li>
+                            <i class="fas fa-check" aria-hidden="true"></i>
+                            <span>Create and manage an employer profile</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check" aria-hidden="true"></i>
+                            <span>Add company details and contact information</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check" aria-hidden="true"></i>
+                            <span>Create and manage job postings</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check" aria-hidden="true"></i>
+                            <span>Search and browse candidate profiles</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check" aria-hidden="true"></i>
+                            <span>Receive recommended candidates</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check" aria-hidden="true"></i>
+                            <span>Review applications and update statuses</span>
+                        </li>
+                    </ul>
+                    <a href="/register/employer" class="membership-page__action">
+                        Continue as employer
+                    </a>
+                </div>
+            </div>
+        </article>
+    </section>
+    <section class="membership-page__flexible-account" aria-labelledby="flexible-account-title">
+            <span class="membership-page__flexible-account-icon">
+            <i class="fas fa-exchange-alt" aria-hidden="true"></i>
+            </span>
+        <div class="membership-page__flexible-account-content">
+            <p class="membership-page__eyebrow">
+                Flexible Accounts
+            </p>
+            <h2 id="flexible-account-title" class="membership-page__section-title">
+                One user can use both account types.
+            </h2>
+            <p class="membership-page__section-description">
+                A TalentMatch user can have both a candidate profile and an employer
+                profile. This supports users who may be looking for work while also
+                representing an organisation or recruitment need.
+            </p>
+        </div>
+    </section>
+    <section class="membership-page__capabilities" aria-labelledby="capabilities-title">
+        <div class="membership-page__section-header">
+            <p class="membership-page__eyebrow">
+                Capabilities
+            </p>
+            <h2 id="capabilities-title" class="membership-page__section-title">
+                What each account type can do.
+            </h2>
+            <p class="membership-page__section-description">
+                Candidate and employer profiles use the same matching engine,
+                but unlock different actions inside the platform.
+            </p>
+        </div>
+        <div class="membership-page__selector" role="tablist" aria-label="Select account capability view">
+            <button
+                    class="membership-page__selector-button membership-page__selector-button--active"
+                    type="button"
+                    role="tab"
+                    aria-selected="true"
+                    aria-controls="candidate-capabilities"
+                    id="candidate-capabilities-tab"
+                    data-membership-target="candidate"
+            >
+                Candidate
+            </button>
+            <button
+                    class="membership-page__selector-button"
+                    type="button"
+                    role="tab"
+                    aria-selected="false"
+                    aria-controls="employer-capabilities"
+                    id="employer-capabilities-tab"
+                    data-membership-target="employer"
+            >
+                Employer
+            </button>
+            <button
+                    class="membership-page__selector-button"
+                    type="button"
+                    role="tab"
+                    aria-selected="false"
+                    aria-controls="flexible-capabilities"
+                    id="flexible-capabilities-tab"
+                    data-membership-target="flexible"
+            >
+                Flexible
+            </button>
+        </div>
+        <div class="membership-page__capability-panels">
+            <section
+                    id="candidate-capabilities"
+                    class="membership-page__capability-panel membership-page__capability-panel--active"
+                    role="tabpanel"
+                    aria-labelledby="candidate-capabilities-tab"
+                    data-membership-panel="candidate"
+            >
+                <ul class="membership-page__capability-list">
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span>Create a candidate profile</span></li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span>Add education, work experience, and skills</span></li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span>Search and browse job postings</span></li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span>Receive recommended jobs</span></li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span>Save jobs and apply for roles</span></li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span>Update profile details and preferences</span></li>
+                </ul>
+            </section>
+            <section
+                    id="employer-capabilities"
+                    class="membership-page__capability-panel"
+                    role="tabpanel"
+                    aria-labelledby="employer-capabilities-tab"
+                    data-membership-panel="employer"
+                    hidden
+            >
+                <ul class="membership-page__capability-list">
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span>Create an employer profile</span></li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span>Add company information</span></li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span>Create and manage job postings</span></li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span>Search and browse candidate profiles</span></li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span>Receive recommended candidates</span></li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span>Review applications and update statuses</span></li>
+                </ul>
+            </section>
+            <section
+                    id="flexible-capabilities"
+                    class="membership-page__capability-panel"
+                    role="tabpanel"
+                    aria-labelledby="flexible-capabilities-tab"
+                    data-membership-panel="flexible"
+                    hidden
+            >
+                <ul class="membership-page__capability-list">
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span>Create both candidate and employer profiles</span></li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span>Search job postings and candidate profiles</span></li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span>Receive job and candidate recommendations</span></li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span>Apply for jobs and manage job postings</span></li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span>Review applications while managing personal job searches</span></li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span>Switch between recruitment and job-seeking workflows</span></li>
+                </ul>
+            </section>
+        </div>
+    </section>
+</main>
+<%- include('../partials/footer/footer'); %>
+<script src="/js/global.js"></script>
+<script src="/js/membership.js"></script>
+</body>
+</html>
