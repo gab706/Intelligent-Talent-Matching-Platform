@@ -1,0 +1,295 @@
+.public-header {
+    --public-header-bg: color-mix(in srgb, var(--color-surface) 92%, transparent);
+
+    --public-header-logo-bg: #111827;
+    --public-header-logo-fg: #ffffff;
+    --public-header-logo-border: #111827;
+    --public-header-logo-shadow: none;
+    --public-header-logo-hover-fg: #ffffff;
+
+    --public-header-logo-hover-shadow: 0 14px 28px rgba(37, 99, 235, 0.22);
+    --public-header-theme-bg: #facc15;
+    --public-header-theme-text: #111827;
+    --public-header-theme-border: #eab308;
+    --public-header-theme-shadow: 0 12px 24px rgba(250, 204, 21, 0.26);
+
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    width: 100%;
+
+    background: var(--public-header-bg);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--color-border);
+}
+
+body.dark-mode .public-header {
+    --public-header-logo-bg: #ffffff;
+    --public-header-logo-fg: #0f172a;
+    --public-header-logo-border: #ffffff;
+    --public-header-logo-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+
+    --public-header-theme-bg: linear-gradient(
+            135deg,
+            #111827 0%,
+            #312e81 50%,
+            #0f172a 100%
+    );
+    --public-header-theme-text: #ffffff;
+    --public-header-theme-border: rgba(255, 255, 255, 0.12);
+    --public-header-theme-shadow: 0 12px 28px rgba(49, 46, 129, 0.32);
+}
+
+.public-header__nav {
+    width: 100%;
+    min-height: 74px;
+    padding: 0 32px;
+
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 32px;
+}
+
+.public-header__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 13px;
+
+    color: var(--color-text);
+    font-weight: 800;
+}
+
+.public-header__logo-wrapper {
+    width: 48px;
+    height: 48px;
+
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+
+    border-radius: 999px;
+
+    background: var(--public-header-logo-bg);
+    color: var(--public-header-logo-fg);
+    border: 1px solid var(--public-header-logo-border);
+    box-shadow: var(--public-header-logo-shadow);
+
+    transition:
+            transform 260ms ease,
+            background 260ms ease,
+            color 260ms ease,
+            border-color 260ms ease,
+            box-shadow 260ms ease;
+}
+
+.public-header__logo {
+    width: 29px;
+    height: 29px;
+}
+
+.public-header__logo,
+.public-header__logo * {
+    fill: none;
+    stroke: currentColor;
+    filter: none;
+}
+
+.public-header__logo circle,
+.public-header__logo path {
+    stroke: currentColor;
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.public-header__brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+}
+
+.public-header__brand-title {
+    color: var(--color-text);
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+}
+
+.public-header__brand-subtitle {
+    margin-top: 4px;
+
+    color: var(--color-muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.public-header__brand:hover .public-header__logo-wrapper,
+.public-header__brand:focus-visible .public-header__logo-wrapper {
+    background: var(--color-primary);
+    color: var(--public-header-logo-hover-fg);
+    border-color: var(--color-primary);
+    box-shadow: var(--public-header-logo-hover-shadow);
+
+    animation: publicHeaderLogoJump 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.public-header__right {
+    justify-self: end;
+
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.public-header__links {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    color: var(--color-text);
+    font-weight: 500;
+}
+
+.public-header__link-item {
+    display: flex;
+    align-items: center;
+}
+
+.public-header__link {
+    min-height: 42px;
+    padding: 0 12px;
+
+    display: inline-flex;
+    align-items: center;
+
+    border-radius: 999px;
+
+    color: var(--color-text);
+
+    transition:
+            color 180ms ease,
+            background 180ms ease,
+            transform 180ms ease;
+}
+
+.public-header__link:hover,
+.public-header__link:focus-visible {
+    color: var(--color-primary);
+    background: var(--color-surface-soft);
+    transform: translateY(-1px);
+}
+
+.public-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.public-header__theme-toggle {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+
+    display: inline-grid;
+    place-items: center;
+
+    border: 1px solid var(--public-header-theme-border);
+    border-radius: 999px;
+
+    background: var(--public-header-theme-bg);
+    color: var(--public-header-theme-text);
+
+    cursor: pointer;
+
+    transition:
+            transform 180ms ease,
+            border-color 180ms ease,
+            box-shadow 180ms ease,
+            background 180ms ease,
+            color 180ms ease;
+}
+
+.public-header__theme-toggle:hover,
+.public-header__theme-toggle:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: var(--public-header-theme-shadow);
+}
+
+.public-header__theme-toggle i {
+    font-size: 1.05rem;
+    line-height: 1;
+}
+
+@keyframes publicHeaderLogoJump {
+    0% {
+        transform: translateY(0) scale(1);
+    }
+
+    30% {
+        transform: translateY(-8px) scale(1.035);
+    }
+
+    58% {
+        transform: translateY(0) scale(1);
+    }
+
+    78% {
+        transform: translateY(-3px) scale(1.015);
+    }
+
+    100% {
+        transform: translateY(0) scale(1);
+    }
+}
+
+@media (max-width: 980px) {
+    .public-header__links {
+        display: none;
+    }
+
+    .public-header__nav {
+        grid-template-columns: auto auto;
+    }
+
+    .public-header__right {
+        justify-self: end;
+    }
+}
+
+@media (max-width: 560px) {
+    .public-header__nav {
+        min-height: 68px;
+        padding: 0 16px;
+        gap: 16px;
+    }
+
+    .public-header__logo-wrapper {
+        width: 44px;
+        height: 44px;
+    }
+
+    .public-header__logo {
+        width: 27px;
+        height: 27px;
+    }
+
+    .public-header__brand-title {
+        font-size: 0.96rem;
+    }
+
+    .public-header__brand-subtitle {
+        display: none;
+    }
+
+    .public-header__theme-toggle {
+        width: 40px;
+        height: 40px;
+    }
+}

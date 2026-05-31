@@ -3,348 +3,98 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>TalentMatch | Intelligent Talent Matching Platform</title>
-
+    <title>Home | Intelligent Talent Matching Platform</title>
     <meta name="description" content="TalentMatch helps candidates find jobs and employers find candidates using intelligent profile and job matching." />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/modern-normalize@2.0.0/modern-normalize.min.css" />
-
+    <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
     <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/home.css" />
+    <script src="/lib/js/jquery.min.js"></script>
 </head>
-
 <body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
-
-<header class="site-header">
-    <nav class="navbar" aria-label="Main navigation">
-
-        <a href="/index" class="navbar-brand" aria-label="TalentMatch Home">
-            <span class="brand-logo-wrapper">
-                <img src="/images/Icon.svg" alt="TalentMatch Logo" class="brand-logo" />
-            </span>
-
-            <span class="brand-name-group">
-                <span class="brand-title">
-                    TalentMatch
-                </span>
-
-                <span class="brand-subtitle">
-                    ITMP Platform
-                </span>
-            </span>
-        </a>
-
-        <div class="navbar-right">
-            <ul class="navbar-links">
-                <li>
-                    <a href="/candidate/find-a-job">
-                        Find Jobs
-                    </a>
-                </li>
-
-                <li>
-                    <a href="/employer/find-a-candidate">
-                        Find Candidates
-                    </a>
-                </li>
-
-                <li>
-                    <a href="/candidate/companies">
-                        Companies
-                    </a>
-                </li>
-
-                <li>
-                    <a href="/membership">
-                        Membership
-                    </a>
-                </li>
-            </ul>
-
-            <div class="navbar-actions">
-                <button class="theme-toggle" type="button" aria-label="Toggle dark mode" data-theme-toggle>
-                    <i class="fa-solid fa-sun" aria-hidden="true"></i>
-                </button>
-            </div>
-        </div>
-
-    </nav>
-</header>
-
-<main>
-
-    <section class="hero-minimal" aria-labelledby="hero-title">
-
-        <form class="hero-search" action="/candidate/search" method="get" role="search" data-progressive-search>
-            <div class="search-field search-field-keywords">
-                <div class="search-field-inner">
-                    <label for="search-keywords" class="search-label">
+<%- include('../partials/public-header/public-header'); %>
+<main class="home-page">
+    <section class="home-hero" aria-labelledby="home-hero-title">
+        <form class="home-search" action="/candidate/search" method="get" role="search" data-progressive-search>
+            <div class="home-search__field home-search__field--keywords">
+                <div class="home-search__field-inner">
+                    <label for="home-search-keywords" class="home-search__label">
                         Job title, skills, keyword, or company
                     </label>
-
-                    <div class="search-input-row">
-                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-                        <input id="search-keywords" name="q" type="search" autocomplete="off" />
+                    <div class="home-search__input-row">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                        <input id="home-search-keywords" name="q" type="search" autocomplete="off" />
                     </div>
                 </div>
             </div>
-
-            <div class="search-field search-field-location" data-location-field>
-                <div class="search-field-inner">
-                    <label for="search-location" class="search-label">
+            <div class="home-search__field home-search__field--location" data-location-field>
+                <div class="home-search__field-inner">
+                    <label for="home-search-location" class="home-search__label">
                         Location
                     </label>
-
-                    <div class="search-input-row">
-                        <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
-
-                        <input id="search-location" name="location" type="search" autocomplete="off" />
+                    <div class="home-search__input-row">
+                        <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                        <input id="home-search-location" name="location" type="search" autocomplete="off" />
                     </div>
                 </div>
             </div>
-
-            <button class="btn btn-primary search-submit" type="submit" data-search-submit>
+            <button class="home-search__submit" type="submit" data-search-submit>
                 Find jobs
             </button>
         </form>
-
-        <div class="hero-centre">
-            <p class="eyebrow">
+        <div class="home-hero__content">
+            <p class="home-hero__eyebrow">
                 Intelligent Talent Matching Platform
             </p>
-
-            <h1 id="hero-title">
+            <h1 id="home-hero-title" class="home-hero__title">
                 Your next match starts here.
             </h1>
-
-            <p class="hero-description">
+            <p class="home-hero__description">
                 Create a profile to receive smarter job and candidate
                 recommendations based on skills, experience,
                 working preferences, and intelligent matching logic.
             </p>
-
-            <div class="hero-actions">
-                <a href="/register" class="btn btn-primary hero-cta">
+            <div class="home-hero__actions">
+                <a href="/register" class="home-hero__cta">
                     Get started
-                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    <i class="fas fa-arrow-right" aria-hidden="true"></i>
                 </a>
             </div>
-
-            <div class="hero-secondary-actions">
-                <a href="/candidate/find-a-job">
-                    Browse jobs
-                </a>
-
-                <span aria-hidden="true">
-                    ·
-                </span>
-
-                <a href="/employer/find-a-candidate">
-                    Browse candidates
-                </a>
-
-                <span aria-hidden="true">
-                    ·
-                </span>
-
-                <a href="/login">
-                    Login
-                </a>
-
+            <div class="home-hero__secondary-actions">
+                <a href="/candidate/find-a-job">Browse jobs</a>
+                <span aria-hidden="true">·</span>
+                <a href="/employer/find-a-candidate">Browse candidates</a>
+                <span aria-hidden="true">·</span>
+                <a href="/login">Login</a>
             </div>
-
         </div>
-
     </section>
-
-    <section class="quick-links" aria-label="Quick platform actions">
-        <a href="/register?type=candidate" class="quick-link-card">
-            <i class="fa-solid fa-user-tie" aria-hidden="true"></i>
-
-            <div class="quick-link-content">
-                <strong>
-                    Candidate profiles
-                </strong>
-
-                <span>
-                    Build your profile and receive recommendations
-                </span>
+    <section class="home-quick-links" aria-label="Quick platform actions">
+        <a href="/register?type=candidate" class="home-quick-link-card">
+            <i class="fas fa-user-tie" aria-hidden="true"></i>
+            <div class="home-quick-link-card__content">
+                <strong>Candidate profiles</strong>
+                <span>Build your profile and receive recommendations</span>
             </div>
         </a>
-
-        <a href="/register?type=employer" class="quick-link-card">
-            <i class="fa-solid fa-building" aria-hidden="true"></i>
-
-            <div class="quick-link-content">
-                <strong>
-                    Employer accounts
-                </strong>
-
-                <span>
-                    Post jobs and discover suitable candidates
-                </span>
+        <a href="/register?type=employer" class="home-quick-link-card">
+            <i class="fas fa-building" aria-hidden="true"></i>
+            <div class="home-quick-link-card__content">
+                <strong>Employer accounts</strong>
+                <span>Post jobs and discover suitable candidates</span>
             </div>
         </a>
-
-        <a href="/membership" class="quick-link-card" >
-            <i class="fa-solid fa-star" aria-hidden="true"></i>
-
-            <div class="quick-link-content">
-                <strong>
-                    Membership access
-                </strong>
-
-                <span>
-                    Unlock unlimited intelligent recommendations
-                </span>
+        <a href="/membership" class="home-quick-link-card">
+            <i class="fas fa-star" aria-hidden="true"></i>
+            <div class="home-quick-link-card__content">
+                <strong>Membership access</strong>
+                <span>Unlock unlimited intelligent recommendations</span>
             </div>
         </a>
     </section>
 </main>
-
-<footer class="site-footer">
-
-    <div class="footer-inner">
-
-        <section class="footer-column footer-brand-column">
-
-            <a href="/index" class="navbar-brand footer-brand">
-                <span class="brand-logo-wrapper">
-                    <img src="/images/Icon.svg" alt="TalentMatch Logo" class="brand-logo" />
-                </span>
-
-                <span class="brand-name-group">
-                    <span class="brand-title">
-                        TalentMatch
-                    </span>
-
-                    <span class="brand-subtitle">
-                        ITMP Platform
-                    </span>
-                </span>
-            </a>
-
-            <p class="footer-description">
-                Intelligent recruitment matching for candidates
-                and employers using profile and job relevance scoring.
-            </p>
-
-        </section>
-
-        <nav
-                class="footer-column"
-                aria-label="Platform links"
-        >
-
-            <h2>
-                Platform
-            </h2>
-
-            <a href="/candidate/find-a-job">
-                Find Jobs
-            </a>
-
-            <a href="/employer/find-a-candidate">
-                Find Candidates
-            </a>
-
-            <a href="/candidate/companies">
-                Companies
-            </a>
-
-            <a href="/membership">
-                Membership
-            </a>
-
-        </nav>
-
-        <nav
-                class="footer-column"
-                aria-label="Support links"
-        >
-
-            <h2>
-                Support
-            </h2>
-
-            <a href="/help">
-                Help centre
-            </a>
-
-            <a href="/contact">
-                Contact us
-            </a>
-
-            <a href="/privacy">
-                Privacy policy
-            </a>
-
-            <a href="/terms">
-                Terms of service
-            </a>
-
-        </nav>
-
-        <nav
-                class="footer-column"
-                aria-label="Account links"
-        >
-
-            <h2>
-                Account
-            </h2>
-
-            <a href="/login">
-                Sign in
-            </a>
-
-            <a href="/register">
-                Create account
-            </a>
-
-            <a href="/membership">
-                Upgrade membership
-            </a>
-
-            <a href="/settings">
-                Account settings
-            </a>
-
-        </nav>
-
-    </div>
-
-    <div class="footer-bottom">
-
-        <p class="footer-meta">
-            &copy; <%= new Date().getFullYear() %>
-            TalentMatch. All rights reserved.
-        </p>
-
-        <div class="footer-legal-links">
-            <a href="/privacy">
-                Privacy
-            </a>
-
-            <a href="/terms">
-                Terms
-            </a>
-
-            <a href="/cookies">
-                Cookies
-            </a>
-        </div>
-
-    </div>
-
-</footer>
+<%- include('../partials/footer/footer'); %>
 <script src="/js/global.js"></script>
-
+<script src="/js/home.js"></script>
 </body>
 </html>
