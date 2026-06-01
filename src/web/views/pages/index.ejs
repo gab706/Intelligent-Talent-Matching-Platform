@@ -8,40 +8,18 @@
     <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
     <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
     <link rel="stylesheet" href="/css/global.css" />
-    <link rel="stylesheet" href="/css/home.css" />
+    <link rel="stylesheet" href="/css/index.css" />
     <script src="/lib/js/jquery.min.js"></script>
 </head>
 <body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
 <%- include('../partials/public-header/public-header'); %>
 <main class="home-page">
     <section class="home-hero" aria-labelledby="home-hero-title">
-        <form class="home-search" action="/candidate/search" method="get" role="search" data-progressive-search>
-            <div class="home-search__field home-search__field--keywords">
-                <div class="home-search__field-inner">
-                    <label for="home-search-keywords" class="home-search__label">
-                        Job title, skills, keyword, or company
-                    </label>
-                    <div class="home-search__input-row">
-                        <i class="fas fa-search" aria-hidden="true"></i>
-                        <input id="home-search-keywords" name="q" type="search" autocomplete="off" />
-                    </div>
-                </div>
-            </div>
-            <div class="home-search__field home-search__field--location" data-location-field>
-                <div class="home-search__field-inner">
-                    <label for="home-search-location" class="home-search__label">
-                        Location
-                    </label>
-                    <div class="home-search__input-row">
-                        <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
-                        <input id="home-search-location" name="location" type="search" autocomplete="off" />
-                    </div>
-                </div>
-            </div>
-            <button class="home-search__submit" type="submit" data-search-submit>
-                Find jobs
-            </button>
-        </form>
+        <div class="home-hero__slides" aria-hidden="true" data-home-slider>
+            <img class="home-hero__slide is-active" src="/images/home/hero-candidate.png" alt="" />
+            <img class="home-hero__slide" src="/images/home/hero-opportunity.png" alt="" />
+            <img class="home-hero__slide" src="/images/home/hero-employer.png" alt="" />
+        </div>
         <div class="home-hero__content">
             <p class="home-hero__eyebrow">
                 Intelligent Talent Matching Platform
@@ -50,51 +28,55 @@
                 Your next match starts here.
             </h1>
             <p class="home-hero__description">
-                Create a profile to receive smarter job and candidate
-                recommendations based on skills, experience,
-                working preferences, and intelligent matching logic.
+                Connect with relevant roles and candidates through profile-based
+                recommendations shaped by skills, experience, location, and work
+                preferences.
             </p>
-            <div class="home-hero__actions">
-                <a href="/register" class="home-hero__cta">
-                    Get started
-                    <i class="fas fa-arrow-right" aria-hidden="true"></i>
-                </a>
-            </div>
-            <div class="home-hero__secondary-actions">
-                <a href="/candidate/find-a-job">Browse jobs</a>
-                <span aria-hidden="true">·</span>
-                <a href="/employer/find-a-candidate">Browse candidates</a>
-                <span aria-hidden="true">·</span>
-                <a href="/login">Login</a>
+            <form class="home-search" action="/candidate/search" method="get" role="search" data-progressive-search>
+                <div class="home-search__field home-search__field--keywords">
+                    <label for="home-search-keywords" class="home-search__label">
+                        What are you looking for?
+                    </label>
+                    <div class="home-search__input-row">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                        <input
+                                id="home-search-keywords"
+                                name="q"
+                                type="search"
+                                autocomplete="off"
+                                placeholder="Software engineer, data analyst, UX designer"
+                        />
+                    </div>
+                </div>
+                <div class="home-search__field home-search__field--location">
+                    <label for="home-search-location" class="home-search__label">
+                        Where?
+                    </label>
+                    <div class="home-search__input-row">
+                        <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                        <input
+                                id="home-search-location"
+                                name="location"
+                                type="search"
+                                autocomplete="off"
+                                placeholder="Sydney, remote, hybrid"
+                        />
+                    </div>
+                </div>
+                <button class="home-search__submit" type="submit">
+                    Search
+                </button>
+            </form>
+            <div class="home-hero__indicators" aria-label="Hero image slides">
+                <button class="home-hero__indicator is-active" type="button" aria-label="Show candidate slide" data-slide-index="0"></button>
+                <button class="home-hero__indicator" type="button" aria-label="Show opportunity slide" data-slide-index="1"></button>
+                <button class="home-hero__indicator" type="button" aria-label="Show employer slide" data-slide-index="2"></button>
             </div>
         </div>
-    </section>
-    <section class="home-quick-links" aria-label="Quick platform actions">
-        <a href="/register/candidate" class="home-quick-link-card">
-            <i class="fas fa-user-tie" aria-hidden="true"></i>
-            <div class="home-quick-link-card__content">
-                <strong>Candidate profiles</strong>
-                <span>Build your profile and receive recommendations</span>
-            </div>
-        </a>
-        <a href="/register/employer" class="home-quick-link-card">
-            <i class="fas fa-building" aria-hidden="true"></i>
-            <div class="home-quick-link-card__content">
-                <strong>Employer accounts</strong>
-                <span>Post jobs and discover suitable candidates</span>
-            </div>
-        </a>
-        <a href="/membership" class="home-quick-link-card">
-            <i class="fas fa-star" aria-hidden="true"></i>
-            <div class="home-quick-link-card__content">
-                <strong>Account types</strong>
-                <span>View the different account types we have</span>
-            </div>
-        </a>
     </section>
 </main>
 <%- include('../partials/footer/footer'); %>
 <script src="/js/global.js"></script>
-<script src="/js/home.js"></script>
+<script src="/js/index.js"></script>
 </body>
 </html>
