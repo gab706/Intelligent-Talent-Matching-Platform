@@ -23,6 +23,11 @@ enum UserRole {
   ADMIN
 }
 
+enum CompanyMemberRole {
+  USER
+  ADMIN
+}
+
 enum AccountStatus {
   ACTIVE
   SUSPENDED
@@ -79,6 +84,8 @@ model User {
   candidate Candidate?
   employer  Employer?
 
+  ownedCompanies Company[] @relation("CompanyOwner")
+
   sentNotifications     Notification[] @relation("NotificationSender")
   receivedNotifications Notification[] @relation("NotificationRecipient")
 
@@ -133,32 +140,69 @@ model Employer {
   id     String @id @default(uuid())
   userId String @unique
 
-  companyName        String?
-  companyEmail       String?
-  companyPhone       String?
-  companyWebsite     String?
-  companyLocation    String?
-  industry           String?
-  companyDescription String?
-  companyAvatarHash  String?
-  companySize        String?
-  companyValues      String?
-
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companies   EmployerCompany[]
   jobPostings JobPosting[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([companyLocation])
-  @@index([industry])
   @@index([createdAt])
   @@map("employers")
+}
+
+model Company {
+  id        String @id @default(uuid())
+  ownedById String
+
+  name        String
+  email       String?
+  phone       String?
+  website     String?
+  location    String?
+  industry    String?
+  description String?
+  avatarHash  String?
+  size        String?
+  values      String?
+
+  ownedBy     User              @relation("CompanyOwner", fields: [ownedById], references: [id], onDelete: Restrict)
+  employers   EmployerCompany[]
+  jobPostings JobPosting[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownedById])
+  @@index([location])
+  @@index([industry])
+  @@index([createdAt])
+  @@map("companies")
+}
+
+model EmployerCompany {
+  id         String            @id @default(uuid())
+  employerId String
+  companyId  String
+  role       CompanyMemberRole @default(USER)
+
+  employer Employer @relation(fields: [employerId], references: [id], onDelete: Cascade)
+  company  Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([employerId, companyId])
+  @@index([employerId])
+  @@index([companyId])
+  @@index([role])
+  @@map("employer_companies")
 }
 
 model JobPosting {
   id         String @id @default(uuid())
   employerId String
+  companyId  String
 
   jobTitle           String
   companyInformation String
@@ -178,6 +222,7 @@ model JobPosting {
   isActive    Boolean   @default(true)
 
   employer     Employer          @relation(fields: [employerId], references: [id], onDelete: Cascade)
+  company      Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
   skills       JobPostingSkill[]
   applications JobApplication[]
   savedBy      SavedJob[]
@@ -186,6 +231,7 @@ model JobPosting {
   updatedAt DateTime @updatedAt
 
   @@index([employerId])
+  @@index([companyId])
   @@index([jobLocation])
   @@index([workMode])
   @@index([jobType])

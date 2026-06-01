@@ -81,16 +81,16 @@ $(function () {
         });
     }
 
-    const $candidateForm = $("[data-candidate-register-form]");
+    const $registerForm = $("[data-register-form]");
 
-    if (!$candidateForm.length) {
+    if (!$registerForm.length) {
         return;
     }
 
-    const $steps = $candidateForm.find("[data-register-step]");
+    const $steps = $registerForm.find("[data-register-step]");
     const $progress = $("[data-register-progress]");
-    const $backButton = $candidateForm.find("[data-register-back]");
-    const $nextButton = $candidateForm.find("[data-register-next]");
+    const $backButton = $registerForm.find("[data-register-back]");
+    const $nextButton = $registerForm.find("[data-register-next]");
     let currentStep = 0;
 
     const showError = function (message) {
@@ -120,8 +120,8 @@ $(function () {
             .text(currentStep === $steps.length - 1 ? "Create" : "Next");
     };
 
-    const resetCandidateForm = function () {
-        $candidateForm[0].reset();
+    const resetRegisterForm = function () {
+        $registerForm[0].reset();
         currentStep = 0;
         updateStep();
     };
@@ -148,18 +148,18 @@ $(function () {
         }
 
         if (currentStep === $steps.length - 1) {
-            const password = String($("#candidate-password").val() || "");
-            const confirmPassword = String($("#candidate-confirm-password").val() || "");
+            const password = String($registerForm.find("[data-register-field='password']").val() || "");
+            const confirmPassword = String($registerForm.find("[data-register-field='confirm_password']").val() || "");
 
             if (password.length < 8) {
                 showError("Password must be at least 8 characters.");
-                $("#candidate-password").trigger("focus");
+                $registerForm.find("[data-register-field='password']").trigger("focus");
                 return false;
             }
 
             if (password !== confirmPassword) {
                 showError("Passwords do not match.");
-                $("#candidate-confirm-password").trigger("focus");
+                $registerForm.find("[data-register-field='confirm_password']").trigger("focus");
                 return false;
             }
         }
@@ -185,7 +185,7 @@ $(function () {
         updateStep();
     });
 
-    $candidateForm.on("submit", async function (event) {
+    $registerForm.on("submit", async function (event) {
         event.preventDefault();
 
         if (!validateCurrentStep()) {
@@ -193,13 +193,13 @@ $(function () {
         }
 
         const payload = {
-            account_type: 1,
-            email: String($("#candidate-email").val() || "").trim(),
-            phone: String($("#candidate-phone").val() || "").trim(),
-            first_name: String($("#candidate-first-name").val() || "").trim(),
-            last_name: String($("#candidate-last-name").val() || "").trim(),
-            password: String($("#candidate-password").val() || ""),
-            confirm_password: String($("#candidate-confirm-password").val() || "")
+            account_type: Number($registerForm.data("register-account-type")),
+            email: String($registerForm.find("[data-register-field='email']").val() || "").trim(),
+            phone: String($registerForm.find("[data-register-field='phone']").val() || "").trim(),
+            first_name: String($registerForm.find("[data-register-field='first_name']").val() || "").trim(),
+            last_name: String($registerForm.find("[data-register-field='last_name']").val() || "").trim(),
+            password: String($registerForm.find("[data-register-field='password']").val() || ""),
+            confirm_password: String($registerForm.find("[data-register-field='confirm_password']").val() || "")
         };
 
         $nextButton.prop("disabled", true).text("Creating...");
@@ -218,15 +218,15 @@ $(function () {
 
             if (!response.ok || !data.success) {
                 showError(data.message || "Unable to create your account.");
-                resetCandidateForm();
+                resetRegisterForm();
                 return;
             }
 
-            window.location.href = data.redirectTo || "/candidate/home";
+            window.location.href = data.redirectTo || $registerForm.data("register-redirect") || "/candidate/home";
         } catch (err) {
             console.error(err);
             showError("An unexpected error occurred. Please try again.");
-            resetCandidateForm();
+            resetRegisterForm();
         } finally {
             $nextButton.prop("disabled", false);
             $backButton

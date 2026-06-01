@@ -567,7 +567,7 @@ body:has(.register-candidate) .public-header:not(.is-scrolled) .public-header__h
     }
 }
 
-.register-candidate:has([data-candidate-register-form]) {
+.register-candidate:has([data-register-form]) {
     --register-candidate-logo-bg: #111827;
     --register-candidate-logo-fg: #ffffff;
     --register-candidate-logo-border: #111827;
@@ -588,7 +588,7 @@ body:has(.register-candidate) .public-header:not(.is-scrolled) .public-header__h
     color: var(--color-text);
 }
 
-body.dark-mode .register-candidate:has([data-candidate-register-form]) {
+body.dark-mode .register-candidate:has([data-register-form]) {
     --register-candidate-logo-bg: #ffffff;
     --register-candidate-logo-fg: #0f172a;
     --register-candidate-logo-border: #ffffff;
@@ -607,7 +607,7 @@ body.dark-mode .register-candidate:has([data-candidate-register-form]) {
     --register-candidate-focus: rgba(96, 165, 250, 0.14);
 }
 
-.register-candidate:has([data-candidate-register-form]) .register-candidate__panel {
+.register-candidate:has([data-register-form]) .register-candidate__panel {
     min-width: 0;
     padding: 38px 46px;
 
@@ -746,19 +746,19 @@ body.dark-mode .register-candidate:has([data-candidate-register-form]) {
     line-height: 1;
 }
 
-.register-candidate:has([data-candidate-register-form]) .register-candidate__header,
-.register-candidate:has([data-candidate-register-form]) .register-candidate__progress,
-.register-candidate:has([data-candidate-register-form]) .register-candidate__form,
-.register-candidate:has([data-candidate-register-form]) .register-candidate__login-link {
+.register-candidate:has([data-register-form]) .register-candidate__header,
+.register-candidate:has([data-register-form]) .register-candidate__progress,
+.register-candidate:has([data-register-form]) .register-candidate__form,
+.register-candidate:has([data-register-form]) .register-candidate__login-link {
     width: 100%;
     max-width: 430px;
 }
 
-.register-candidate:has([data-candidate-register-form]) .register-candidate__header {
+.register-candidate:has([data-register-form]) .register-candidate__header {
     margin: 72px auto 22px;
 }
 
-.register-candidate:has([data-candidate-register-form]) .register-candidate__title {
+.register-candidate:has([data-register-form]) .register-candidate__title {
     margin-bottom: 14px;
     color: var(--color-text);
     font-size: clamp(2rem, 4vw, 3.2rem);
@@ -767,12 +767,12 @@ body.dark-mode .register-candidate:has([data-candidate-register-form]) {
     letter-spacing: 0;
 }
 
-.register-candidate:has([data-candidate-register-form]) .register-candidate__progress {
+.register-candidate:has([data-register-form]) .register-candidate__progress {
     margin: 0 auto 22px;
     grid-template-columns: repeat(3, 1fr);
 }
 
-.register-candidate:has([data-candidate-register-form]) .register-candidate__form {
+.register-candidate:has([data-register-form]) .register-candidate__form {
     margin: 0 auto;
 }
 
@@ -793,11 +793,11 @@ body.dark-mode .register-candidate:has([data-candidate-register-form]) {
     color: var(--color-primary-hover);
 }
 
-.register-candidate:has([data-candidate-register-form]) .register-candidate__step legend {
+.register-candidate:has([data-register-form]) .register-candidate__step legend {
     font-size: clamp(1.35rem, 2.6vw, 1.8rem);
 }
 
-.register-candidate:has([data-candidate-register-form]) .register-candidate__input:focus-within {
+.register-candidate:has([data-register-form]) .register-candidate__input:focus-within {
     border-color: var(--color-primary);
     box-shadow: 0 0 0 4px var(--register-candidate-focus);
 }
@@ -860,11 +860,11 @@ body.dark-mode .register-candidate:has([data-candidate-register-form]) {
 }
 
 @media (max-width: 980px) {
-    .register-candidate:has([data-candidate-register-form]) {
+    .register-candidate:has([data-register-form]) {
         grid-template-columns: 1fr;
     }
 
-    .register-candidate:has([data-candidate-register-form]) .register-candidate__panel {
+    .register-candidate:has([data-register-form]) .register-candidate__panel {
         min-height: 100vh;
         border-right: 0;
     }
@@ -875,7 +875,7 @@ body.dark-mode .register-candidate:has([data-candidate-register-form]) {
 }
 
 @media (max-width: 560px) {
-    .register-candidate:has([data-candidate-register-form]) .register-candidate__panel {
+    .register-candidate:has([data-register-form]) .register-candidate__panel {
         padding: 18px 18px 28px;
     }
 
@@ -897,11 +897,11 @@ body.dark-mode .register-candidate:has([data-candidate-register-form]) {
         font-size: 1.2rem;
     }
 
-    .register-candidate:has([data-candidate-register-form]) .register-candidate__header {
+    .register-candidate:has([data-register-form]) .register-candidate__header {
         margin: 0 auto 22px;
     }
 
-    .register-candidate:has([data-candidate-register-form]) .register-candidate__title {
+    .register-candidate:has([data-register-form]) .register-candidate__title {
         font-size: clamp(2.1rem, 13vw, 3.2rem);
     }
 }

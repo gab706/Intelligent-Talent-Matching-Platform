@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Candidate Registration | Intelligent Talent Matching Platform</title>
-    <meta name="description" content="Create a TalentMatch candidate account and begin building your profile." />
+    <title>Employer Registration | Intelligent Talent Matching Platform</title>
+    <meta name="description" content="Create a TalentMatch employer account and begin setting up hiring access." />
     <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
     <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
     <link rel="stylesheet" href="/lib/css/toastr.min.css" />
@@ -14,8 +14,8 @@
     <script src="/lib/js/toastr.min.js"></script>
 </head>
 <body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
-<main class="register-candidate">
-    <section class="register-candidate__panel" aria-labelledby="candidate-register-title">
+<main class="register-candidate register-employer">
+    <section class="register-candidate__panel" aria-labelledby="employer-register-title">
         <div class="register-candidate__brand-row">
             <a href="/index" class="register-candidate__brand" aria-label="TalentMatch Home">
                 <span class="register-candidate__logo-wrapper">
@@ -39,10 +39,10 @@
 
         <div class="register-candidate__header">
             <p class="register-candidate__eyebrow">
-                Candidate registration
+                Employer registration
             </p>
-            <h1 id="candidate-register-title" class="register-candidate__title">
-                Build your candidate account.
+            <h1 id="employer-register-title" class="register-candidate__title">
+                Build your employer account.
             </h1>
         </div>
 
@@ -52,31 +52,31 @@
             <span data-register-progress="2"></span>
         </div>
 
-        <form class="register-candidate__form" data-register-form data-register-account-type="1" data-register-redirect="/candidate/home">
-            <input type="hidden" name="account_type" value="1" />
+        <form class="register-candidate__form" data-register-form data-register-account-type="2" data-register-redirect="/employer/home">
+            <input type="hidden" name="account_type" value="2" />
 
             <fieldset class="register-candidate__step is-active" data-register-step="0">
                 <legend>
                     Contact details
                 </legend>
                 <p>
-                    These details become the base of your TalentMatch account.
+                    These details create your personal employer-side login.
                 </p>
 
-                <label class="register-candidate__field" for="candidate-email">
+                <label class="register-candidate__field" for="employer-email">
                     <span>Email address</span>
                     <span class="register-candidate__input">
-                            <i class="fas fa-envelope" aria-hidden="true"></i>
-                            <input id="candidate-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" data-register-field="email" required />
-                        </span>
+                        <i class="fas fa-envelope" aria-hidden="true"></i>
+                        <input id="employer-email" name="email" type="email" autocomplete="email" placeholder="you@company.com" data-register-field="email" required />
+                    </span>
                 </label>
 
-                <label class="register-candidate__field" for="candidate-phone">
+                <label class="register-candidate__field" for="employer-phone">
                     <span>Phone number</span>
                     <span class="register-candidate__input">
-                            <i class="fas fa-phone" aria-hidden="true"></i>
-                            <input id="candidate-phone" name="phone" type="tel" autocomplete="tel" placeholder="0400 000 000" data-register-field="phone" required />
-                        </span>
+                        <i class="fas fa-phone" aria-hidden="true"></i>
+                        <input id="employer-phone" name="phone" type="tel" autocomplete="tel" placeholder="0400 000 000" data-register-field="phone" required />
+                    </span>
                 </label>
             </fieldset>
 
@@ -85,23 +85,23 @@
                     Your name
                 </legend>
                 <p>
-                    Use the name you want employers to see when your profile is ready.
+                    Use the name attached to your employer account. Company details come later.
                 </p>
 
-                <label class="register-candidate__field" for="candidate-first-name">
+                <label class="register-candidate__field" for="employer-first-name">
                     <span>First name</span>
                     <span class="register-candidate__input">
-                            <i class="fas fa-user" aria-hidden="true"></i>
-                            <input id="candidate-first-name" name="first_name" type="text" autocomplete="given-name" placeholder="First name" data-register-field="first_name" required />
-                        </span>
+                        <i class="fas fa-user" aria-hidden="true"></i>
+                        <input id="employer-first-name" name="first_name" type="text" autocomplete="given-name" placeholder="First name" data-register-field="first_name" required />
+                    </span>
                 </label>
 
-                <label class="register-candidate__field" for="candidate-last-name">
+                <label class="register-candidate__field" for="employer-last-name">
                     <span>Last name</span>
                     <span class="register-candidate__input">
-                            <i class="fas fa-user" aria-hidden="true"></i>
-                            <input id="candidate-last-name" name="last_name" type="text" autocomplete="family-name" placeholder="Last name" data-register-field="last_name" required />
-                        </span>
+                        <i class="fas fa-user" aria-hidden="true"></i>
+                        <input id="employer-last-name" name="last_name" type="text" autocomplete="family-name" placeholder="Last name" data-register-field="last_name" required />
+                    </span>
                 </label>
             </fieldset>
 
@@ -110,23 +110,23 @@
                     Secure your account
                 </legend>
                 <p>
-                    Choose a password before TalentMatch creates your candidate profile.
+                    Choose a password before TalentMatch creates your employer access.
                 </p>
 
-                <label class="register-candidate__field" for="candidate-password">
+                <label class="register-candidate__field" for="employer-password">
                     <span>Password</span>
                     <span class="register-candidate__input">
-                            <i class="fas fa-lock" aria-hidden="true"></i>
-                            <input id="candidate-password" name="password" type="password" autocomplete="new-password" placeholder="Create a password" data-register-field="password" required />
-                        </span>
+                        <i class="fas fa-lock" aria-hidden="true"></i>
+                        <input id="employer-password" name="password" type="password" autocomplete="new-password" placeholder="Create a password" data-register-field="password" required />
+                    </span>
                 </label>
 
-                <label class="register-candidate__field" for="candidate-confirm-password">
+                <label class="register-candidate__field" for="employer-confirm-password">
                     <span>Confirm password</span>
                     <span class="register-candidate__input">
-                            <i class="fas fa-shield-alt" aria-hidden="true"></i>
-                            <input id="candidate-confirm-password" name="confirm_password" type="password" autocomplete="new-password" placeholder="Repeat your password" data-register-field="confirm_password" required />
-                        </span>
+                        <i class="fas fa-shield-alt" aria-hidden="true"></i>
+                        <input id="employer-confirm-password" name="confirm_password" type="password" autocomplete="new-password" placeholder="Repeat your password" data-register-field="confirm_password" required />
+                    </span>
                 </label>
             </fieldset>
 
@@ -148,14 +148,14 @@
         </p>
     </section>
 
-    <aside class="register-candidate__aside" aria-label="Candidate registration visual">
-        <img src="/images/home/hero-candidate.png" alt="Candidate reviewing role opportunities on a laptop" />
+    <aside class="register-candidate__aside" aria-label="Employer registration visual">
+        <img src="/images/home/hero-employer.png" alt="Employer reviewing candidate information during hiring" />
         <div class="register-candidate__aside-caption">
             <span>
-                Candidate profile
+                Employer access
             </span>
             <strong>
-                Start with an account, then shape the profile around the work you want.
+                Start with your account, then connect or create the company profile you hire from.
             </strong>
         </div>
     </aside>

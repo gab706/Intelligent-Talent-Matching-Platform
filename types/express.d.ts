@@ -5,6 +5,7 @@ declare global {
 		interface Response {
 			payload: {
 				theme?: string;
+				userId?: string;
 			};
 		}
 	}

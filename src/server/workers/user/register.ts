@@ -4,6 +4,7 @@ import { prisma } from '../../database/prisma.js';
 
 const SESSION_MS = 1000 * 60 * 60 * 24 * 7;
 const CANDIDATE_ACCOUNT_TYPE = 1;
+const EMPLOYER_ACCOUNT_TYPE = 2;
 
 function isValidEmail(email: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -32,7 +33,7 @@ export default async function registerWorker(
         const lastName = String(req.body?.last_name || '').trim();
         const phone = String(req.body?.phone || '').trim();
 
-        if (accountType !== CANDIDATE_ACCOUNT_TYPE) {
+        if (![CANDIDATE_ACCOUNT_TYPE, EMPLOYER_ACCOUNT_TYPE].includes(accountType)) {
             return res.json({
                 success: false,
                 message: 'Invalid account type.'
@@ -72,11 +73,43 @@ export default async function registerWorker(
                 email
             },
             select: {
-                id: true
+                id: true,
+                candidate: {
+                    select: {
+                        id: true
+                    }
+                },
+                employer: {
+                    select: {
+                        id: true
+                    }
+                }
             }
         });
 
         if (existingUser) {
+            if (
+                accountType === CANDIDATE_ACCOUNT_TYPE &&
+                existingUser.employer &&
+                !existingUser.candidate
+            ) {
+                return res.json({
+                    success: false,
+                    message: 'Please login and migrate your account'
+                });
+            }
+
+            if (
+                accountType === EMPLOYER_ACCOUNT_TYPE &&
+                existingUser.candidate &&
+                !existingUser.employer
+            ) {
+                return res.json({
+                    success: false,
+                    message: 'Please login and migrate your account'
+                });
+            }
+
             return res.json({
                 success: false,
                 message: 'An account already exists with that email address.'
@@ -95,9 +128,17 @@ export default async function registerWorker(
                 phone,
                 theme,
                 lastLoginAt: new Date(),
-                candidate: {
-                    create: {}
-                }
+                ...(accountType === CANDIDATE_ACCOUNT_TYPE
+                    ? {
+                        candidate: {
+                            create: {}
+                        }
+                    }
+                    : {
+                        employer: {
+                            create: {}
+                        }
+                    })
             },
             select: {
                 id: true,
@@ -107,14 +148,26 @@ export default async function registerWorker(
                     select: {
                         id: true
                     }
+                },
+                employer: {
+                    select: {
+                        id: true
+                    }
                 }
             }
         });
 
-        if (!user.candidate) {
+        if (accountType === CANDIDATE_ACCOUNT_TYPE && !user.candidate) {
             return res.json({
                 success: false,
                 message: 'Unable to create candidate profile.'
+            });
+        }
+
+        if (accountType === EMPLOYER_ACCOUNT_TYPE && !user.employer) {
+            return res.json({
+                success: false,
+                message: 'Unable to create employer profile.'
             });
         }
 
@@ -125,7 +178,10 @@ export default async function registerWorker(
             req.session.isAuthenticated = true;
             req.session.userId = user.id;
             req.session.userRole = user.role === 'ADMIN' ? 1 : 0;
-            req.session.accountType = CANDIDATE_ACCOUNT_TYPE;
+            req.session.accountType =
+                accountType === EMPLOYER_ACCOUNT_TYPE
+                    ? EMPLOYER_ACCOUNT_TYPE
+                    : CANDIDATE_ACCOUNT_TYPE;
             req.session.theme = user.theme;
             req.session.createdAt = Date.now();
             req.session.lastActivityAt = Date.now();
@@ -137,8 +193,14 @@ export default async function registerWorker(
 
                 return res.status(201).json({
                     success: true,
-                    message: 'Candidate account created successfully.',
-                    redirectTo: '/candidate/home'
+                    message:
+                        accountType === EMPLOYER_ACCOUNT_TYPE
+                            ? 'Employer account created successfully.'
+                            : 'Candidate account created successfully.',
+                    redirectTo:
+                        accountType === EMPLOYER_ACCOUNT_TYPE
+                            ? '/employer/home'
+                            : '/candidate/home'
                 });
             });
         });
