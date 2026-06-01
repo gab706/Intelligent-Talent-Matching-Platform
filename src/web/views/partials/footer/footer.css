@@ -6,8 +6,8 @@
     --tm-footer-logo-hover-fg: #ffffff;
     --tm-footer-logo-hover-shadow: 0 14px 28px rgba(37, 99, 235, 0.22);
 
-    background: var(--color-surface-muted);
-    border-top: 1px solid var(--color-border);
+    background: var(--color-bg);
+    border-top: 0;
 }
 
 body.dark-mode .tm-footer {
@@ -20,7 +20,7 @@ body.dark-mode .tm-footer {
 .tm-footer__inner {
     max-width: var(--layout-max-width);
     margin: 0 auto;
-    padding: 56px 24px 42px;
+    padding: 64px 24px 42px;
 
     display: grid;
     grid-template-columns: 1.6fr 1fr 1fr 1fr;
@@ -73,21 +73,20 @@ body.dark-mode .tm-footer {
 }
 
 .tm-footer__logo {
-    width: 28px;
-    height: 28px;
+    width: 1em;
+    height: 1em;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1.28rem;
+    line-height: 1;
 }
 
-.tm-footer__logo,
-.tm-footer__logo * {
-    fill: none;
-    stroke: currentColor;
-}
-
-.tm-footer__logo circle,
-.tm-footer__logo path {
-    stroke-width: 4;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+.tm-footer__logo::before {
+    display: block;
+    line-height: 1;
 }
 
 .tm-footer__brand:hover .tm-footer__logo-wrapper,
