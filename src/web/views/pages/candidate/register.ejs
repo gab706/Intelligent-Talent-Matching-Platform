@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Candidate Registration | Intelligent Talent Matching Platform</title>
+    <meta name="description" content="Create a TalentMatch candidate account and begin building your profile." />
+    <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
+    <link rel="stylesheet" href="/lib/css/toastr.min.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/register.css" />
+    <script src="/lib/js/jquery.min.js"></script>
+    <script src="/lib/js/toastr.min.js"></script>
+</head>
+<body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
+<main class="register-candidate">
+    <section class="register-candidate__panel" aria-labelledby="candidate-register-title">
+        <div class="register-candidate__brand-row">
+            <a href="/index" class="register-candidate__brand" aria-label="TalentMatch Home">
+                <span class="register-candidate__logo-wrapper">
+                    <i class="fas fa-eye register-candidate__logo" aria-hidden="true"></i>
+                </span>
+
+                <span class="register-candidate__brand-text">
+                    <span class="register-candidate__brand-title">
+                        TalentMatch
+                    </span>
+                    <span class="register-candidate__brand-subtitle">
+                        ITMP Platform
+                    </span>
+                </span>
+            </a>
+
+            <button class="register-candidate__theme-toggle" type="button" aria-label="Toggle dark mode" data-theme-toggle>
+                <i class="fas <%= theme === 'DARK' ? 'fa-moon' : 'fa-sun' %>" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <div class="register-candidate__header">
+            <p class="register-candidate__eyebrow">
+                Candidate registration
+            </p>
+            <h1 id="candidate-register-title" class="register-candidate__title">
+                Build your candidate account.
+            </h1>
+        </div>
+
+        <div class="register-candidate__progress" aria-hidden="true">
+            <span class="is-active" data-register-progress="0"></span>
+            <span data-register-progress="1"></span>
+            <span data-register-progress="2"></span>
+        </div>
+
+        <form class="register-candidate__form" data-candidate-register-form>
+            <input type="hidden" name="account_type" value="1" />
+
+            <fieldset class="register-candidate__step is-active" data-register-step="0">
+                <legend>
+                    Contact details
+                </legend>
+                <p>
+                    These details become the base of your TalentMatch account.
+                </p>
+
+                <label class="register-candidate__field" for="candidate-email">
+                    <span>Email address</span>
+                    <span class="register-candidate__input">
+                            <i class="fas fa-envelope" aria-hidden="true"></i>
+                            <input id="candidate-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required />
+                        </span>
+                </label>
+
+                <label class="register-candidate__field" for="candidate-phone">
+                    <span>Phone number</span>
+                    <span class="register-candidate__input">
+                            <i class="fas fa-phone" aria-hidden="true"></i>
+                            <input id="candidate-phone" name="phone" type="tel" autocomplete="tel" placeholder="0400 000 000" required />
+                        </span>
+                </label>
+            </fieldset>
+
+            <fieldset class="register-candidate__step" data-register-step="1">
+                <legend>
+                    Your name
+                </legend>
+                <p>
+                    Use the name you want employers to see when your profile is ready.
+                </p>
+
+                <label class="register-candidate__field" for="candidate-first-name">
+                    <span>First name</span>
+                    <span class="register-candidate__input">
+                            <i class="fas fa-user" aria-hidden="true"></i>
+                            <input id="candidate-first-name" name="first_name" type="text" autocomplete="given-name" placeholder="First name" required />
+                        </span>
+                </label>
+
+                <label class="register-candidate__field" for="candidate-last-name">
+                    <span>Last name</span>
+                    <span class="register-candidate__input">
+                            <i class="fas fa-user" aria-hidden="true"></i>
+                            <input id="candidate-last-name" name="last_name" type="text" autocomplete="family-name" placeholder="Last name" required />
+                        </span>
+                </label>
+            </fieldset>
+
+            <fieldset class="register-candidate__step" data-register-step="2">
+                <legend>
+                    Secure your account
+                </legend>
+                <p>
+                    Choose a password before TalentMatch creates your candidate profile.
+                </p>
+
+                <label class="register-candidate__field" for="candidate-password">
+                    <span>Password</span>
+                    <span class="register-candidate__input">
+                            <i class="fas fa-lock" aria-hidden="true"></i>
+                            <input id="candidate-password" name="password" type="password" autocomplete="new-password" placeholder="Create a password" required />
+                        </span>
+                </label>
+
+                <label class="register-candidate__field" for="candidate-confirm-password">
+                    <span>Confirm password</span>
+                    <span class="register-candidate__input">
+                            <i class="fas fa-shield-alt" aria-hidden="true"></i>
+                            <input id="candidate-confirm-password" name="confirm_password" type="password" autocomplete="new-password" placeholder="Repeat your password" required />
+                        </span>
+                </label>
+            </fieldset>
+
+            <div class="register-candidate__actions">
+                <button class="register-candidate__back" type="button" data-register-back disabled>
+                    Back
+                </button>
+                <button class="register-candidate__next" type="button" data-register-next>
+                    Next
+                </button>
+            </div>
+        </form>
+
+        <p class="register-candidate__login-link">
+            Already have an account?
+            <a href="/login">
+                Log in
+            </a>
+        </p>
+    </section>
+
+    <aside class="register-candidate__aside" aria-label="Candidate registration visual">
+        <img src="/images/home/hero-candidate.png" alt="Candidate reviewing role opportunities on a laptop" />
+        <div class="register-candidate__aside-caption">
+            <span>
+                Candidate profile
+            </span>
+            <strong>
+                Start with an account, then shape the profile around the work you want.
+            </strong>
+        </div>
+    </aside>
+</main>
+<script src="/js/global.js"></script>
+<script src="/js/register.js"></script>
+</body>
+</html>
