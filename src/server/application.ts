@@ -18,11 +18,11 @@ const app: Application = express();
 const partialsStatic = express.static(partialsPath);
 const PgSession = connectPgSimple(session);
 
-if (!process.env.POSTGRES_SESSION_URL || !process.env.SESSION_SECRET)
-	throw new Error('POSTGRES_SESSION_URL and SESSION_SECRET are required');
+if (!process.env.SESSION_SECRET)
+	throw new Error('SESSION_SECRET is required');
 
 const sessionPostgresPool = new pg.Pool({
-	connectionString: process.env.POSTGRES_SESSION_URL,
+	connectionString: process.env.POSTGRES_URL,
 	max: 10,
 	idleTimeoutMillis: 30000,
 	connectionTimeoutMillis: 5000
@@ -71,19 +71,15 @@ app.use((_req: Request, res, next: NextFunction) => {
 
 app.use(session({
 	name: 'itmp.sid',
-
 	store: new PgSession({
 		pool: sessionPostgresPool,
 		tableName: 'sessions',
-		createTableIfMissing: true
+		createTableIfMissing: false
 	}),
-
 	secret: process.env.SESSION_SECRET,
-
 	resave: false,
 	saveUninitialized: false,
 	rolling: true,
-
 	cookie: {
 		httpOnly: true,
 		secure: process.env.ENVIRONMENT === 'production',

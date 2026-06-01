@@ -322,3 +322,12 @@ model RecommendationLog {
   @@index([createdAt])
   @@map("recommendation_logs")
 }
+
+model Session {
+  sid    String   @id @db.VarChar
+  sess   Json
+  expire DateTime
+
+  @@index([expire])
+  @@map("sessions")
+}

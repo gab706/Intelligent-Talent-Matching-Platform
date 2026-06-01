@@ -41,10 +41,15 @@ export default async function updateThemeWorker(
 
         req.session.theme = user.theme;
 
-        return res.json({
-            success: true,
-            persisted: true,
-            theme: user.theme
+        req.session.save((saveErr) => {
+            if (saveErr)
+                return next(saveErr);
+
+            return res.json({
+                success: true,
+                persisted: true,
+                theme: user.theme
+            });
         });
     } catch (err) {
         return next(err);
