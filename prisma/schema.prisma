@@ -66,7 +66,7 @@ model User {
 
   firstName  String
   lastName   String
-  phone      String?
+  phone      String
   avatarHash String?
 
   role          UserRole      @default(USER)
@@ -98,14 +98,11 @@ model Candidate {
   id     String @id @default(uuid())
   userId String @unique
 
-  contactEmail String?
-  contactPhone String?
+  education         String?
+  major             String?
+  yearsOfExperience Int     @default(0)
 
-  education         String
-  major             String
-  yearsOfExperience Int    @default(0)
-
-  workExperience String
+  workExperience String?
   profileSummary String?
 
   preferredWorkingMode WorkingMode?
@@ -136,13 +133,13 @@ model Employer {
   id     String @id @default(uuid())
   userId String @unique
 
-  companyName        String
+  companyName        String?
   companyEmail       String?
   companyPhone       String?
   companyWebsite     String?
-  companyLocation    String
+  companyLocation    String?
   industry           String?
-  companyDescription String
+  companyDescription String?
   companyAvatarHash  String?
   companySize        String?
   companyValues      String?

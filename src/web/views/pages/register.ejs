@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register | Intelligent Talent Matching Platform</title>
+    <meta name="description" content="Choose whether to register for TalentMatch as a candidate or an employer." />
+    <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/register.css" />
+    <script src="/lib/js/jquery.min.js"></script>
+</head>
+<body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
+<%- include('../partials/public-header/public-header'); %>
+<main class="register-landing">
+    <section class="register-landing__hero" aria-labelledby="register-landing-title">
+        <img class="register-landing__hero-image" src="/images/register/register-hero.jpg" alt="Professional using a laptop in a modern office" />
+        <div class="register-landing__hero-overlay"></div>
+        <div class="register-landing__hero-inner">
+            <p class="register-landing__eyebrow">
+                Create your account
+            </p>
+            <h1 id="register-landing-title" class="register-landing__title">
+                Start on the side of TalentMatch that fits what you need.
+            </h1>
+            <p class="register-landing__description">
+                Candidates use TalentMatch to build a profile and find relevant roles.
+                Employers use it to represent an organisation and find people worth speaking to.
+            </p>
+        </div>
+    </section>
+
+    <section class="register-landing__intro" aria-label="Choose a registration path">
+        <p>
+            You can change how you use TalentMatch later if your workflow grows.
+            For now, choose the path that matches the account you need to create.
+        </p>
+    </section>
+
+    <section class="register-landing__path register-landing__path--candidate" aria-labelledby="register-candidate-title">
+        <div class="register-landing__path-media">
+            <img src="/images/home/hero-candidate.png" alt="Candidate reviewing job opportunities" />
+        </div>
+        <div class="register-landing__path-copy">
+            <p class="register-landing__eyebrow">
+                Candidate
+            </p>
+            <h2 id="register-candidate-title">
+                Set up the account TalentMatch will use to understand your next move.
+            </h2>
+            <p>
+                Candidate registration starts with the practical details that shape matching:
+                what you do, where you want to work, how you want to work, and what kind
+                of roles are worth showing you.
+            </p>
+            <ul class="register-landing__list">
+                <li>Add the profile details needed for role matching.</li>
+                <li>Set work preferences before browsing opportunities.</li>
+                <li>Use one candidate sign-in for saved roles and applications.</li>
+            </ul>
+            <a class="register-landing__path-action" href="/candidate/register">
+                Register as a candidate
+            </a>
+        </div>
+    </section>
+
+    <section class="register-landing__path register-landing__path--employer" aria-labelledby="register-employer-title">
+        <div class="register-landing__path-media">
+            <img src="/images/home/hero-employer.png" alt="Employer reviewing candidate matches" />
+        </div>
+        <div class="register-landing__path-copy">
+            <p class="register-landing__eyebrow">
+                Employer
+            </p>
+            <h2 id="register-employer-title">
+                Create the employer access your team needs before posting or searching.
+            </h2>
+            <p>
+                Employer registration is for people acting on behalf of an organisation.
+                It prepares the company side of TalentMatch so jobs, hiring activity,
+                and candidate discovery sit under the right business profile.
+            </p>
+            <ul class="register-landing__list">
+                <li>Connect your account to an organisation profile.</li>
+                <li>Prepare company details before creating hiring activity.</li>
+                <li>Keep employer tools separate from candidate-only workflows.</li>
+            </ul>
+            <a class="register-landing__path-action" href="/employer/register">
+                Register as an employer
+            </a>
+        </div>
+    </section>
+</main>
+<%- include('../partials/footer/footer'); %>
+<script src="/js/global.js"></script>
+<script src="/js/register.js"></script>
+</body>
+</html>

@@ -5,6 +5,10 @@ import { prisma } from '../../database/prisma.js';
 const SHORT_SESSION_MS = 1000 * 60 * 60 * 2; // 2 hours
 const LONG_SESSION_MS = 1000 * 60 * 60 * 24 * 30; // 30 days
 
+function isValidEmail(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 function getAccountType(user: {
     candidate: { id: string } | null;
     employer: { id: string } | null;
@@ -35,6 +39,20 @@ export default async function loginWorker(
             return res.json({
                 success: false,
                 message: 'Email and password are required.'
+            });
+        }
+
+        if (!isValidEmail(email)) {
+            return res.json({
+                success: false,
+                message: 'Please enter a valid email address.'
+            });
+        }
+
+        if (password.length < 8) {
+            return res.json({
+                success: false,
+                message: 'Password must be at least 8 characters.'
             });
         }
 
@@ -135,8 +153,8 @@ export default async function loginWorker(
 
                 const redirectTo =
                     req.session.accountType === 2
-                        ? '/employer/find-a-candidate'
-                        : '/candidate/find-a-job';
+                        ? '/employer/home'
+                        : '/candidate/home';
 
                 return res.json({
                     success: true,

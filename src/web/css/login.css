@@ -13,7 +13,7 @@
 
     min-height: 100vh;
     display: grid;
-    grid-template-columns: minmax(420px, 0.9fr) minmax(0, 1.1fr);
+    grid-template-columns: minmax(420px, 0.92fr) minmax(0, 1.08fr);
 
     background: var(--color-bg);
     color: var(--color-text);
@@ -55,6 +55,7 @@ body.dark-mode .login-page {
     top: 34px;
     left: 46px;
     right: 46px;
+    z-index: 2;
 
     display: flex;
     align-items: center;
@@ -93,21 +94,20 @@ body.dark-mode .login-page {
 }
 
 .login-page__logo {
-    width: 29px;
-    height: 29px;
+    width: 1em;
+    height: 1em;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1.3rem;
+    line-height: 1;
 }
 
-.login-page__logo,
-.login-page__logo * {
-    fill: none;
-    stroke: currentColor;
-}
-
-.login-page__logo circle,
-.login-page__logo path {
-    stroke-width: 4;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+.login-page__logo::before {
+    display: block;
+    line-height: 1;
 }
 
 .login-page__brand:hover .login-page__logo-wrapper,
@@ -184,7 +184,7 @@ body.dark-mode .login-page {
 }
 
 .login-page__header {
-    margin: 72px auto 28px;
+    margin: 72px auto 30px;
 }
 
 .login-page__eyebrow {
@@ -192,8 +192,8 @@ body.dark-mode .login-page {
 
     color: var(--color-primary);
     font-size: 0.78rem;
-    font-weight: 800;
-    letter-spacing: 0.1em;
+    font-weight: 700;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
 }
 
@@ -201,10 +201,10 @@ body.dark-mode .login-page {
     margin-bottom: 14px;
 
     color: var(--color-text);
-    font-size: clamp(2.2rem, 4vw, 3.5rem);
-    font-weight: 900;
-    line-height: 0.98;
-    letter-spacing: -0.06em;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: 0;
 }
 
 .login-page__description {
@@ -227,7 +227,7 @@ body.dark-mode .login-page {
 .login-page__label {
     color: var(--color-text);
     font-size: 0.88rem;
-    font-weight: 800;
+    font-weight: 700;
 }
 
 .login-page__input-wrapper {
@@ -264,6 +264,11 @@ body.dark-mode .login-page {
     color: var(--color-text);
 }
 
+.login-page__input-wrapper input::placeholder {
+    color: var(--color-muted);
+    opacity: 0.86;
+}
+
 .login-page__options {
     display: flex;
     align-items: center;
@@ -297,7 +302,7 @@ body.dark-mode .login-page {
 .login-page__signup a {
     color: var(--color-primary);
     font-size: 0.9rem;
-    font-weight: 800;
+    font-weight: 700;
 }
 
 .login-page__link:hover,
@@ -320,7 +325,7 @@ body.dark-mode .login-page {
     background: var(--color-primary);
     color: #ffffff;
 
-    font-weight: 900;
+    font-weight: 700;
 
     transition:
             background 180ms ease,
@@ -343,83 +348,60 @@ body.dark-mode .login-page {
 }
 
 .login-page__aside {
+    position: relative;
+    isolation: isolate;
     min-width: 0;
+
+    display: grid;
+    align-items: center;
+    overflow: hidden;
+
+    background: #111827;
+}
+
+.login-page__aside::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+            linear-gradient(90deg, rgba(7, 11, 22, 0.66), rgba(7, 11, 22, 0.12)),
+            linear-gradient(0deg, rgba(7, 11, 22, 0.74), rgba(7, 11, 22, 0.08));
+}
+
+.login-page__aside img {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.login-page__aside-caption {
+    width: min(100%, 640px);
     padding: 46px;
-
-    display: grid;
-    place-items: center;
-
-    background:
-            radial-gradient(circle at 20% 20%, rgba(21, 87, 214, 0.18), transparent 34%),
-            radial-gradient(circle at 80% 80%, rgba(21, 87, 214, 0.12), transparent 34%),
-            var(--color-bg);
+    color: #ffffff;
 }
 
-body.dark-mode .login-page__aside {
-    background:
-            radial-gradient(circle at 20% 20%, rgba(96, 165, 250, 0.16), transparent 34%),
-            radial-gradient(circle at 80% 80%, rgba(96, 165, 250, 0.1), transparent 34%),
-            var(--color-bg);
+.login-page__aside-caption span {
+    display: block;
+    margin-bottom: 12px;
+    color: #bfdbfe;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
 }
 
-.login-page__aside-content {
-    max-width: 560px;
-    padding: 42px;
-
-    background: color-mix(in srgb, var(--color-surface) 88%, transparent);
-    border: 1px solid var(--color-border);
-    border-radius: calc(var(--radius-lg) + 8px);
-    box-shadow: 0 18px 44px var(--color-shadow);
-    backdrop-filter: blur(16px);
-}
-
-.login-page__aside-content h2 {
-    margin-bottom: 16px;
-
-    color: var(--color-text);
+.login-page__aside-caption strong {
+    display: block;
+    max-width: 620px;
+    color: #ffffff;
     font-size: clamp(2rem, 4vw, 3.4rem);
-    font-weight: 900;
-    line-height: 1;
-    letter-spacing: -0.06em;
-}
-
-.login-page__aside-content p {
-    color: var(--color-muted);
-    font-size: 1.02rem;
-    line-height: 1.75;
-}
-
-.login-page__aside-content ul {
-    margin-top: 26px;
-    display: grid;
-    gap: 14px;
-}
-
-.login-page__aside-content li {
-    display: grid;
-    grid-template-columns: 24px 1fr;
-    gap: 12px;
-    align-items: start;
-
-    color: var(--color-muted);
-    line-height: 1.55;
-}
-
-.login-page__aside-content li i {
-    width: 22px;
-    height: 22px;
-
-    display: grid;
-    place-items: center;
-
-    margin-top: 1px;
-
-    border-radius: var(--radius-pill);
-
-    background: var(--login-check-bg);
-    color: var(--color-primary);
-
-    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: 0;
 }
 
 @keyframes loginLogoJump {
@@ -461,12 +443,12 @@ body.dark-mode .login-page__aside {
 
 @media (max-width: 560px) {
     .login-page__panel {
-        padding: 28px 18px;
+        padding: 18px 18px 28px;
     }
 
     .login-page__brand-row {
         position: static;
-        margin-bottom: 48px;
+        margin-bottom: 34px;
     }
 
     .login-page__brand-subtitle {
@@ -479,8 +461,7 @@ body.dark-mode .login-page__aside {
     }
 
     .login-page__logo {
-        width: 27px;
-        height: 27px;
+        font-size: 1.2rem;
     }
 
     .login-page__header {
