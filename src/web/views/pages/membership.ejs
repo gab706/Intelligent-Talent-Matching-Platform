@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Membership | Intelligent Talent Matching Platform</title>
+    <meta name="description" content="TalentMatch helps candidates find jobs and employers find candidates using intelligent profile and job matching." />
+    <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/membership.css" />
+    <script src="/lib/js/jquery.min.js"></script>
+</head>
+<body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
+<%- include('../partials/public-header/public-header'); %>
+<main class="membership-page">
+
+    <section class="membership-page__hero" aria-labelledby="membership-title">
+        <p class="membership-page__eyebrow">
+            Account Types
+        </p>
+
+        <h1 id="membership-title" class="membership-page__title">
+            Built for every stage of recruitment.
+        </h1>
+
+        <p class="membership-page__description">
+            TalentMatch supports candidates, employers, and flexible users who need both workflows in one account.
+        </p>
+    </section>
+
+    <section class="membership-page__types" aria-label="TalentMatch account types">
+
+        <article class="membership-page__type membership-page__type--candidate">
+            <i class="fas fa-user-tie" aria-hidden="true"></i>
+
+            <h2>
+                Candidate
+            </h2>
+
+            <p>
+                Build your profile, discover suitable jobs, save opportunities,
+                and apply for roles matched to your skills and preferences.
+            </p>
+
+            <ul>
+                <li>Candidate profile</li>
+                <li>Job recommendations</li>
+                <li>Saved jobs and applications</li>
+            </ul>
+
+            <a href="/register/candidate">
+                Continue as candidate
+            </a>
+        </article>
+
+        <article class="membership-page__type membership-page__type--employer">
+            <i class="fas fa-building" aria-hidden="true"></i>
+
+            <h2>
+                Employer
+            </h2>
+
+            <p>
+                Create company profiles, publish job postings, review applications,
+                and discover candidates through intelligent matching.
+            </p>
+
+            <ul>
+                <li>Employer profile</li>
+                <li>Candidate recommendations</li>
+                <li>Job posting management</li>
+            </ul>
+
+            <a href="/register/employer">
+                Continue as employer
+            </a>
+        </article>
+
+        <article class="membership-page__type membership-page__type--flexible">
+            <i class="fas fa-exchange-alt" aria-hidden="true"></i>
+
+            <h2>
+                Flexible
+            </h2>
+
+            <p>
+                Use both candidate and employer features from one account when
+                you need to search for work and represent an organisation.
+            </p>
+
+            <ul>
+                <li>Candidate and employer profiles</li>
+                <li>Both recommendation workflows</li>
+                <li>Switch between account needs</li>
+            </ul>
+
+            <a href="/register">
+                Create flexible account
+            </a>
+        </article>
+
+    </section>
+
+    <section class="membership-page__explain" aria-labelledby="membership-explain-title">
+        <div>
+            <p class="membership-page__eyebrow">
+                How it works
+            </p>
+
+            <h2 id="membership-explain-title">
+                One platform, different workflows.
+            </h2>
+
+            <p>
+                Candidates focus on finding jobs. Employers focus on finding candidates.
+                Flexible users can use both sides of the platform without needing separate accounts.
+            </p>
+        </div>
+
+        <div class="membership-page__steps">
+
+            <article>
+                <span>
+                    01
+                </span>
+
+                <div class="membership-page__steps-content">
+                    <strong>
+                        Create the account type you need
+                    </strong>
+
+                    <p>
+                        Start as a candidate, employer, or flexible user.
+                    </p>
+                </div>
+            </article>
+
+            <article>
+                <span>
+                    02
+                </span>
+
+                <div class="membership-page__steps-content">
+                    <strong>
+                        Build the right profile
+                    </strong>
+
+                    <p>
+                        Add candidate details, company details, or both depending
+                        on how you plan to use TalentMatch.
+                    </p>
+                </div>
+            </article>
+
+            <article>
+                <span>
+                    03
+                </span>
+
+                <div class="membership-page__steps-content">
+                    <strong>
+                        Use intelligent matching
+                    </strong>
+
+                    <p>
+                        Receive job or candidate recommendations based on profile,
+                        job, skill, and preference data.
+                    </p>
+                </div>
+            </article>
+
+        </div>
+    </section>
+
+</main>
+<%- include('../partials/footer/footer'); %>
+<script src="/js/global.js"></script>
+<script src="/js/membership.js"></script>
+</body>
+</html>
