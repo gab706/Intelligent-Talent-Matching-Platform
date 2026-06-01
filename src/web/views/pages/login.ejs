@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | Intelligent Talent Matching Platform</title>
+    <meta name="description" content="TalentMatch helps candidates find jobs and employers find candidates using intelligent profile and job matching." />
+    <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
+    <link rel="stylesheet" href="/lib/css/toastr.min.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/login.css" />
+    <script src="/lib/js/jquery.min.js"></script>
+    <script src="/lib/js/toastr.min.js"></script>
+</head>
+<body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
+<main class="login-page">
+    <section class="login-page__panel" aria-labelledby="login-title">
+
+        <div class="login-page__brand-row">
+            <a href="/index" class="login-page__brand" aria-label="TalentMatch Home">
+                <span class="login-page__logo-wrapper">
+                    <svg class="login-page__logo" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <circle cx="20" cy="22" r="8" />
+                        <circle cx="44" cy="22" r="8" />
+                        <circle cx="32" cy="46" r="8" />
+                        <path d="M27 26L37 42" />
+                        <path d="M37 26L27 42" />
+                        <path d="M28 22H36" />
+                    </svg>
+                </span>
+
+                <span class="login-page__brand-text">
+                    <span class="login-page__brand-title">
+                        TalentMatch
+                    </span>
+
+                    <span class="login-page__brand-subtitle">
+                        ITMP Platform
+                    </span>
+                </span>
+            </a>
+
+            <button class="login-page__theme-toggle" type="button" aria-label="Toggle dark mode" data-theme-toggle>
+                <i class="fas <%= theme === 'DARK' ? 'fa-moon' : 'fa-sun' %>" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <div class="login-page__header">
+            <p class="login-page__eyebrow">
+                Welcome back
+            </p>
+
+            <h1 id="login-title" class="login-page__title">
+                Log in to TalentMatch.
+            </h1>
+
+            <p class="login-page__description">
+                Access your profile, recommendations, applications, and recruitment workflows.
+            </p>
+        </div>
+
+        <form class="login-page__form">
+            <div class="login-page__field">
+                <label class="login-page__label" for="email">
+                    Email address
+                </label>
+
+                <div class="login-page__input-wrapper">
+                    <i class="fas fa-envelope" aria-hidden="true"></i>
+
+                    <input id="email" name="email" type="email" autocomplete="email" required/>
+                </div>
+            </div>
+
+            <div class="login-page__field">
+                <label class="login-page__label" for="password">
+                    Password
+                </label>
+
+                <div class="login-page__input-wrapper">
+                    <i class="fas fa-lock" aria-hidden="true"></i>
+
+                    <input id="password" name="password" type="password" autocomplete="current-password" required />
+                </div>
+            </div>
+
+            <div class="login-page__options">
+                <label class="login-page__remember">
+                    <input type="checkbox" name="remember" value="true"/>
+
+                    <span>
+                        Remember me
+                    </span>
+                </label>
+
+                <a href="/forgot-password" class="login-page__link">
+                    Forgot password?
+                </a>
+            </div>
+
+            <button class="login-page__submit" type="submit">
+                Log in
+            </button>
+        </form>
+
+        <p class="login-page__signup">
+            Do not have an account?
+            <a href="/register">
+                Create one
+            </a>
+        </p>
+
+    </section>
+
+    <aside class="login-page__aside" aria-label="TalentMatch platform summary">
+        <div class="login-page__aside-content">
+            <p class="login-page__eyebrow">
+                Intelligent matching
+            </p>
+
+            <h2>
+                One account for smarter recruitment workflows.
+            </h2>
+
+            <p>
+                TalentMatch helps candidates find suitable jobs and helps employers
+                discover candidates using structured profiles, skills, preferences,
+                and recommendation logic.
+            </p>
+
+            <ul>
+                <li>
+                    <i class="fas fa-check" aria-hidden="true"></i>
+                    Candidate and employer profiles
+                </li>
+
+                <li>
+                    <i class="fas fa-check" aria-hidden="true"></i>
+                    Job and candidate recommendations
+                </li>
+
+                <li>
+                    <i class="fas fa-check" aria-hidden="true"></i>
+                    Applications, saved jobs and notifications
+                </li>
+            </ul>
+        </div>
+    </aside>
+</main>
+<script src="/js/global.js"></script>
+<script src="/js/login.js"></script>
+</body>
+</html>
