@@ -1,0 +1,205 @@
+body:has(.account-home) .public-header {
+    z-index: 95;
+    background: color-mix(in srgb, var(--color-surface) 94%, transparent);
+    backdrop-filter: blur(14px);
+    border-bottom-color: var(--color-border);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+body.dark-mode:has(.account-home) .public-header {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+.account-home {
+    min-height: 100vh;
+    margin-top: -74px;
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    background: var(--color-bg);
+    color: var(--color-text);
+}
+
+.account-home__sidebar {
+    position: relative;
+    min-height: 100vh;
+    padding: 104px 24px 24px;
+    border-right: 1px solid var(--color-border);
+    background: var(--color-surface);
+    overflow: hidden;
+}
+
+.account-home__sidebar::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 74px;
+    background: color-mix(in srgb, var(--color-primary) 9%, var(--color-surface));
+    border-bottom: 1px solid var(--color-border);
+}
+
+.account-home__nav {
+    min-height: calc(100vh - 128px);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    position: relative;
+    z-index: 1;
+}
+
+.account-home__nav-primary,
+.account-home__nav-actions {
+    display: grid;
+    gap: 6px;
+}
+
+.account-home__nav-actions {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+}
+
+.account-home__nav-link {
+    min-height: 44px;
+    padding: 0 14px;
+
+    display: flex;
+    align-items: center;
+
+    border-radius: var(--radius-sm);
+    color: var(--color-muted);
+    font-weight: 760;
+    letter-spacing: 0;
+
+    transition:
+            background 180ms ease,
+            color 180ms ease,
+            transform 180ms ease;
+}
+
+.account-home__nav-link:hover,
+.account-home__nav-link:focus-visible,
+.account-home__nav-link.is-active {
+    background: var(--color-surface-soft);
+    color: var(--color-primary);
+    transform: translateY(-1px);
+}
+
+.account-home__nav-link--mode {
+    color: var(--color-text);
+}
+
+.account-home__nav-link--admin {
+    color: #dc2626;
+}
+
+.account-home__nav-link--admin:hover,
+.account-home__nav-link--admin:focus-visible {
+    color: #b91c1c;
+    background: color-mix(in srgb, #dc2626 10%, var(--color-surface));
+}
+
+.account-home__nav-divider {
+    height: 1px;
+    margin: 10px 0;
+    background: var(--color-border);
+}
+
+.account-home__content {
+    min-width: 0;
+    padding: 132px clamp(24px, 5vw, 72px) 56px;
+}
+
+.account-home__eyebrow {
+    margin-bottom: 10px;
+    color: var(--color-primary);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.account-home__title {
+    margin-bottom: 16px;
+    color: var(--color-text);
+    font-size: clamp(2.3rem, 5vw, 4.5rem);
+    font-weight: 700;
+    line-height: 1.04;
+    letter-spacing: 0;
+}
+
+.account-home__copy {
+    max-width: 720px;
+    margin-bottom: 18px;
+    color: var(--color-muted);
+    font-size: 1.08rem;
+    line-height: 1.7;
+}
+
+.account-home__meta {
+    font-size: 0.9rem;
+    color: var(--color-muted);
+}
+
+.account-home__meta strong {
+    color: var(--color-text);
+}
+
+.account-home--candidate .account-home__nav-link {
+    font-family: "Trebuchet MS", "Inter", system-ui, sans-serif;
+    font-weight: 700;
+}
+
+.account-home--employer .account-home__nav-link {
+    font-family: "Trebuchet MS", "Inter", system-ui, sans-serif;
+    font-weight: 700;
+}
+
+@media (max-width: 860px) {
+    .account-home {
+        grid-template-columns: 1fr;
+        margin-top: 0;
+    }
+
+    .account-home__sidebar {
+        min-height: 0;
+        padding: 14px 16px;
+        border-right: 0;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .account-home__sidebar::before {
+        display: none;
+    }
+
+    .account-home__nav {
+        min-height: 0;
+        flex-direction: row;
+        gap: 6px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+    }
+
+    .account-home__nav-primary,
+    .account-home__nav-actions {
+        display: flex;
+        flex: 0 0 auto;
+        gap: 6px;
+    }
+
+    .account-home__nav-actions {
+        margin-top: 0;
+        align-self: stretch;
+        padding-top: 0;
+        padding-left: 10px;
+        border-top: 0;
+        border-left: 1px solid var(--color-border);
+    }
+
+    .account-home__nav-divider {
+        display: none;
+    }
+
+    .account-home__content {
+        padding: 36px 16px 58px;
+    }
+}
