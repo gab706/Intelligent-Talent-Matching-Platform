@@ -4,10 +4,17 @@ $(async function () {
     const $helpModal = $("[data-help-modal]");
     const $helpOpenButton = $("[data-help-open]");
     const $helpCloseButtons = $("[data-help-close]");
+    const $profileModal = $("[data-profile-modal]");
+    const $profileOpenButtons = $("[data-profile-open]");
+    const $profileCloseButtons = $("[data-profile-close]");
+    const $profileForm = $("[data-profile-form]");
+    const $profileAvatarInput = $("[data-profile-avatar-input]");
+    const $profileAvatarPreview = $("[data-profile-avatar-preview]");
     const $publicHeader = $(".public-header");
     const $mobileMenuToggle = $("[data-mobile-menu-toggle]");
     const $dropdownItems = $(".public-header__link-item--dropdown");
     const mobileMenuQuery = window.matchMedia("(max-width: 980px)");
+    let dropdownCloseTimer = null;
 
     const updateHeaderScrollState = function () {
         $publicHeader.toggleClass("is-scrolled", window.scrollY > 16);
@@ -16,7 +23,17 @@ $(async function () {
     $(window).on("scroll", updateHeaderScrollState);
     updateHeaderScrollState();
 
+    const clearDropdownCloseTimer = function () {
+        if (!dropdownCloseTimer)
+            return;
+
+        window.clearTimeout(dropdownCloseTimer);
+        dropdownCloseTimer = null;
+    };
+
     const closeDropdowns = function () {
+        clearDropdownCloseTimer();
+
         $dropdownTriggers.each(function () {
             $(this)
                 .attr("aria-expanded", "false")
@@ -32,10 +49,31 @@ $(async function () {
         }
     };
 
+    const closeOtherDropdowns = function ($activeItem) {
+        $dropdownItems.not($activeItem).each(function () {
+            $(this)
+                .removeClass("is-open")
+                .find("[data-public-dropdown]")
+                .attr("aria-expanded", "false");
+        });
+    };
+
     const openDropdown = function ($item) {
-        closeDropdowns();
+        clearDropdownCloseTimer();
+        closeOtherDropdowns($item);
         $item.addClass("is-open");
         $item.find("[data-public-dropdown]").attr("aria-expanded", "true");
+    };
+
+    const scheduleDropdownClose = function ($item) {
+        clearDropdownCloseTimer();
+
+        dropdownCloseTimer = window.setTimeout(function () {
+            if ($item.is(":hover") || $item.find("*:hover").length)
+                return;
+
+            closeDropdowns();
+        }, 180);
     };
 
     const closeMobileMenu = function () {
@@ -94,7 +132,11 @@ $(async function () {
         if (mobileMenuQuery.matches)
             return;
 
-        closeDropdowns();
+        scheduleDropdownClose($(this));
+    });
+
+    $("[data-public-dropdown-menu], [data-public-dropdown]").on("mouseenter", function () {
+        clearDropdownCloseTimer();
     });
 
     $(document).on("click", function () {
@@ -104,15 +146,6 @@ $(async function () {
 
     $(".public-header__menu").on("click", function (event) {
         event.stopPropagation();
-    });
-
-    $("[data-public-dropdown-menu]").on("click", function (event) {
-        event.stopPropagation();
-    });
-
-    $(".public-header__dropdown-link, .public-header__link:not(.public-header__dropdown-trigger)").on("click", function () {
-        closeMobileMenu();
-        closeDropdowns();
     });
 
     const openHelpModal = function () {
@@ -131,6 +164,190 @@ $(async function () {
     $helpOpenButton.on("click", openHelpModal);
     $helpCloseButtons.on("click", closeHelpModal);
 
+    const showMessage = function (message, type = "error") {
+        if (window.toastr && typeof window.toastr[type] === "function") {
+            window.toastr[type](message);
+            return;
+        }
+
+        window.alert(message);
+    };
+
+    const openProfileModal = function () {
+        closeMobileMenu();
+        closeDropdowns();
+        $profileModal.addClass("is-open").attr("aria-hidden", "false");
+        $("body").addClass("is-profile-modal-open");
+        $profileModal.find("[data-profile-close]").first().trigger("focus");
+    };
+
+    const closeProfileModal = function () {
+        $profileModal.removeClass("is-open").attr("aria-hidden", "true");
+        $("body").removeClass("is-profile-modal-open");
+    };
+
+    $profileOpenButtons.on("click", openProfileModal);
+    $profileCloseButtons.on("click", closeProfileModal);
+
+    $profileAvatarInput.on("change", function () {
+        const file = this.files && this.files[0];
+
+        if (!file)
+            return;
+
+        $profileAvatarPreview.attr("src", URL.createObjectURL(file));
+    });
+
+    $profileForm.on("submit", async function (event) {
+        event.preventDefault();
+
+        const $saveButton = $profileForm.find("[data-profile-save]");
+        const formData = new FormData(this);
+
+        $saveButton.prop("disabled", true).text("Saving...");
+
+        try {
+            const response = await fetch("/user/profile", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                showMessage(data.message || "Unable to save your profile.");
+                return;
+            }
+
+            closeProfileModal();
+            window.location.reload();
+        } catch (err) {
+            console.error(err);
+            showMessage("An unexpected error occurred. Please try again.");
+        } finally {
+            $saveButton.prop("disabled", false).text("Save");
+        }
+    });
+
+    const renderEmptyNotifications = function () {
+        $("[data-notification-list]").html(
+            '<p class="public-header__notification-empty">No New Notifications</p>'
+        );
+        $("[data-notification-badge]").remove();
+        $("[data-notification-read-all]")
+            .replaceWith(
+                '<span class="public-header__notification-read-all is-disabled" aria-disabled="true" data-notification-read-all-disabled>Mark all as read</span>'
+            );
+    };
+
+    const updateNotificationBadge = function (unreadCount) {
+        const normalisedCount = Number(unreadCount) || 0;
+        const $toggle = $(".public-header__notification-toggle");
+        const $badge = $("[data-notification-badge]");
+
+        if (normalisedCount <= 0) {
+            $badge.remove();
+            return;
+        }
+
+        if ($badge.length) {
+            $badge.text(normalisedCount);
+            return;
+        }
+
+        $toggle.append(
+            '<span class="public-header__notification-badge" data-notification-badge>' +
+                normalisedCount +
+                '</span>'
+        );
+    };
+
+    const markNotificationsRead = async function (payload) {
+        const response = await fetch("/user/notification-read", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success)
+            throw new Error(data.message || "Unable to update notifications.");
+
+        return data;
+    };
+
+    $("[data-public-dropdown-menu]").on("click", "[data-notification-read]", async function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const $notification = $(this);
+        const notificationId = $notification.data("notification-id");
+
+        if (!notificationId || $notification.prop("disabled"))
+            return;
+
+        $notification.prop("disabled", true);
+
+        try {
+            const data = await markNotificationsRead({
+                notificationId
+            });
+
+            $notification.remove();
+            const unreadCount = Number(data.unreadCount) || 0;
+
+            updateNotificationBadge(unreadCount);
+
+            if (!$("[data-notification-read]").length && unreadCount > 0) {
+                window.location.reload();
+                return;
+            }
+
+            if (!$("[data-notification-read]").length)
+                renderEmptyNotifications();
+        } catch (err) {
+            console.error(err);
+            $notification.prop("disabled", false);
+            showMessage(err.message || "Unable to update notifications.");
+        }
+    });
+
+    $("[data-public-dropdown-menu]").on("click", "[data-notification-read-all]", async function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const $readAll = $(this);
+
+        if ($readAll.hasClass("is-disabled"))
+            return;
+
+        $readAll.addClass("is-disabled").attr("aria-disabled", "true");
+
+        try {
+            await markNotificationsRead({
+                all: true
+            });
+
+            renderEmptyNotifications();
+        } catch (err) {
+            console.error(err);
+            $readAll.removeClass("is-disabled").removeAttr("aria-disabled");
+            showMessage(err.message || "Unable to update notifications.");
+        }
+    });
+
+    $("[data-public-dropdown-menu]").on("click", function (event) {
+        event.stopPropagation();
+    });
+
+    $(".public-header__dropdown-link:not([data-profile-open]), .public-header__link:not(.public-header__dropdown-trigger)").on("click", function () {
+        closeMobileMenu();
+        closeDropdowns();
+    });
+
     $(document).on("keydown", function (event) {
         if (event.key === "Escape") {
             closeDropdowns();
@@ -140,8 +357,6 @@ $(async function () {
     });
 
     if ($themeToggleButton.length) {
-        const $themeIcon = $themeToggleButton.find("i");
-
         const applyTheme = function (theme) {
             const normalisedTheme =
                 String(theme || "LIGHT").toUpperCase() === "DARK"
@@ -150,23 +365,29 @@ $(async function () {
 
             $("body").toggleClass("dark-mode", normalisedTheme === "DARK");
 
-            $themeIcon
-                .removeClass("fas fa-sun fa-moon")
-                .addClass("fas")
-                .addClass(normalisedTheme === "DARK" ? "fa-moon" : "fa-sun");
+            $themeToggleButton.each(function () {
+                const $toggle = $(this);
 
-            $themeToggleButton.attr(
-                "aria-label",
-                normalisedTheme === "DARK"
-                    ? "Switch to light mode"
-                    : "Switch to dark mode"
-            );
+                if ($toggle.is("input[type='checkbox']")) {
+                    $toggle.prop("checked", normalisedTheme === "DARK");
+                    return;
+                }
+
+                $toggle
+                    .attr(
+                        "aria-label",
+                        normalisedTheme === "DARK"
+                            ? "Switch to light mode"
+                            : "Switch to dark mode"
+                    )
+                    .find("i")
+                    .removeClass("fas fa-sun fa-moon")
+                    .addClass("fas")
+                    .addClass(normalisedTheme === "DARK" ? "fa-moon" : "fa-sun");
+            });
         };
 
-        $themeToggleButton.on("click", async function () {
-            const isDarkMode = $("body").hasClass("dark-mode");
-            const nextTheme = isDarkMode ? "LIGHT" : "DARK";
-
+        const persistTheme = async function (nextTheme) {
             applyTheme(nextTheme);
 
             try {
@@ -185,6 +406,15 @@ $(async function () {
             } catch (err) {
                 console.error(err);
             }
+        };
+
+        $themeToggleButton.filter("button").on("click", async function () {
+            const isDarkMode = $("body").hasClass("dark-mode");
+            await persistTheme(isDarkMode ? "LIGHT" : "DARK");
+        });
+
+        $themeToggleButton.filter("input[type='checkbox']").on("change", async function () {
+            await persistTheme($(this).is(":checked") ? "DARK" : "LIGHT");
         });
     }
 });

@@ -5,6 +5,9 @@ export default function candidateHomeHelper(
     res: Response,
     _next: NextFunction
 ) {
+    if (!req.session.isAuthenticated || !req.session.userId)
+        return res.redirect('/login');
+
     if (req.session.accountType === 2)
         return res.redirect('/employer/home');
 

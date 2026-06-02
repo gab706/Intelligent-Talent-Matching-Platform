@@ -3,6 +3,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import PublicHelper from './helpers/PublicHelper.js';
+import LogoutHelper from './helpers/logout.js';
 
 type Handler = (
 	req: Request,
@@ -18,9 +19,32 @@ const __dirname = path.dirname(__filename);
 const viewsDir = path.join(__dirname, '../../src/web/views/pages');
 const helpersDir = path.join(__dirname, './helpers');
 const workersDir = path.join(__dirname, './workers');
+const avatarImagesDir = path.join(__dirname, '../../src/web/images/avatars');
 
 router.get('/', (_req: Request, res: Response) =>
 	res.redirect('/index'));
+
+router.get('/logout', LogoutHelper);
+
+router.get('/images/avatars/:hash', async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const hash = String(req.params.hash || '');
+
+		if (!/^[a-zA-Z0-9_-]+$/.test(hash))
+			return res.redirect('/images/avatar/default.png');
+
+		const files = await fs.readdir(avatarImagesDir);
+		const avatarFile = files.find(file =>
+			file.startsWith(`${hash}.`));
+
+		if (!avatarFile)
+			return res.redirect('/images/avatar/default.png');
+
+		return res.sendFile(path.join(avatarImagesDir, avatarFile));
+	} catch (err) {
+		return next(err);
+	}
+});
 
 async function fileExists(filePath: string): Promise<boolean> {
 	try {

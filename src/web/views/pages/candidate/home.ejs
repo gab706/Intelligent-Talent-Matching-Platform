@@ -8,34 +8,52 @@
     <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
     <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
     <link rel="stylesheet" href="/css/global.css" />
-    <link rel="stylesheet" href="/css/register.css" />
+    <link rel="stylesheet" href="/css/account-home.css" />
     <script src="/lib/js/jquery.min.js"></script>
 </head>
 <body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
 <%- include('../../partials/public-header/public-header'); %>
-<main class="register-candidate">
-    <section class="register-candidate__shell" aria-labelledby="candidate-home-title">
-        <div class="register-candidate__intro">
-            <p class="register-candidate__eyebrow">
-                Candidate home
-            </p>
-            <h1 id="candidate-home-title">
-                Your candidate account is ready.
-            </h1>
-            <p>
-                Add skills, work history, preferences, and documents next so TalentMatch
-                can start shaping better job recommendations around your profile.
-            </p>
-            <p>
-                Server userId:
-                <strong>
-                    <%= userId || 'No user session' %>
-                </strong>
-            </p>
-        </div>
+<main class="account-home account-home--candidate">
+    <aside class="account-home__sidebar" aria-label="Candidate navigation">
+        <nav class="account-home__nav">
+            <div class="account-home__nav-primary">
+                <a class="account-home__nav-link is-active" href="/candidate/home">Candidate Home</a>
+                <a class="account-home__nav-link" href="/candidate/find-a-job">Find a Job</a>
+                <a class="account-home__nav-link" href="/candidate/applications">Track Applications</a>
+                <a class="account-home__nav-link" href="/candidate/profile">Manage Profile</a>
+            </div>
+            <div class="account-home__nav-actions">
+                <% if (accountType === 3) { %>
+                <a class="account-home__nav-link account-home__nav-link--mode" href="/employer/home">Swap to Employer Mode</a>
+                <% } else { %>
+                <a class="account-home__nav-link account-home__nav-link--mode" href="/candidate/migrate">Migrate to Employer Account</a>
+                <% } %>
+                <% if (isAdmin) { %>
+                <a class="account-home__nav-link account-home__nav-link--admin" href="/admin/control">Admin Control</a>
+                <% } %>
+            </div>
+        </nav>
+    </aside>
+
+    <section class="account-home__content" aria-labelledby="candidate-home-title">
+        <p class="account-home__eyebrow">
+            Candidate home
+        </p>
+        <h1 id="candidate-home-title" class="account-home__title">
+            Welcome back <%= firstName || 'there' %>
+        </h1>
+        <p class="account-home__copy">
+            Add skills, work history, preferences, and documents next so TalentMatch
+            can start shaping better job recommendations around your profile.
+        </p>
+        <p class="account-home__meta">
+            Server userId:
+            <strong>
+                <%= userId || 'No user session' %>
+            </strong>
+        </p>
     </section>
 </main>
-<%- include('../../partials/footer/footer'); %>
 <script src="/js/global.js"></script>
 </body>
 </html>

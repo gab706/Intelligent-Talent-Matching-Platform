@@ -8,34 +8,53 @@
     <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
     <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
     <link rel="stylesheet" href="/css/global.css" />
-    <link rel="stylesheet" href="/css/register.css" />
+    <link rel="stylesheet" href="/css/account-home.css" />
     <script src="/lib/js/jquery.min.js"></script>
 </head>
 <body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
 <%- include('../../partials/public-header/public-header'); %>
-<main class="register-candidate">
-    <section class="register-candidate__shell" aria-labelledby="employer-home-title">
-        <div class="register-candidate__intro">
-            <p class="register-candidate__eyebrow">
-                Employer home
-            </p>
-            <h1 id="employer-home-title">
-                Your employer account is ready.
-            </h1>
-            <p>
-                Connect to an existing company or create a company profile next so
-                TalentMatch can organise jobs, candidates, and hiring activity.
-            </p>
-            <p>
-                Server userId:
-                <strong>
-                    <%= userId || 'No user session' %>
-                </strong>
-            </p>
-        </div>
+<main class="account-home account-home--employer">
+    <aside class="account-home__sidebar" aria-label="Employer navigation">
+        <nav class="account-home__nav">
+            <div class="account-home__nav-primary">
+                <a class="account-home__nav-link is-active" href="/employer/home">Employer Home</a>
+                <a class="account-home__nav-link" href="/employer/find-a-candidate">Find a Candidate</a>
+                <a class="account-home__nav-link" href="/employer/postings">Tracking Postings</a>
+                <a class="account-home__nav-link" href="/employer/applications">Manage Applications</a>
+                <a class="account-home__nav-link" href="/employer/companies">Manage Companies</a>
+            </div>
+            <div class="account-home__nav-actions">
+                <% if (accountType === 3) { %>
+                <a class="account-home__nav-link account-home__nav-link--mode" href="/candidate/home">Swap to Candidate Mode</a>
+                <% } else { %>
+                <a class="account-home__nav-link account-home__nav-link--mode" href="/employer/migrate">Migrate to Candidate Account</a>
+                <% } %>
+                <% if (isAdmin) { %>
+                <a class="account-home__nav-link account-home__nav-link--admin" href="/admin/control">Admin Control</a>
+                <% } %>
+            </div>
+        </nav>
+    </aside>
+
+    <section class="account-home__content" aria-labelledby="employer-home-title">
+        <p class="account-home__eyebrow">
+            Employer home
+        </p>
+        <h1 id="employer-home-title" class="account-home__title">
+            Welcome back <%= firstName || 'there' %>
+        </h1>
+        <p class="account-home__copy">
+            Connect to an existing company or create a company profile next so
+            TalentMatch can organise jobs, candidates, and hiring activity.
+        </p>
+        <p class="account-home__meta">
+            Server userId:
+            <strong>
+                <%= userId || 'No user session' %>
+            </strong>
+        </p>
     </section>
 </main>
-<%- include('../../partials/footer/footer'); %>
 <script src="/js/global.js"></script>
 </body>
 </html>
