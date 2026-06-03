@@ -479,6 +479,12 @@ body.dark-mode .public-header {
     min-width: 300px;
 }
 
+.public-header__notification-list {
+    max-height: min(420px, 58vh);
+    overflow-y: auto;
+    padding-right: 2px;
+}
+
 .public-header__notification-item {
     width: 100%;
     padding: 10px 12px;
@@ -505,8 +511,25 @@ body.dark-mode .public-header {
 }
 
 .public-header__notification-item:disabled {
-    cursor: wait;
-    opacity: 0.72;
+    cursor: default;
+    opacity: 1;
+}
+
+.public-header__notification-item--read strong {
+    font-weight: 650;
+}
+
+.public-header__notification-item--unread strong {
+    font-weight: 900;
+}
+
+.public-header__notification-item--read {
+    background: color-mix(in srgb, var(--color-surface-soft) 45%, transparent);
+}
+
+.public-header__notification-item--read:hover,
+.public-header__notification-item--read:focus-visible {
+    transform: none;
 }
 
 .public-header__notification-avatar {
@@ -526,7 +549,6 @@ body.dark-mode .public-header {
 .public-header__notification-item strong {
     color: var(--color-text);
     font-size: 0.92rem;
-    font-weight: 800;
 }
 
 .public-header__notification-item span,
@@ -1014,22 +1036,34 @@ body.dark-mode .public-profile-modal__dialog {
     display: none;
 }
 
-.public-profile-modal__account-type {
-    min-height: 34px;
-    padding: 0 12px;
+.public-profile-modal__settings-pair {
+    max-width: 460px;
+    width: 100%;
     justify-self: center;
 
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 9px;
-
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-pill);
-    background: var(--color-surface-soft);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px;
 }
 
-.public-profile-modal__account-type span,
+.public-profile-modal__setting {
+    display: grid;
+    gap: 5px;
+    align-content: start;
+}
+
+.public-profile-modal__setting--account {
+    justify-items: start;
+    text-align: left;
+}
+
+.public-profile-modal__setting--membership {
+    justify-items: end;
+    text-align: right;
+    cursor: pointer;
+}
+
+.public-profile-modal__setting-label,
 .public-profile-modal__field span,
 .public-profile-modal__password-group p {
     color: var(--color-muted);
@@ -1037,9 +1071,55 @@ body.dark-mode .public-profile-modal__dialog {
     font-weight: 800;
 }
 
-.public-profile-modal__account-type strong {
+.public-profile-modal__setting-value {
     color: var(--color-text);
     font-weight: 800;
+}
+
+.public-profile-modal__setting--membership input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.public-profile-modal__membership-slider {
+    position: relative;
+    width: 38px;
+    height: 22px;
+    flex: 0 0 auto;
+
+    border-radius: 999px;
+    background: var(--color-border);
+    transition: background 180ms ease;
+}
+
+.public-profile-modal__membership-slider::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+
+    width: 16px;
+    height: 16px;
+
+    border-radius: 999px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.22);
+    transition: transform 180ms ease;
+}
+
+.public-profile-modal__setting--membership input:checked + .public-profile-modal__membership-slider {
+    background: var(--color-primary);
+}
+
+.public-profile-modal__setting--membership input:checked + .public-profile-modal__membership-slider::after {
+    transform: translateX(16px);
+}
+
+.public-profile-modal__setting--membership input:focus-visible + .public-profile-modal__membership-slider {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 24%, transparent);
 }
 
 .public-profile-modal__grid {

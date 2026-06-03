@@ -15,12 +15,19 @@ export default async function SharedController(req: Request, res: Response, next
 			: req.session.accountType === 2
 				? 'Employer'
 				: 'Candidate';
-	res.payload.isAccountHomePage = ['/candidate/home', '/employer/home'].includes(req.path);
+	res.payload.isAccountHomePage = [
+		'/candidate/home',
+		'/candidate/profile',
+		'/employer/home'
+	].includes(req.path) || req.path.startsWith('/employer/companies');
 	res.payload.avatarPath = '/images/avatar/default.png';
 	res.payload.notifications = [];
 	res.payload.unreadNotificationCount = 0;
 
 	if (req.session.isAuthenticated && req.session.userId) {
+		const notificationCutoff = new Date();
+		notificationCutoff.setDate(notificationCutoff.getDate() - 7);
+
 		const user = await prisma.user.findUnique({
 			where: {
 				id: req.session.userId
@@ -31,6 +38,7 @@ export default async function SharedController(req: Request, res: Response, next
 				firstName: true,
 				lastName: true,
 				phone: true,
+				isMember: true,
 				role: true
 			}
 		});
@@ -41,6 +49,7 @@ export default async function SharedController(req: Request, res: Response, next
 			res.payload.lastName = user.lastName;
 			res.payload.fullName = `${user.firstName} ${user.lastName}`.trim();
 			res.payload.phone = user.phone;
+			res.payload.isMember = user.isMember;
 			res.payload.isAdmin = user.role === 'ADMIN';
 
 			if (user.avatarHash)
@@ -51,19 +60,25 @@ export default async function SharedController(req: Request, res: Response, next
 			prisma.notification.count({
 				where: {
 					recipientId: req.session.userId,
-					isRead: false
+					isRead: false,
+					createdAt: {
+						gte: notificationCutoff
+					}
 				}
 			}),
 			prisma.notification.findMany({
 				where: {
 					recipientId: req.session.userId,
-					isRead: false
+					createdAt: {
+						gte: notificationCutoff
+					}
 				},
 				select: {
 					id: true,
 					title: true,
 					message: true,
 					type: true,
+					isRead: true,
 					sender: {
 						select: {
 							avatarHash: true
@@ -72,8 +87,7 @@ export default async function SharedController(req: Request, res: Response, next
 				},
 				orderBy: {
 					createdAt: 'desc'
-				},
-				take: 5
+				}
 			})
 		]);
 
@@ -83,6 +97,7 @@ export default async function SharedController(req: Request, res: Response, next
 			title: string;
 			message: string;
 			type: string;
+			isRead: boolean;
 			sender: {
 				avatarHash: string | null;
 			} | null;
@@ -100,6 +115,7 @@ export default async function SharedController(req: Request, res: Response, next
 				title: notification.title,
 				message: notification.message,
 				type: notification.type,
+				isRead: notification.isRead,
 				avatarPath
 			};
 		});

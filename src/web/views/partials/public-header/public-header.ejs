@@ -13,6 +13,7 @@
     const renderedFullName = typeof fullName !== 'undefined' && fullName ? fullName : 'Your account';
     const renderedEmail = typeof email !== 'undefined' && email ? email : '';
     const renderedPhone = typeof phone !== 'undefined' && phone ? phone : '';
+    const renderedIsMember = typeof isMember !== 'undefined' && isMember;
     const renderedIsAdmin = typeof isAdmin !== 'undefined' && isAdmin;
     const renderedAccountLabel = typeof accountLabel !== 'undefined' && accountLabel ? accountLabel : 'Candidate';
     const renderedNotifications = typeof notifications !== 'undefined' && notifications ? notifications : [];
@@ -48,7 +49,11 @@
                             <div class="public-header__notification-list" data-notification-list>
                                 <% if (renderedNotifications.length) { %>
                                     <% renderedNotifications.forEach((notification) => { %>
-                                    <button class="public-header__notification-item" type="button" data-notification-read data-notification-id="<%= notification.id %>">
+                                    <% if (notification.isRead) { %>
+                                    <button class="public-header__notification-item public-header__notification-item--read" type="button" disabled>
+                                    <% } else { %>
+                                    <button class="public-header__notification-item public-header__notification-item--unread" type="button" data-notification-read data-notification-id="<%= notification.id %>">
+                                    <% } %>
                                         <img class="public-header__notification-avatar" src="<%= notification.avatarPath || '/images/avatar/default.png' %>" alt="" />
                                         <span class="public-header__notification-copy">
                                             <strong><%= notification.title %></strong>
@@ -98,7 +103,7 @@
                                 <% } %>
                             </div>
                             <button class="public-header__dropdown-link public-header__dropdown-button" type="button" data-profile-open>
-                                Your Profile
+                                Account Settings
                             </button>
                             <label class="public-header__theme-switch">
                                 <span>Dark Theme</span>
@@ -210,7 +215,7 @@
                                 <% } %>
                             </div>
                             <button class="public-header__dropdown-link public-header__dropdown-button" type="button" data-profile-open>
-                                Your Profile
+                                Account Settings
                             </button>
                             <label class="public-header__theme-switch">
                                 <span>Dark Theme</span>
@@ -263,10 +268,10 @@
             <i class="fas fa-times" aria-hidden="true"></i>
         </button>
         <p class="public-profile-modal__eyebrow">
-            Your Profile
+            Account Settings
         </p>
         <h2 id="public-profile-title" class="public-profile-modal__title">
-            Account details
+            Account settings
         </h2>
         <form class="public-profile-modal__form" data-profile-form>
             <label class="public-profile-modal__avatar" for="public-profile-avatar">
@@ -276,9 +281,18 @@
                 </span>
                 <input id="public-profile-avatar" name="avatar" type="file" accept=".jpg,.jpeg,.png,.heic,image/jpeg,image/png,image/heic,image/heif" data-profile-avatar-input />
             </label>
-            <div class="public-profile-modal__account-type">
-                <span>Account type</span>
-                <strong><%= renderedAccountLabel %></strong>
+            <div class="public-profile-modal__settings-pair">
+                <div class="public-profile-modal__setting public-profile-modal__setting--account">
+                    <span class="public-profile-modal__setting-label">Account type</span>
+                    <strong class="public-profile-modal__setting-value"><%= renderedAccountLabel %></strong>
+                </div>
+                <label class="public-profile-modal__setting public-profile-modal__setting--membership">
+                    <span class="public-profile-modal__setting-label">
+                        Membership subscription
+                    </span>
+                    <input type="checkbox" name="membershipSubscription" <%= renderedIsMember ? 'checked' : '' %> />
+                    <span class="public-profile-modal__membership-slider" aria-hidden="true"></span>
+                </label>
             </div>
             <div class="public-profile-modal__grid">
                 <label class="public-profile-modal__field" for="public-profile-first-name">

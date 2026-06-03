@@ -16,12 +16,17 @@ export default async function notificationReadWorker(
 
 		const { notificationId, all } = req.body ?? {};
 		const now = new Date();
+		const notificationCutoff = new Date();
+		notificationCutoff.setDate(notificationCutoff.getDate() - 7);
 
 		if (all === true) {
 			await prisma.notification.updateMany({
 				where: {
 					recipientId: req.session.userId,
-					isRead: false
+					isRead: false,
+					createdAt: {
+						gte: notificationCutoff
+					}
 				},
 				data: {
 					isRead: true,
@@ -33,6 +38,30 @@ export default async function notificationReadWorker(
 				return res.status(400).json({
 					success: false,
 					message: 'Invalid notification.'
+				});
+			}
+
+			const notification = await prisma.notification.findFirst({
+				where: {
+					id: notificationId,
+					recipientId: req.session.userId
+				},
+				select: {
+					isRead: true
+				}
+			});
+
+			if (!notification) {
+				return res.status(404).json({
+					success: false,
+					message: 'Notification could not be found.'
+				});
+			}
+
+			if (notification.isRead) {
+				return res.status(409).json({
+					success: false,
+					message: 'This notification has already been read.'
 				});
 			}
 
@@ -52,7 +81,10 @@ export default async function notificationReadWorker(
 		const unreadCount = await prisma.notification.count({
 			where: {
 				recipientId: req.session.userId,
-				isRead: false
+				isRead: false,
+				createdAt: {
+					gte: notificationCutoff
+				}
 			}
 		});
 

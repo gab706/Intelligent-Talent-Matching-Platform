@@ -49,6 +49,39 @@
                 <li>Search jobs and companies from the candidate side.</li>
                 <li>Save roles and manage applications.</li>
             </ul>
+            <div class="membership-page__comparison" aria-label="Candidate membership recommendation limits">
+                <table class="membership-page__comparison-table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Access</th>
+                        <th scope="col">Standard</th>
+                        <th scope="col">Member</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <th scope="row">Top 10 recommended jobs</th>
+                        <td><span class="membership-page__check" aria-label="Included"></span></td>
+                        <td><span class="membership-page__check" aria-label="Included"></span></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Unlimited recommended jobs</th>
+                        <td><span class="membership-page__empty" aria-label="Not included"></span></td>
+                        <td><span class="membership-page__check" aria-label="Included"></span></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Search and browse all available job postings</th>
+                        <td><span class="membership-page__check" aria-label="Included"></span></td>
+                        <td><span class="membership-page__check" aria-label="Included"></span></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Broader opportunity discovery from your profile</th>
+                        <td><span class="membership-page__empty" aria-label="Not included"></span></td>
+                        <td><span class="membership-page__check" aria-label="Included"></span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
             <a class="membership-page__action" href="/candidate/register">
                 Create candidate account
             </a>
@@ -76,6 +109,39 @@
                 <li>Publish and manage job postings.</li>
                 <li>Review applications and discover candidate matches.</li>
             </ul>
+            <div class="membership-page__comparison" aria-label="Employer membership recommendation limits">
+                <table class="membership-page__comparison-table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Access</th>
+                        <th scope="col">Standard</th>
+                        <th scope="col">Member</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <th scope="row">Top 10 recommended candidates</th>
+                        <td><span class="membership-page__check" aria-label="Included"></span></td>
+                        <td><span class="membership-page__check" aria-label="Included"></span></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Unlimited recommended candidates</th>
+                        <td><span class="membership-page__empty" aria-label="Not included"></span></td>
+                        <td><span class="membership-page__check" aria-label="Included"></span></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Search and browse candidate profiles</th>
+                        <td><span class="membership-page__check" aria-label="Included"></span></td>
+                        <td><span class="membership-page__check" aria-label="Included"></span></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Broader recruitment matching from each job description</th>
+                        <td><span class="membership-page__empty" aria-label="Not included"></span></td>
+                        <td><span class="membership-page__check" aria-label="Included"></span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
             <a class="membership-page__action" href="/employer/register">
                 Create employer account
             </a>
@@ -107,6 +173,5 @@
 </main>
 <%- include('../partials/footer/footer'); %>
 <script src="/js/global.js"></script>
-<script src="/js/membership.js"></script>
 </body>
 </html>

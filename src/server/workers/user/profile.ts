@@ -4,6 +4,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type { Prisma } from '../../../../prisma/generated/client.js';
 import { prisma } from '../../database/prisma.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -156,6 +157,7 @@ export default async function profileWorker(
         const lastName = String(fields.lastName || '').trim();
         const email = String(fields.email || '').trim().toLowerCase();
         const phone = String(fields.phone || '').trim();
+        const wantsMembership = fields.membershipSubscription === 'on';
         const oldPassword = String(fields.oldPassword || '');
         const newPassword = String(fields.newPassword || '');
         const confirmPassword = String(fields.confirmPassword || '');
@@ -181,6 +183,7 @@ export default async function profileWorker(
             select: {
                 id: true,
                 email: true,
+                isMember: true,
                 passwordHash: true
             }
         });
@@ -281,17 +284,35 @@ export default async function profileWorker(
             avatarData.avatarHash = avatarHash;
         }
 
-        await prisma.user.update({
-            where: {
-                id: req.session.userId
-            },
-            data: {
-                firstName,
-                lastName,
-                email,
-                phone,
-                ...passwordData,
-                ...avatarData
+        await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+            await tx.user.update({
+                where: {
+                    id: req.session.userId
+                },
+                data: {
+                    firstName,
+                    lastName,
+                    email,
+                    phone,
+                    isMember: wantsMembership,
+                    ...passwordData,
+                    ...avatarData
+                }
+            });
+
+            if (wantsMembership !== user.isMember) {
+                await tx.notification.create({
+                    data: {
+                        recipientId: user.id,
+                        type: 'MEMBERSHIP',
+                        title: wantsMembership
+                            ? 'Subscription Activated'
+                            : 'Subscription Deactivated',
+                        message: wantsMembership
+                            ? `Congratulations ${firstName}, your membership subscription has been activated`
+                            : `${firstName}, we're sorry to see you go, your membership subscription has been deactivated`
+                    }
+                });
             }
         });
 

@@ -173,6 +173,84 @@ body.dark-mode:has(.membership-page) .public-header:not(.is-scrolled) .public-he
     line-height: 1.62;
 }
 
+.membership-page__comparison {
+    max-width: 660px;
+    margin-top: 24px;
+    overflow-x: auto;
+}
+
+.membership-page__comparison-table {
+    width: 100%;
+    min-width: 500px;
+    border-collapse: collapse;
+}
+
+.membership-page__comparison-table th,
+.membership-page__comparison-table td {
+    padding: 11px 0;
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: middle;
+}
+
+.membership-page__comparison-table thead th {
+    color: var(--color-muted);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.membership-page__comparison-table thead th:first-child {
+    text-align: left;
+}
+
+.membership-page__comparison-table tbody th {
+    color: var(--color-text);
+    font-size: 0.9rem;
+    font-weight: 650;
+    line-height: 1.4;
+    text-align: left;
+}
+
+.membership-page__comparison-table td {
+    width: 22%;
+    text-align: center;
+}
+
+.membership-page__comparison-table tr:last-child th,
+.membership-page__comparison-table tr:last-child td {
+    border-bottom: 0;
+}
+
+.membership-page__check,
+.membership-page__empty {
+    width: 18px;
+    height: 18px;
+
+    display: inline-grid;
+    place-items: center;
+
+    border-radius: 3px;
+}
+
+.membership-page__check {
+    background: var(--color-primary);
+    color: #ffffff;
+}
+
+.membership-page__check::before {
+    content: "\2713";
+    font-size: 0.82rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.membership-page__empty {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-soft);
+}
+
 .membership-page__action {
     width: fit-content;
     min-height: 42px;
@@ -224,6 +302,10 @@ body.dark-mode:has(.membership-page) .public-header:not(.is-scrolled) .public-he
     .membership-page__path--employer .membership-page__path-copy {
         order: initial;
     }
+
+    .membership-page__comparison {
+        max-width: 720px;
+    }
 }
 
 @media (max-width: 640px) {
@@ -246,6 +328,15 @@ body.dark-mode:has(.membership-page) .public-header:not(.is-scrolled) .public-he
     .membership-page__path {
         padding-top: 32px;
         padding-bottom: 32px;
+    }
+
+    .membership-page__comparison-table {
+        min-width: 460px;
+    }
+
+    .membership-page__comparison-table th,
+    .membership-page__comparison-table td {
+        padding: 12px;
     }
 
     .membership-page__flex {

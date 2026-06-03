@@ -231,7 +231,7 @@ $(async function () {
 
     const renderEmptyNotifications = function () {
         $("[data-notification-list]").html(
-            '<p class="public-header__notification-empty">No New Notifications</p>'
+            '<p class="public-header__notification-empty">No Notifications From The Last 7 Days</p>'
         );
         $("[data-notification-badge]").remove();
         $("[data-notification-read-all]")
@@ -296,18 +296,21 @@ $(async function () {
                 notificationId
             });
 
-            $notification.remove();
             const unreadCount = Number(data.unreadCount) || 0;
 
             updateNotificationBadge(unreadCount);
-
-            if (!$("[data-notification-read]").length && unreadCount > 0) {
-                window.location.reload();
-                return;
-            }
+            $notification
+                .removeAttr("data-notification-read")
+                .removeAttr("data-notification-id")
+                .removeClass("public-header__notification-item--unread")
+                .addClass("public-header__notification-item--read")
+                .prop("disabled", true);
 
             if (!$("[data-notification-read]").length)
-                renderEmptyNotifications();
+                $("[data-notification-read-all]")
+                    .replaceWith(
+                        '<span class="public-header__notification-read-all is-disabled" aria-disabled="true" data-notification-read-all-disabled>Mark all as read</span>'
+                    );
         } catch (err) {
             console.error(err);
             $notification.prop("disabled", false);
@@ -331,7 +334,16 @@ $(async function () {
                 all: true
             });
 
-            renderEmptyNotifications();
+            updateNotificationBadge(0);
+            $("[data-notification-read]")
+                .removeAttr("data-notification-read")
+                .removeAttr("data-notification-id")
+                .removeClass("public-header__notification-item--unread")
+                .addClass("public-header__notification-item--read")
+                .prop("disabled", true);
+            $readAll.replaceWith(
+                '<span class="public-header__notification-read-all is-disabled" aria-disabled="true" data-notification-read-all-disabled>Mark all as read</span>'
+            );
         } catch (err) {
             console.error(err);
             $readAll.removeClass("is-disabled").removeAttr("aria-disabled");

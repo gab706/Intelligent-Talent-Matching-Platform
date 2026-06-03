@@ -15,6 +15,7 @@ declare global {
 				lastName?: string;
 				email?: string;
 				phone?: string;
+				isMember?: boolean;
 				isAdmin?: boolean;
 				accountLabel?: string;
 				isAccountHomePage?: boolean;
@@ -23,6 +24,7 @@ declare global {
 					title: string;
 					message: string;
 					type?: string;
+					isRead?: boolean;
 					avatarPath?: string;
 				}>;
 				unreadNotificationCount?: number;
