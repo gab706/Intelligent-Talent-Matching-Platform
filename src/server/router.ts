@@ -4,6 +4,7 @@ import path from 'node:path';
 import fs from 'node:fs/promises';
 import PublicHelper from './helpers/PublicHelper.js';
 import LogoutHelper from './helpers/logout.js';
+import EmployerCompaniesHelper from './helpers/employer/companies.js';
 
 type Handler = (
 	req: Request,
@@ -20,11 +21,15 @@ const viewsDir = path.join(__dirname, '../../src/web/views/pages');
 const helpersDir = path.join(__dirname, './helpers');
 const workersDir = path.join(__dirname, './workers');
 const avatarImagesDir = path.join(__dirname, '../../src/web/images/avatars');
+const companyImagesDir = path.join(__dirname, '../../src/web/images/companies');
 
 router.get('/', (_req: Request, res: Response) =>
 	res.redirect('/index'));
 
 router.get('/logout', LogoutHelper);
+
+router.get('/employer/companies/:companyName/view', PublicHelper, EmployerCompaniesHelper);
+router.get('/employer/companies/:companyName/edit', PublicHelper, EmployerCompaniesHelper);
 
 router.get('/images/avatars/:hash', async (req: Request, res: Response, next: NextFunction) => {
 	try {
@@ -41,6 +46,26 @@ router.get('/images/avatars/:hash', async (req: Request, res: Response, next: Ne
 			return res.redirect('/images/avatar/default.png');
 
 		return res.sendFile(path.join(avatarImagesDir, avatarFile));
+	} catch (err) {
+		return next(err);
+	}
+});
+
+router.get('/images/companies/:hash', async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const hash = String(req.params.hash || '');
+
+		if (!/^[a-zA-Z0-9_-]+$/.test(hash))
+			return res.redirect('/images/avatar/default.png');
+
+		const files = await fs.readdir(companyImagesDir);
+		const imageFile = files.find(file =>
+			file.startsWith(`${hash}.`));
+
+		if (!imageFile)
+			return res.redirect('/images/avatar/default.png');
+
+		return res.sendFile(path.join(companyImagesDir, imageFile));
 	} catch (err) {
 		return next(err);
 	}

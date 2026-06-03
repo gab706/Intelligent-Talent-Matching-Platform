@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Companies | Intelligent Talent Matching Platform</title>
+    <meta name="description" content="Manage employer companies in TalentMatch." />
+    <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
+    <link rel="stylesheet" href="/lib/css/toastr.min.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/account-home.css" />
+    <link rel="stylesheet" href="/css/employer-companies.css" />
+    <script src="/lib/js/jquery.min.js"></script>
+    <script src="/lib/js/toastr.min.js"></script>
+</head>
+<body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
+<%- include('../../partials/public-header/public-header'); %>
+<%
+    const companyPage = activeCompany || null;
+    const activeCompanyData = companyPage ? companyPage.company : null;
+    const canManageActiveCompany = companyPage && (companyPage.isOwner || companyPage.role === 'ADMIN');
+    const isCompanyEditPage = activeCompanyMode === 'edit';
+    const organisationLabels = {
+        PRIVATE_COMPANY: 'Private Company',
+        PUBLIC_COMPANY: 'Public Company',
+        GOVERNMENT_AGENCY: 'Government Agency',
+        UNIVERSITY: 'University',
+        NON_PROFIT: 'Non-Profit',
+        STARTUP: 'Startup'
+    };
+%>
+<main class="account-home account-home--employer">
+    <aside class="account-home__sidebar" aria-label="Employer navigation">
+        <nav class="account-home__nav">
+            <div class="account-home__nav-primary">
+                <a class="account-home__nav-link" href="/employer/home">Employer Home</a>
+                <a class="account-home__nav-link" href="/employer/find-a-candidate">Find a Candidate</a>
+                <a class="account-home__nav-link" href="/employer/postings">Tracking Postings</a>
+                <a class="account-home__nav-link" href="/employer/applications">Manage Applications</a>
+                <a class="account-home__nav-link is-active" href="/employer/companies">Manage Companies</a>
+            </div>
+            <div class="account-home__nav-actions">
+                <% if (accountType === 3) { %>
+                <a class="account-home__nav-link account-home__nav-link--mode" href="/candidate/home">Swap to Candidate Mode</a>
+                <% } else { %>
+                <a class="account-home__nav-link account-home__nav-link--mode" href="/employer/migrate">Migrate to Candidate Account</a>
+                <% } %>
+                <% if (isAdmin) { %>
+                <a class="account-home__nav-link account-home__nav-link--admin" href="/admin/control">Admin Control</a>
+                <% } %>
+            </div>
+        </nav>
+    </aside>
+
+    <section class="account-home__content employer-companies" aria-labelledby="employer-companies-title">
+        <div class="employer-companies__header">
+            <div class="employer-companies__header-main">
+                <p class="account-home__eyebrow"><%= companyPage ? 'Company page' : 'Manage companies' %></p>
+                <div class="employer-companies__identity">
+                    <% if (activeCompanyData) { %>
+                    <% if (activeCompanyData.logoUrl) { %>
+                    <img class="employer-companies__identity-logo" src="<%= activeCompanyData.logoUrl %>" alt="" />
+                    <% } else { %>
+                    <span class="employer-companies__identity-logo"></span>
+                    <% } %>
+                    <% } %>
+                    <div>
+                        <div class="employer-companies__title-row">
+                            <% if (activeCompanyData && activeCompanyData.organisationType) { %>
+                            <span class="employer-companies__type-badge">
+                                <i class="fas fa-building" aria-hidden="true"></i>
+                                <%= organisationLabels[activeCompanyData.organisationType] || 'Organisation' %>
+                            </span>
+                            <% } %>
+                            <h1 id="employer-companies-title" class="account-home__title employer-companies__title">
+                                <%= activeCompanyData ? activeCompanyData.name : 'Company access' %>
+                            </h1>
+                        </div>
+                        <% if (activeCompanyData) { %>
+                        <div class="employer-companies__quick-facts" aria-label="Company contact details">
+                            <% if (activeCompanyData.email) { %>
+                            <span><i class="fas fa-envelope" aria-hidden="true"></i><%= activeCompanyData.email %></span>
+                            <% } %>
+                            <% if (activeCompanyData.phone) { %>
+                            <span><i class="fas fa-phone" aria-hidden="true"></i><%= activeCompanyData.phone %></span>
+                            <% } %>
+                            <% if (activeCompanyData.website) { %>
+                            <a href="<%= activeCompanyData.website %>" target="_blank" rel="noopener noreferrer">
+                                <i class="fas fa-globe" aria-hidden="true"></i><%= activeCompanyData.website %>
+                            </a>
+                            <% } %>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+                <p class="account-home__copy">
+                    <%= activeCompanyData ? (activeCompanyData.description || 'No company description added.') : 'Create company profiles, respond to invitations, and manage the organisations you are attached to.' %>
+                </p>
+            </div>
+            <% if (companyPage) { %>
+            <div class="employer-companies__header-actions">
+                <% if (!isCompanyEditPage) { %>
+                <a class="employer-companies__ghost" href="/employer/companies">Back to Overview</a>
+                <% } %>
+                <% if (canManageActiveCompany && !isCompanyEditPage) { %>
+                <a class="employer-companies__primary" href="/employer/companies/<%= encodeURIComponent(activeCompanyData.name) %>/edit">
+                    Manage
+                </a>
+                <% } %>
+            </div>
+            <% } else { %>
+            <button class="employer-companies__primary" type="button" data-company-create-open>
+                <i class="fas fa-plus" aria-hidden="true"></i>
+                Create company
+            </button>
+            <% } %>
+        </div>
+
+        <section class="employer-companies__company-page" <%= companyPage ? '' : 'hidden' %> data-company-page aria-labelledby="employer-companies-title">
+            <div data-company-page-content></div>
+        </section>
+
+        <section class="employer-companies__section" <%= companyPage ? 'hidden' : '' %> hidden data-company-invitations-section aria-labelledby="company-requests-title">
+            <h2 id="company-requests-title">Company requests</h2>
+            <div class="employer-companies__list" data-company-invitations></div>
+        </section>
+
+        <section class="employer-companies__section" <%= companyPage ? 'hidden' : '' %> data-company-overview aria-labelledby="company-list-title">
+            <h2 id="company-list-title">Your companies</h2>
+            <div class="employer-companies__list" data-company-list></div>
+        </section>
+
+        <section class="employer-companies__viewer" hidden data-company-viewer aria-labelledby="company-view-title">
+            <div class="employer-companies__creator-header">
+                <div>
+                    <p class="account-home__eyebrow">Company profile</p>
+                    <h2 id="company-view-title" data-company-view-title>Company details</h2>
+                </div>
+                <button class="employer-companies__ghost" type="button" data-company-view-close>
+                    Close
+                </button>
+            </div>
+            <div class="employer-companies__view-body" data-company-view-body></div>
+        </section>
+
+        <section class="employer-companies__editor" hidden data-company-editor aria-labelledby="company-edit-title">
+            <div class="employer-companies__creator-header">
+                <div>
+                    <p class="account-home__eyebrow">Edit company</p>
+                    <h2 id="company-edit-title" data-company-edit-title>Company details</h2>
+                </div>
+                <button class="employer-companies__ghost" type="button" data-company-edit-close>
+                    Close
+                </button>
+            </div>
+
+            <form class="employer-companies__form" data-company-edit-form>
+                <input type="hidden" name="companyId" data-edit-company-id />
+                <label class="employer-companies__field">
+                    <span>Company Name</span>
+                    <input name="name" type="text" required data-edit-name />
+                </label>
+                <label class="employer-companies__field">
+                    <span>Short Company Description</span>
+                    <textarea name="description" rows="4" required data-edit-description></textarea>
+                </label>
+                <div class="employer-companies__grid">
+                    <label class="employer-companies__field">
+                        <span>Industry</span>
+                        <input name="industry" type="text" required data-edit-industry />
+                    </label>
+                    <label class="employer-companies__field">
+                        <span>Company Location</span>
+                        <input name="location" type="text" required data-edit-location />
+                    </label>
+                    <label class="employer-companies__field">
+                        <span>Contact Email</span>
+                        <input name="email" type="email" required data-edit-email />
+                    </label>
+                    <label class="employer-companies__field">
+                        <span>Contact Phone</span>
+                        <input name="phone" type="tel" required data-edit-phone />
+                    </label>
+                    <label class="employer-companies__field">
+                        <span>Company Website</span>
+                        <input name="website" type="url" placeholder="https://example.com" data-edit-website />
+                    </label>
+                    <label class="employer-companies__field">
+                        <span>Brand Colour</span>
+                        <input name="brandColour" type="color" value="#2563eb" data-edit-brand-colour />
+                    </label>
+                    <label class="employer-companies__field">
+                        <span>Company Size</span>
+                        <select name="size" required data-edit-size>
+                            <option value="">Select size</option>
+                            <option>1-10 Employees</option>
+                            <option>11-50 Employees</option>
+                            <option>51-200 Employees</option>
+                            <option>201-1000 Employees</option>
+                            <option>1000+</option>
+                        </select>
+                    </label>
+                    <label class="employer-companies__field">
+                        <span>Organisation Type</span>
+                        <select name="organisationType" required data-edit-organisation-type>
+                            <option value="">Select type</option>
+                            <option value="PRIVATE_COMPANY">Private Company</option>
+                            <option value="PUBLIC_COMPANY">Public Company</option>
+                            <option value="GOVERNMENT_AGENCY">Government Agency</option>
+                            <option value="UNIVERSITY">University</option>
+                            <option value="NON_PROFIT">Non-Profit</option>
+                            <option value="STARTUP">Startup</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="employer-companies__actions">
+                    <button class="employer-companies__ghost" type="button" data-company-edit-close>Cancel</button>
+                    <button class="employer-companies__primary" type="submit">Save company</button>
+                </div>
+            </form>
+        </section>
+
+        <div class="employer-companies__create-modal" hidden aria-hidden="true" data-company-creator>
+            <div class="employer-companies__create-overlay" aria-hidden="true"></div>
+            <section class="employer-companies__creator" role="dialog" aria-modal="true" aria-labelledby="company-create-title">
+                <button class="employer-companies__modal-close" type="button" aria-label="Close create company" data-company-create-close>
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+                <div class="employer-companies__creator-header">
+                    <div>
+                        <p class="account-home__eyebrow">Create company</p>
+                        <h2 id="company-create-title">Build a company profile</h2>
+                    </div>
+                </div>
+
+                <div class="employer-companies__progress" aria-hidden="true">
+                    <span class="is-active" data-company-progress="0"></span>
+                    <span data-company-progress="1"></span>
+                    <span data-company-progress="2"></span>
+                </div>
+
+                <form class="employer-companies__form" data-company-form novalidate>
+                    <fieldset class="employer-companies__step is-active" data-company-step="0">
+                        <legend>Company details</legend>
+                        <label class="employer-companies__field">
+                            <span>Company Name</span>
+                            <input name="name" type="text" required />
+                        </label>
+                        <label class="employer-companies__field">
+                            <span>Short Company Description</span>
+                            <textarea name="description" rows="4" required></textarea>
+                        </label>
+                        <div class="employer-companies__grid">
+                            <label class="employer-companies__field">
+                                <span>Industry</span>
+                                <input name="industry" type="text" required />
+                            </label>
+                            <label class="employer-companies__field">
+                                <span>Company Location</span>
+                                <input name="location" type="text" required />
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="employer-companies__step" data-company-step="1">
+                        <legend>Contact</legend>
+                        <div class="employer-companies__grid">
+                            <label class="employer-companies__field">
+                                <span>Contact Email</span>
+                                <input name="email" type="email" required />
+                            </label>
+                            <label class="employer-companies__field">
+                                <span>Contact Phone</span>
+                                <input name="phone" type="tel" required />
+                            </label>
+                        </div>
+                        <label class="employer-companies__field">
+                            <span>Company Website</span>
+                            <input name="website" type="url" placeholder="https://example.com" />
+                        </label>
+                        <div class="employer-companies__grid">
+                            <label class="employer-companies__field">
+                                <span>Company Size</span>
+                                <select name="size" required>
+                                    <option value="">Select size</option>
+                                    <option>1-10 Employees</option>
+                                    <option>11-50 Employees</option>
+                                    <option>51-200 Employees</option>
+                                    <option>201-1000 Employees</option>
+                                    <option>1000+</option>
+                                </select>
+                            </label>
+                            <label class="employer-companies__field">
+                                <span>Organisation Type</span>
+                                <select name="organisationType" required>
+                                    <option value="">Select type</option>
+                                    <option value="PRIVATE_COMPANY">Private Company</option>
+                                    <option value="PUBLIC_COMPANY">Public Company</option>
+                                    <option value="GOVERNMENT_AGENCY">Government Agency</option>
+                                    <option value="UNIVERSITY">University</option>
+                                    <option value="NON_PROFIT">Non-Profit</option>
+                                    <option value="STARTUP">Startup</option>
+                                </select>
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="employer-companies__step" data-company-step="2">
+                        <legend>Branding</legend>
+                        <label class="employer-companies__logo-upload" data-company-logo-upload>
+                            <span>Company Logo</span>
+                            <input name="logo" type="file" required accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-company-logo-input />
+                            <span class="employer-companies__logo-preview" data-company-logo-preview>
+                                <i class="fas fa-image" aria-hidden="true"></i>
+                            </span>
+                        </label>
+                        <label class="employer-companies__field employer-companies__field--colour">
+                            <span>Brand Colour</span>
+                            <input name="brandColour" type="color" value="#2563eb" required />
+                        </label>
+                    </fieldset>
+
+                    <div class="employer-companies__actions">
+                        <button class="employer-companies__ghost" type="button" data-company-back hidden>Back</button>
+                        <button class="employer-companies__primary" type="button" data-company-next>Next</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+
+        <div class="employer-companies__employee-modal" hidden aria-hidden="true" data-employee-modal>
+            <div class="employer-companies__employee-overlay" data-employee-modal-close></div>
+            <section class="employer-companies__employee-dialog" role="dialog" aria-modal="true" aria-labelledby="employee-modal-title">
+                <button class="employer-companies__modal-close" type="button" aria-label="Close add employee" data-employee-modal-close>
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+                <h2 id="employee-modal-title">Add Employee</h2>
+                <div data-employee-search-panel>
+                    <label class="employer-companies__field">
+                        <span>Search by name</span>
+                        <input type="text" data-company-member-search placeholder="Start typing a name" autocomplete="off" />
+                    </label>
+                    <div class="employer-companies__suggestions" data-company-member-suggestions></div>
+                </div>
+                <div class="employer-companies__selected-employee" hidden data-selected-employee></div>
+                <div class="employer-companies__employee-actions" hidden data-employee-modal-actions>
+                    <button class="employer-companies__primary" type="button" data-company-invite-selected>
+                        Invite User
+                    </button>
+                    <button class="employer-companies__ghost" type="button" data-employee-selection-cancel>
+                        Cancel
+                    </button>
+                </div>
+            </section>
+        </div>
+    </section>
+</main>
+<script>
+    window.__employerCompanies = <%- employerCompaniesJson %>;
+</script>
+<script src="/js/employer-companies.js"></script>
+<script src="/js/global.js"></script>
+</body>
+</html>

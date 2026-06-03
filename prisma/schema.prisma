@@ -63,6 +63,43 @@ enum RecommendationTargetType {
   CANDIDATE
 }
 
+enum EducationQualificationType {
+  CERTIFICATE_I
+  CERTIFICATE_II
+  CERTIFICATE_III
+  CERTIFICATE_IV
+  DIPLOMA
+  ADVANCED_DIPLOMA
+  ASSOCIATE_DEGREE
+  BACHELORS_DEGREE
+  GRADUATE_CERTIFICATE
+  GRADUATE_DIPLOMA
+  MASTERS_DEGREE
+  DOCTORAL_DEGREE
+}
+
+enum LanguageFluency {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  NATIVE
+}
+
+enum OrganisationType {
+  PRIVATE_COMPANY
+  PUBLIC_COMPANY
+  GOVERNMENT_AGENCY
+  UNIVERSITY
+  NON_PROFIT
+  STARTUP
+}
+
+enum CompanyInvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
 model User {
   id String @id @default(uuid())
 
@@ -124,6 +161,11 @@ model Candidate {
   user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   skills       CandidateSkill[]
   applications JobApplication[]
+  educationRecords CandidateEducation[]
+  experienceRecords CandidateExperience[]
+  portfolioLinks CandidatePortfolioLink[]
+  certifications CandidateCertification[]
+  languages CandidateLanguage[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -136,12 +178,106 @@ model Candidate {
   @@map("candidates")
 }
 
+model CandidateEducation {
+  id          String @id @default(uuid())
+  candidateId String
+
+  school            String
+  qualificationType EducationQualificationType
+  major             String?
+  fromDate          DateTime?
+  toDate            DateTime?
+  isCurrent         Boolean @default(false)
+
+  candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([candidateId])
+  @@index([qualificationType])
+  @@map("candidate_education")
+}
+
+model CandidateExperience {
+  id          String @id @default(uuid())
+  candidateId String
+
+  company      String
+  jobTitle     String
+  workType     WorkingMode
+  location     String?
+  duties       String?
+  fromDate     DateTime?
+  toDate       DateTime?
+  isCurrent    Boolean @default(false)
+
+  candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([candidateId])
+  @@index([workType])
+  @@map("candidate_experience")
+}
+
+model CandidatePortfolioLink {
+  id          String @id @default(uuid())
+  candidateId String
+
+  label String
+  url   String
+
+  candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([candidateId])
+  @@map("candidate_portfolio_links")
+}
+
+model CandidateCertification {
+  id          String @id @default(uuid())
+  candidateId String
+
+  name String
+
+  candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([candidateId])
+  @@map("candidate_certifications")
+}
+
+model CandidateLanguage {
+  id          String @id @default(uuid())
+  candidateId String
+
+  name    String
+  fluency LanguageFluency
+
+  candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([candidateId])
+  @@index([fluency])
+  @@map("candidate_languages")
+}
+
 model Employer {
   id     String @id @default(uuid())
   userId String @unique
 
   user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   companies   EmployerCompany[]
+  sentCompanyInvitations CompanyInvitation[] @relation("CompanyInvitationSender")
+  receivedCompanyInvitations CompanyInvitation[] @relation("CompanyInvitationRecipient")
   jobPostings JobPosting[]
 
   createdAt DateTime @default(now())
@@ -163,11 +299,14 @@ model Company {
   industry    String?
   description String?
   avatarHash  String?
+  brandColour String?
   size        String?
+  organisationType OrganisationType?
   values      String?
 
   ownedBy     User              @relation("CompanyOwner", fields: [ownedById], references: [id], onDelete: Restrict)
   employers   EmployerCompany[]
+  invitations CompanyInvitation[]
   jobPostings JobPosting[]
 
   createdAt DateTime @default(now())
@@ -176,7 +315,9 @@ model Company {
   @@index([ownedById])
   @@index([location])
   @@index([industry])
+  @@index([organisationType])
   @@index([createdAt])
+  @@unique([name])
   @@map("companies")
 }
 
@@ -197,6 +338,29 @@ model EmployerCompany {
   @@index([companyId])
   @@index([role])
   @@map("employer_companies")
+}
+
+model CompanyInvitation {
+  id String @id @default(uuid())
+
+  companyId           String
+  recipientEmployerId String
+  invitedByEmployerId String
+  role                CompanyMemberRole       @default(USER)
+  status              CompanyInvitationStatus @default(PENDING)
+
+  company           Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  recipientEmployer Employer @relation("CompanyInvitationRecipient", fields: [recipientEmployerId], references: [id], onDelete: Cascade)
+  invitedByEmployer Employer @relation("CompanyInvitationSender", fields: [invitedByEmployerId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([recipientEmployerId])
+  @@index([invitedByEmployerId])
+  @@index([status])
+  @@map("company_invitations")
 }
 
 model JobPosting {

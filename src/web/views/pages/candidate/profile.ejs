@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Profile | Intelligent Talent Matching Platform</title>
+    <meta name="description" content="Manage your TalentMatch candidate profile." />
+    <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
+    <link rel="stylesheet" href="/lib/css/toastr.min.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/account-home.css" />
+    <link rel="stylesheet" href="/css/candidate-profile.css" />
+    <script src="/lib/js/jquery.min.js"></script>
+    <script src="/lib/js/toastr.min.js"></script>
+</head>
+<body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
+<%- include('../../partials/public-header/public-header'); %>
+<main class="account-home account-home--candidate">
+    <aside class="account-home__sidebar" aria-label="Candidate navigation">
+        <nav class="account-home__nav">
+            <div class="account-home__nav-primary">
+                <a class="account-home__nav-link" href="/candidate/home">Candidate Home</a>
+                <a class="account-home__nav-link" href="/candidate/find-a-job">Find a Job</a>
+                <a class="account-home__nav-link" href="/candidate/applications">Track Applications</a>
+                <a class="account-home__nav-link is-active" href="/candidate/profile">Manage Profile</a>
+            </div>
+            <div class="account-home__nav-actions">
+                <% if (accountType === 3) { %>
+                <a class="account-home__nav-link account-home__nav-link--mode" href="/employer/home">Swap to Employer Mode</a>
+                <% } else { %>
+                <a class="account-home__nav-link account-home__nav-link--mode" href="/candidate/migrate">Migrate to Employer Account</a>
+                <% } %>
+                <% if (isAdmin) { %>
+                <a class="account-home__nav-link account-home__nav-link--admin" href="/admin/control">Admin Control</a>
+                <% } %>
+            </div>
+        </nav>
+    </aside>
+
+    <section class="account-home__content candidate-profile" aria-labelledby="candidate-profile-title">
+        <p class="account-home__eyebrow">
+            Manage profile
+        </p>
+        <h1 id="candidate-profile-title" class="account-home__title candidate-profile__title">
+            Candidate profile
+        </h1>
+        <p class="account-home__copy candidate-profile__intro">
+            Keep your profile details current so TalentMatch can shape better job
+            recommendations around your background, skills, and preferences.
+        </p>
+
+        <div class="candidate-profile__top-actions">
+            <button class="candidate-profile__edit" type="button" data-candidate-profile-edit>
+                <i class="fas fa-pen" aria-hidden="true"></i>
+                Edit candidate profile
+            </button>
+        </div>
+
+        <div class="candidate-profile__view" data-candidate-profile-view></div>
+
+        <form class="candidate-profile__form" data-candidate-profile-form hidden>
+            <section class="candidate-profile__section" aria-labelledby="candidate-personal-title">
+                <div class="candidate-profile__section-header">
+                    <h2 id="candidate-personal-title">Personal Information</h2>
+                    <p>These details come from your account settings.</p>
+                </div>
+                <div class="candidate-profile__grid">
+                    <label class="candidate-profile__field">
+                        <span>First Name</span>
+                        <input type="text" value="<%= candidateProfile.personal.firstName %>" readonly />
+                    </label>
+                    <label class="candidate-profile__field">
+                        <span>Last Name</span>
+                        <input type="text" value="<%= candidateProfile.personal.lastName %>" readonly />
+                    </label>
+                    <label class="candidate-profile__field">
+                        <span>Contact Email</span>
+                        <input type="email" value="<%= candidateProfile.personal.email %>" readonly />
+                    </label>
+                    <label class="candidate-profile__field">
+                        <span>Contact Phone</span>
+                        <input type="tel" value="<%= candidateProfile.personal.phone %>" readonly />
+                    </label>
+                </div>
+            </section>
+
+            <section class="candidate-profile__section" aria-labelledby="candidate-education-title">
+                <div class="candidate-profile__section-header">
+                    <h2 id="candidate-education-title">Education</h2>
+                    <button class="candidate-profile__add" type="button" data-add-education>
+                        <i class="fas fa-plus" aria-hidden="true"></i>
+                        Add education
+                    </button>
+                </div>
+                <div class="candidate-profile__stack" data-education-list></div>
+            </section>
+
+            <section class="candidate-profile__section" aria-labelledby="candidate-experience-title">
+                <div class="candidate-profile__section-header">
+                    <h2 id="candidate-experience-title">Experience</h2>
+                    <button class="candidate-profile__add" type="button" data-add-experience>
+                        <i class="fas fa-plus" aria-hidden="true"></i>
+                        Add experience
+                    </button>
+                </div>
+                <div class="candidate-profile__stack" data-experience-list></div>
+            </section>
+
+            <section class="candidate-profile__section" aria-labelledby="candidate-skills-title">
+                <div class="candidate-profile__section-header">
+                    <h2 id="candidate-skills-title">Skills</h2>
+                    <p>Type a skill and press Enter.</p>
+                </div>
+                <label class="candidate-profile__field">
+                    <span>Add skill</span>
+                    <input type="text" placeholder="JavaScript, project management, data analysis" data-skill-input />
+                </label>
+                <div class="candidate-profile__chips" data-skill-list></div>
+            </section>
+
+            <section class="candidate-profile__section" aria-labelledby="candidate-preferences-title">
+                <div class="candidate-profile__section-header">
+                    <h2 id="candidate-preferences-title">Preferences</h2>
+                    <p>Tell TalentMatch what kind of work suits you best.</p>
+                </div>
+                <div class="candidate-profile__grid">
+                    <label class="candidate-profile__field">
+                        <span>Preferred Working Mode</span>
+                        <select name="preferredWorkingMode" data-profile-field="preferredWorkingMode">
+                            <option value="">Select a mode</option>
+                            <option value="REMOTE">Remote</option>
+                            <option value="ONSITE">On-site</option>
+                            <option value="HYBRID">Hybrid</option>
+                        </select>
+                    </label>
+                    <label class="candidate-profile__field">
+                        <span>Preferred Location</span>
+                        <input type="text" name="preferredLocation" placeholder="Sydney, Melbourne, Remote" data-profile-field="preferredLocation" />
+                    </label>
+                    <label class="candidate-profile__field">
+                        <span>Availability</span>
+                        <input type="text" name="availability" placeholder="Immediately available, 2 weeks notice, 1 month notice" data-profile-field="availability" />
+                    </label>
+                    <label class="candidate-profile__field">
+                        <span>Preferred Job Type</span>
+                        <select name="preferredJobType" data-profile-field="preferredJobType">
+                            <option value="">Select a job type</option>
+                            <option value="FULL_TIME">Full Time</option>
+                            <option value="PART_TIME">Part Time</option>
+                            <option value="CASUAL">Casual</option>
+                            <option value="CONTRACT">Contract</option>
+                            <option value="INTERNSHIP">Internship</option>
+                        </select>
+                    </label>
+                </div>
+            </section>
+
+            <section class="candidate-profile__section" aria-labelledby="candidate-summary-title">
+                <div class="candidate-profile__section-header">
+                    <h2 id="candidate-summary-title">Profile Summary</h2>
+                    <p>A short About Me section.</p>
+                </div>
+                <label class="candidate-profile__field">
+                    <span>About Me</span>
+                    <textarea name="profileSummary" rows="5" placeholder="Write a short summary of your background, interests, and career direction." data-profile-field="profileSummary"></textarea>
+                </label>
+            </section>
+
+            <section class="candidate-profile__section" aria-labelledby="candidate-portfolio-title">
+                <div class="candidate-profile__section-header">
+                    <h2 id="candidate-portfolio-title">Portfolio URL</h2>
+                    <button class="candidate-profile__add" type="button" data-add-portfolio>
+                        <i class="fas fa-plus" aria-hidden="true"></i>
+                        Add link
+                    </button>
+                </div>
+                <p class="candidate-profile__hint">
+                    Examples: GitHub, Personal website, Portfolio, LinkedIn.
+                </p>
+                <div class="candidate-profile__stack" data-portfolio-list></div>
+            </section>
+
+            <section class="candidate-profile__section" aria-labelledby="candidate-certifications-title">
+                <div class="candidate-profile__section-header">
+                    <h2 id="candidate-certifications-title">Certifications</h2>
+                    <p>Type a certification and press Enter.</p>
+                </div>
+                <label class="candidate-profile__field">
+                    <span>Add certification</span>
+                    <input type="text" placeholder="Security+, CISSP, CCNA, Azure Fundamentals" data-certification-input />
+                </label>
+                <div class="candidate-profile__chips" data-certification-list></div>
+            </section>
+
+            <section class="candidate-profile__section" aria-labelledby="candidate-languages-title">
+                <div class="candidate-profile__section-header">
+                    <h2 id="candidate-languages-title">Languages</h2>
+                    <button class="candidate-profile__add" type="button" data-add-language>
+                        <i class="fas fa-plus" aria-hidden="true"></i>
+                        Add language
+                    </button>
+                </div>
+                <p class="candidate-profile__hint">
+                    Examples: English, Spanish, Mandarin.
+                </p>
+                <div class="candidate-profile__stack" data-language-list></div>
+            </section>
+
+            <div class="candidate-profile__actions">
+                <button class="candidate-profile__cancel" type="button" data-candidate-profile-cancel>
+                    Cancel
+                </button>
+                <button class="candidate-profile__save" type="submit" data-candidate-profile-save>
+                    Save candidate profile
+                </button>
+            </div>
+        </form>
+    </section>
+</main>
+<script>
+    window.__candidateProfile = <%- candidateProfileJson %>;
+</script>
+<script src="/js/candidate-profile.js"></script>
+<script src="/js/global.js"></script>
+</body>
+</html>
