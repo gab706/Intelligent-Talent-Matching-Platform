@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= company ? company.name : 'Company not found' %> | TalentMatch</title>
+    <meta name="description" content="<%= company ? `Learn more about ${company.name} on TalentMatch.` : 'Company not found.' %>" />
+    <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/companies.css" />
+    <script src="/lib/js/jquery.min.js"></script>
+</head>
+<body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
+<%- include('../partials/public-header/public-header'); %>
+<main class="company-page" style="<%= company && company.brandColour ? `--company-brand: ${company.brandColour};` : '' %>">
+    <% if (!company) { %>
+    <section class="company-page__not-found" aria-labelledby="company-not-found-title">
+        <p class="companies-page__eyebrow">Company</p>
+        <h1 id="company-not-found-title">Company not found</h1>
+        <p>That company profile could not be found.</p>
+        <a href="/companies">Back to company directory</a>
+    </section>
+    <% } else { %>
+    <section class="company-page__hero" aria-labelledby="company-title">
+        <div class="company-page__identity">
+            <% if (company.logoUrl) { %>
+            <img class="company-page__logo" src="<%= company.logoUrl %>" alt="<%= company.name %> logo" />
+            <% } else { %>
+            <span class="company-page__logo company-page__logo--placeholder">
+                <i class="fas fa-building" aria-hidden="true"></i>
+            </span>
+            <% } %>
+            <div>
+                <% if (company.organisationLabel) { %>
+                <p class="company-page__type"><%= company.organisationLabel %></p>
+                <% } %>
+                <h1 id="company-title"><%= company.name %></h1>
+                <% if (company.industry || company.location) { %>
+                <p class="company-page__meta">
+                    <%= [company.industry, company.location].filter(Boolean).join(' | ') %>
+                </p>
+                <% } %>
+            </div>
+        </div>
+        <% if (company.description) { %>
+        <p class="company-page__description"><%= company.description %></p>
+        <% } %>
+    </section>
+
+    <section class="company-page__tabs" aria-label="Company sections">
+        <div class="company-page__tab-list" role="tablist">
+            <button class="company-page__tab is-active" type="button" role="tab" aria-selected="true" data-company-tab="about">
+                Company
+            </button>
+            <button class="company-page__tab" type="button" role="tab" aria-selected="false" data-company-tab="opportunities">
+                Opportunities
+            </button>
+            <button class="company-page__tab" type="button" role="tab" aria-selected="false" data-company-tab="staff">
+                Staff
+            </button>
+        </div>
+
+        <section class="company-page__panel is-active" role="tabpanel" data-company-panel="about">
+            <div class="company-page__details">
+                <% if (company.email) { %>
+                <div>
+                    <span>Email</span>
+                    <a href="mailto:<%= company.email %>"><%= company.email %></a>
+                </div>
+                <% } %>
+                <% if (company.phone) { %>
+                <div>
+                    <span>Phone</span>
+                    <a href="tel:<%= company.phone %>"><%= company.phone %></a>
+                </div>
+                <% } %>
+                <% if (company.website) { %>
+                <div>
+                    <span>Website</span>
+                    <a href="<%= company.website %>" target="_blank" rel="noopener noreferrer"><%= company.website %></a>
+                </div>
+                <% } %>
+                <% if (company.size) { %>
+                <div>
+                    <span>Company size</span>
+                    <p><%= company.size %></p>
+                </div>
+                <% } %>
+                <% if (company.values) { %>
+                <div class="company-page__detail-full">
+                    <span>Values</span>
+                    <p><%= company.values %></p>
+                </div>
+                <% } %>
+            </div>
+        </section>
+
+        <section class="company-page__panel" role="tabpanel" data-company-panel="opportunities">
+            <% if (opportunities.length) { %>
+            <div class="company-page__opportunities">
+                <% opportunities.forEach((posting) => { %>
+                <article class="company-page__opportunity">
+                    <div>
+                        <h2><strong><%= posting.jobTitle %></strong></h2>
+                        <p>
+                            <span class="company-page__work-icon" aria-label="<%= posting.workMode %>">
+                                <% if (posting.workMode === 'REMOTE') { %>
+                                <i class="far fa-star-half" aria-hidden="true"></i>
+                                <% } else if (posting.workMode === 'HYBRID') { %>
+                                <i class="fas fa-star-half-alt" aria-hidden="true"></i>
+                                <% } else { %>
+                                <i class="fas fa-star" aria-hidden="true"></i>
+                                <% } %>
+                            </span>
+                            <%= posting.jobLocation %>
+                            <% if (posting.closingDate) { %>
+                            | Closes <%= posting.closingDate %>
+                            <% } %>
+                        </p>
+                    </div>
+                    <a href="<%= !isAuthenticated ? '/candidate/register' : accountType === 2 ? '/employer/migrate' : '#' %>" aria-label="Apply for <%= posting.jobTitle %>">Apply</a>
+                </article>
+                <% }); %>
+            </div>
+            <% } else { %>
+            <p class="company-page__empty">Nothing here right now...</p>
+            <% } %>
+        </section>
+
+        <section class="company-page__panel" role="tabpanel" data-company-panel="staff">
+            <% if (staff.length) { %>
+            <div class="company-page__staff">
+                <% staff.forEach((member) => { %>
+                <article class="company-page__staff-member">
+                    <img src="<%= member.avatarPath %>" alt="" />
+                    <span><strong><%= member.fullName %></strong></span>
+                </article>
+                <% }); %>
+            </div>
+            <% } else { %>
+            <p class="company-page__empty">No staff listed right now...</p>
+            <% } %>
+        </section>
+    </section>
+    <% } %>
+</main>
+<%- include('../partials/footer/footer'); %>
+<script src="/js/global.js"></script>
+<script src="/js/company.js"></script>
+</body>
+</html>

@@ -9,9 +9,20 @@
     <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
     <link rel="stylesheet" href="/css/global.css" />
     <link rel="stylesheet" href="/css/account-home.css" />
+    <link rel="stylesheet" href="/css/candidate-home.css" />
     <script src="/lib/js/jquery.min.js"></script>
 </head>
 <body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
+<%
+    const home = typeof candidateHome !== 'undefined' ? candidateHome : {
+        savedJobCount: 0,
+        recommendedJobCount: 0,
+        profileCompletion: 0,
+        profileTasks: [],
+        statusCounts: {},
+        recentApplications: []
+    };
+%>
 <%- include('../../partials/public-header/public-header'); %>
 <main class="account-home account-home--candidate">
     <aside class="account-home__sidebar" aria-label="Candidate navigation">
@@ -35,23 +46,106 @@
         </nav>
     </aside>
 
-    <section class="account-home__content" aria-labelledby="candidate-home-title">
-        <p class="account-home__eyebrow">
-            Candidate home
-        </p>
-        <h1 id="candidate-home-title" class="account-home__title">
-            Welcome back <%= firstName || 'there' %>
-        </h1>
-        <p class="account-home__copy">
-            Add skills, work history, preferences, and documents next so TalentMatch
-            can start shaping better job recommendations around your profile.
-        </p>
-        <p class="account-home__meta">
-            Server userId:
-            <strong>
-                <%= userId || 'No user session' %>
-            </strong>
-        </p>
+    <section class="account-home__content candidate-home" aria-labelledby="candidate-home-title">
+        <div class="candidate-home__hero">
+            <div>
+                <p class="account-home__eyebrow">Candidate home</p>
+                <h1 id="candidate-home-title" class="account-home__title candidate-home__title">
+                    Welcome back <%= firstName || 'there' %>
+                </h1>
+                <p class="account-home__copy candidate-home__intro">
+                    Track applications, keep your profile sharp, and jump back into job discovery.
+                </p>
+                <p class="candidate-home__pulse">
+                    <strong><%= home.profileCompletion %>% profile ready</strong>
+                    <span><%= home.recommendedJobCount %> recommendation<%= home.recommendedJobCount === 1 ? '' : 's' %> currently available.</span>
+                </p>
+            </div>
+            <div class="candidate-home__hero-actions" aria-label="Candidate quick actions">
+                <a class="candidate-home__primary-link" href="/candidate/find-a-job">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                    Find jobs
+                </a>
+                <a class="candidate-home__secondary-link" href="/candidate/profile">
+                    <i class="fas fa-user-edit" aria-hidden="true"></i>
+                    Manage profile
+                </a>
+            </div>
+        </div>
+
+        <section class="candidate-home__stats" aria-label="Candidate snapshot">
+            <article class="candidate-home__stat">
+                <span>Applications</span>
+                <strong><%= (home.statusCounts.APPLIED || 0) + (home.statusCounts.SHORTLISTED || 0) + (home.statusCounts.HIRED || 0) + (home.statusCounts.REJECTED || 0) + (home.statusCounts.WITHDRAWN || 0) %></strong>
+            </article>
+            <article class="candidate-home__stat">
+                <span>Shortlisted</span>
+                <strong><%= home.statusCounts.SHORTLISTED || 0 %></strong>
+            </article>
+            <article class="candidate-home__stat">
+                <span>Saved jobs</span>
+                <strong><%= home.savedJobCount %></strong>
+            </article>
+        </section>
+
+        <section class="candidate-home__next" aria-labelledby="candidate-next-title">
+            <% if (home.profileTasks.length) { %>
+            <i class="fas fa-user-check" aria-hidden="true"></i>
+            <div>
+                <p class="account-home__eyebrow">Next step</p>
+                <h2 id="candidate-next-title"><%= home.profileTasks[0] %></h2>
+                <p>Complete more of your profile to improve job recommendations.</p>
+            </div>
+            <a href="/candidate/profile">Update profile</a>
+            <% } else if (home.recentApplications.length) { %>
+            <i class="fas fa-clipboard-list" aria-hidden="true"></i>
+            <div>
+                <p class="account-home__eyebrow">Next step</p>
+                <h2 id="candidate-next-title">Check application progress</h2>
+                <p>Review status changes and manage any active applications.</p>
+            </div>
+            <a href="/candidate/applications">Track applications</a>
+            <% } else { %>
+            <i class="fas fa-briefcase" aria-hidden="true"></i>
+            <div>
+                <p class="account-home__eyebrow">Next step</p>
+                <h2 id="candidate-next-title">Apply for your first role</h2>
+                <p>Search active postings or use recommendations shaped by your profile.</p>
+            </div>
+            <a href="/candidate/find-a-job">Find jobs</a>
+            <% } %>
+        </section>
+
+        <section class="candidate-home__panel" aria-labelledby="candidate-activity-title">
+            <div class="candidate-home__section-head">
+                <div>
+                    <p class="account-home__eyebrow">Applications</p>
+                    <h2 id="candidate-activity-title">Recent activity</h2>
+                </div>
+                <a href="/candidate/applications">View all</a>
+            </div>
+            <% if (home.recentApplications.length) { %>
+            <div class="candidate-home__application-list">
+                <% home.recentApplications.forEach((application) => { %>
+                <article class="candidate-home__application">
+                    <div>
+                        <strong><%= application.jobTitle %></strong>
+                        <p><%= application.companyName %> | <%= application.jobLocation %></p>
+                    </div>
+                    <div class="candidate-home__application-meta">
+                        <span class="candidate-home__status candidate-home__status--<%= application.status.toLowerCase() %>"><%= application.statusLabel %></span>
+                        <small><%= application.updatedAtLabel %></small>
+                    </div>
+                </article>
+                <% }) %>
+            </div>
+            <% } else { %>
+            <div class="candidate-home__empty">
+                <h3>No applications yet</h3>
+                <p>Once you apply for roles, the latest movement will appear here.</p>
+            </div>
+            <% } %>
+        </section>
     </section>
 </main>
 <script src="/js/global.js"></script>

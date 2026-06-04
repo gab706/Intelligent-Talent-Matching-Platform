@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Find Jobs | Intelligent Talent Matching Platform</title>
+    <meta name="description" content="Search and discover recommended jobs in TalentMatch." />
+    <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
+    <link rel="stylesheet" href="/lib/css/toastr.min.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/account-home.css" />
+    <link rel="stylesheet" href="/css/find-a-job.css" />
+    <script src="/lib/js/jquery.min.js"></script>
+    <script src="/lib/js/toastr.min.js"></script>
+</head>
+<body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
+<%- include('../../partials/public-header/public-header'); %>
+<main class="account-home account-home--candidate">
+    <aside class="account-home__sidebar" aria-label="Candidate navigation">
+        <nav class="account-home__nav">
+            <div class="account-home__nav-primary">
+                <a class="account-home__nav-link" href="/candidate/home">Candidate Home</a>
+                <a class="account-home__nav-link is-active" href="/candidate/find-a-job">Find a Job</a>
+                <a class="account-home__nav-link" href="/candidate/applications">Track Applications</a>
+                <a class="account-home__nav-link" href="/candidate/profile">Manage Profile</a>
+            </div>
+            <div class="account-home__nav-actions">
+                <% if (accountType === 3) { %>
+                <a class="account-home__nav-link account-home__nav-link--mode" href="/employer/home">Swap to Employer Mode</a>
+                <% } else { %>
+                <a class="account-home__nav-link account-home__nav-link--mode" href="/candidate/migrate">Migrate to Employer Account</a>
+                <% } %>
+                <% if (isAdmin) { %>
+                <a class="account-home__nav-link account-home__nav-link--admin" href="/admin/control">Admin Control</a>
+                <% } %>
+            </div>
+        </nav>
+    </aside>
+
+    <section class="account-home__content find-job-page" aria-labelledby="find-job-title">
+        <div class="find-job-page__hero">
+            <p class="account-home__eyebrow">Find Jobs</p>
+            <h1 id="find-job-title" class="account-home__title find-job-page__title">
+                Find roles that match how you work.
+            </h1>
+            <p class="account-home__copy find-job-page__intro">
+                Search active postings, filter by role details, and compare those results with TalentMatch recommendations.
+            </p>
+        </div>
+
+        <% if (candidateProfileIncomplete) { %>
+        <section class="find-job-page__notice">
+            <i class="fas fa-user-edit" aria-hidden="true"></i>
+            <div>
+                <strong>Candidate profile incomplete</strong>
+                <p>Add your skills, preferences, summary, and location to improve recommendation quality.</p>
+            </div>
+            <a href="/candidate/profile">Update profile</a>
+        </section>
+        <% } %>
+
+        <form class="find-job-page__search" method="get" action="/candidate/find-a-job">
+            <label class="find-job-page__keyword">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                <span class="sr-only">Keyword</span>
+                <input type="search" name="keyword" value="<%= filters.keyword %>" placeholder="Search title, company, location, description, or skills" autocomplete="off" />
+            </label>
+
+            <section class="find-job-page__filters" aria-label="Job filters">
+                <label>
+                    <span>Location</span>
+                    <input type="text" name="location" value="<%= filters.location %>" placeholder="Sydney" />
+                </label>
+                <label>
+                    <span>Work mode</span>
+                    <select name="workMode">
+                        <option value="">Any mode</option>
+                        <option value="REMOTE" <%= filters.workMode === 'REMOTE' ? 'selected' : '' %>>Remote</option>
+                        <option value="ONSITE" <%= filters.workMode === 'ONSITE' ? 'selected' : '' %>>On-site</option>
+                        <option value="HYBRID" <%= filters.workMode === 'HYBRID' ? 'selected' : '' %>>Hybrid</option>
+                    </select>
+                </label>
+                <label>
+                    <span>Job type</span>
+                    <select name="jobType">
+                        <option value="">Any type</option>
+                        <option value="FULL_TIME" <%= filters.jobType === 'FULL_TIME' ? 'selected' : '' %>>Full Time</option>
+                        <option value="PART_TIME" <%= filters.jobType === 'PART_TIME' ? 'selected' : '' %>>Part Time</option>
+                        <option value="CASUAL" <%= filters.jobType === 'CASUAL' ? 'selected' : '' %>>Casual</option>
+                        <option value="CONTRACT" <%= filters.jobType === 'CONTRACT' ? 'selected' : '' %>>Contract</option>
+                        <option value="INTERNSHIP" <%= filters.jobType === 'INTERNSHIP' ? 'selected' : '' %>>Internship</option>
+                    </select>
+                </label>
+                <label>
+                    <span>Skill</span>
+                    <input type="text" name="skill" value="<%= filters.skill %>" placeholder="Python" />
+                </label>
+                <label>
+                    <span>Experience</span>
+                    <input type="number" min="0" name="requiredExperience" value="<%= filters.requiredExperience %>" placeholder="Years you can meet" />
+                </label>
+                <label>
+                    <span>Education</span>
+                    <select name="educationLevel">
+                        <option value="">Any level</option>
+                        <option value="CERTIFICATE_I" <%= filters.educationLevel === 'CERTIFICATE_I' ? 'selected' : '' %>>Certificate I</option>
+                        <option value="CERTIFICATE_II" <%= filters.educationLevel === 'CERTIFICATE_II' ? 'selected' : '' %>>Certificate II</option>
+                        <option value="CERTIFICATE_III" <%= filters.educationLevel === 'CERTIFICATE_III' ? 'selected' : '' %>>Certificate III</option>
+                        <option value="CERTIFICATE_IV" <%= filters.educationLevel === 'CERTIFICATE_IV' ? 'selected' : '' %>>Certificate IV</option>
+                        <option value="DIPLOMA" <%= filters.educationLevel === 'DIPLOMA' ? 'selected' : '' %>>Diploma</option>
+                        <option value="ADVANCED_DIPLOMA" <%= filters.educationLevel === 'ADVANCED_DIPLOMA' ? 'selected' : '' %>>Advanced Diploma</option>
+                        <option value="ASSOCIATE_DEGREE" <%= filters.educationLevel === 'ASSOCIATE_DEGREE' ? 'selected' : '' %>>Associate Degree</option>
+                        <option value="BACHELORS_DEGREE" <%= filters.educationLevel === 'BACHELORS_DEGREE' ? 'selected' : '' %>>Bachelor's Degree</option>
+                        <option value="GRADUATE_CERTIFICATE" <%= filters.educationLevel === 'GRADUATE_CERTIFICATE' ? 'selected' : '' %>>Graduate Certificate</option>
+                        <option value="GRADUATE_DIPLOMA" <%= filters.educationLevel === 'GRADUATE_DIPLOMA' ? 'selected' : '' %>>Graduate Diploma</option>
+                        <option value="MASTERS_DEGREE" <%= filters.educationLevel === 'MASTERS_DEGREE' ? 'selected' : '' %>>Master's Degree</option>
+                        <option value="DOCTORAL_DEGREE" <%= filters.educationLevel === 'DOCTORAL_DEGREE' ? 'selected' : '' %>>Doctoral Degree</option>
+                    </select>
+                </label>
+                <label>
+                    <span>Salary min</span>
+                    <input type="number" min="0" name="salaryMin" value="<%= filters.salaryMin %>" placeholder="70000" />
+                </label>
+                <label>
+                    <span>Salary max</span>
+                    <input type="number" min="0" name="salaryMax" value="<%= filters.salaryMax %>" placeholder="120000" />
+                </label>
+            </section>
+
+            <div class="find-job-page__filter-actions">
+                <a href="/candidate/find-a-job">Clear</a>
+                <button type="submit">
+                    <i class="fas fa-filter" aria-hidden="true"></i>
+                    Search jobs
+                </button>
+            </div>
+        </form>
+
+        <section class="find-job-page__results" aria-labelledby="job-results-title">
+            <div class="find-job-page__section-head">
+                <div>
+                    <p class="account-home__eyebrow">Search results</p>
+                    <h2 id="job-results-title">Job Results</h2>
+                </div>
+                <span><%= jobs.length %> active match<%= jobs.length === 1 ? '' : 'es' %></span>
+            </div>
+            <% if (jobs.length) { %>
+            <div class="find-job-page__job-list">
+                <% jobs.forEach((job) => { %>
+                <%- include('../../partials/candidate-job-card', { job, savedJobIds, appliedJobIds, showScore: false }) %>
+                <% }) %>
+            </div>
+            <% } else { %>
+            <div class="find-job-page__empty">
+                <h3>No jobs found</h3>
+                <p>Try widening the keyword or removing one of the filters.</p>
+            </div>
+            <% } %>
+        </section>
+
+        <section class="find-job-page__recommendations" aria-labelledby="recommended-jobs-title">
+            <div class="find-job-page__section-head">
+                <div>
+                    <p class="account-home__eyebrow">Recommended for You</p>
+                    <h2 id="recommended-jobs-title">Recommended jobs</h2>
+                </div>
+                <span><%= isMember ? 'Unlimited recommendations enabled' : 'Showing Top 10 recommendations' %></span>
+            </div>
+            <% if (recommendedJobs.length) { %>
+            <div class="find-job-page__job-list">
+                <% recommendedJobs.forEach((job) => { %>
+                <%- include('../../partials/candidate-job-card', { job, savedJobIds, appliedJobIds, showScore: true }) %>
+                <% }) %>
+            </div>
+            <% } else { %>
+            <div class="find-job-page__empty">
+                <h3>No recommendations available</h3>
+                <p>Complete more of your candidate profile to help TalentMatch find stronger matches.</p>
+            </div>
+            <% } %>
+        </section>
+
+        <div class="find-job-page__modal" hidden aria-hidden="true" data-job-modal>
+            <div class="find-job-page__overlay" data-job-modal-close></div>
+            <section class="find-job-page__dialog" role="dialog" aria-modal="true" aria-labelledby="job-detail-title">
+                <button class="find-job-page__close" type="button" aria-label="Close job details" data-job-modal-close>
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+                <div data-job-detail></div>
+            </section>
+        </div>
+    </section>
+</main>
+<script>
+    window.__findJob = <%- findJobJson %>;
+</script>
+<script src="/js/global.js"></script>
+<script src="/js/find-a-job.js"></script>
+</body>
+</html>

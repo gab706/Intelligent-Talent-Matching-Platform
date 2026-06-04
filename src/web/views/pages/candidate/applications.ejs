@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Track Applications | Intelligent Talent Matching Platform</title>
+    <meta name="description" content="Track candidate applications in TalentMatch." />
+    <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
+    <link rel="stylesheet" href="/lib/css/toastr.min.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/account-home.css" />
+    <link rel="stylesheet" href="/css/candidate-applications.css" />
+    <script src="/lib/js/jquery.min.js"></script>
+    <script src="/lib/js/toastr.min.js"></script>
+</head>
+<body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
+<%- include('../../partials/public-header/public-header'); %>
+<main class="account-home account-home--candidate">
+    <aside class="account-home__sidebar" aria-label="Candidate navigation">
+        <nav class="account-home__nav">
+            <div class="account-home__nav-primary">
+                <a class="account-home__nav-link" href="/candidate/home">Candidate Home</a>
+                <a class="account-home__nav-link" href="/candidate/find-a-job">Find a Job</a>
+                <a class="account-home__nav-link is-active" href="/candidate/applications">Track Applications</a>
+                <a class="account-home__nav-link" href="/candidate/profile">Manage Profile</a>
+            </div>
+            <div class="account-home__nav-actions">
+                <% if (accountType === 3) { %>
+                <a class="account-home__nav-link account-home__nav-link--mode" href="/employer/home">Swap to Employer Mode</a>
+                <% } else { %>
+                <a class="account-home__nav-link account-home__nav-link--mode" href="/candidate/migrate">Migrate to Employer Account</a>
+                <% } %>
+                <% if (isAdmin) { %>
+                <a class="account-home__nav-link account-home__nav-link--admin" href="/admin/control">Admin Control</a>
+                <% } %>
+            </div>
+        </nav>
+    </aside>
+
+    <section class="account-home__content candidate-applications" aria-labelledby="candidate-applications-title">
+        <div class="candidate-applications__header">
+            <div>
+                <p class="account-home__eyebrow">Applications</p>
+                <h1 id="candidate-applications-title" class="account-home__title candidate-applications__title">
+                    Track applications
+                </h1>
+                <p class="account-home__copy candidate-applications__intro">
+                    See where each application is up to, review job details, and withdraw applications that are still active.
+                </p>
+            </div>
+            <a class="candidate-applications__primary" href="/candidate/find-a-job">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                Find more jobs
+            </a>
+        </div>
+
+        <section class="candidate-applications__summary" aria-label="Application status summary">
+            <button type="button" class="is-active" data-status-filter="ALL">
+                <span>All</span>
+                <strong><%= applications.length %></strong>
+            </button>
+            <button type="button" data-status-filter="APPLIED">
+                <span>Applied</span>
+                <strong><%= statusCounts.APPLIED || 0 %></strong>
+            </button>
+            <button type="button" data-status-filter="SHORTLISTED">
+                <span>Shortlisted</span>
+                <strong><%= statusCounts.SHORTLISTED || 0 %></strong>
+            </button>
+            <button type="button" data-status-filter="HIRED">
+                <span>Accepted</span>
+                <strong><%= statusCounts.HIRED || 0 %></strong>
+            </button>
+            <button type="button" data-status-filter="REJECTED">
+                <span>Rejected</span>
+                <strong><%= statusCounts.REJECTED || 0 %></strong>
+            </button>
+            <button type="button" data-status-filter="WITHDRAWN">
+                <span>Withdrawn</span>
+                <strong><%= statusCounts.WITHDRAWN || 0 %></strong>
+            </button>
+        </section>
+
+        <section class="candidate-applications__list" aria-label="Your applications" data-application-list></section>
+
+        <div class="candidate-applications__empty" hidden data-empty-state>
+            <h2>No applications here</h2>
+            <p>Try another status, or apply for a role from Find a Job.</p>
+            <a href="/candidate/find-a-job">Find jobs</a>
+        </div>
+
+        <div class="candidate-applications__modal" hidden aria-hidden="true" data-application-modal>
+            <div class="candidate-applications__overlay" data-application-modal-close></div>
+            <section class="candidate-applications__dialog" role="dialog" aria-modal="true" aria-labelledby="application-detail-title">
+                <button class="candidate-applications__close" type="button" aria-label="Close application details" data-application-modal-close>
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+                <div data-application-detail></div>
+            </section>
+        </div>
+    </section>
+</main>
+<script>
+    window.__candidateApplications = <%- candidateApplicationsJson %>;
+</script>
+<script src="/js/global.js"></script>
+<script src="/js/candidate-applications.js"></script>
+</body>
+</html>

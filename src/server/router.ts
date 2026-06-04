@@ -5,6 +5,9 @@ import fs from 'node:fs/promises';
 import PublicHelper from './helpers/PublicHelper.js';
 import LogoutHelper from './helpers/logout.js';
 import EmployerCompaniesHelper from './helpers/employer/companies.js';
+import PublicCompanyHelper from './helpers/company.js';
+import CandidateJobSaveWorker from './workers/candidate/job-save.js';
+import CandidateJobApplyWorker from './workers/candidate/job-apply.js';
 
 type Handler = (
 	req: Request,
@@ -30,6 +33,9 @@ router.get('/logout', LogoutHelper);
 
 router.get('/employer/companies/:companyName/view', PublicHelper, EmployerCompaniesHelper);
 router.get('/employer/companies/:companyName/edit', PublicHelper, EmployerCompaniesHelper);
+router.get('/companies/:companyName', PublicHelper, PublicCompanyHelper);
+router.post('/candidate/jobs/:jobId/save', CandidateJobSaveWorker);
+router.post('/candidate/jobs/:jobId/apply', CandidateJobApplyWorker);
 
 router.get('/images/avatars/:hash', async (req: Request, res: Response, next: NextFunction) => {
 	try {

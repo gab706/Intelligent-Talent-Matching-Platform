@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Applications | Intelligent Talent Matching Platform</title>
+    <meta name="description" content="Manage candidate applications in TalentMatch." />
+    <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
+    <link rel="stylesheet" href="/lib/css/toastr.min.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/account-home.css" />
+    <link rel="stylesheet" href="/css/employer-applications.css" />
+    <script src="/lib/js/jquery.min.js"></script>
+    <script src="/lib/js/toastr.min.js"></script>
+</head>
+<body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
+<%- include('../../partials/public-header/public-header'); %>
+<main class="account-home account-home--employer">
+    <aside class="account-home__sidebar" aria-label="Employer navigation">
+        <nav class="account-home__nav">
+            <div class="account-home__nav-primary">
+                <a class="account-home__nav-link" href="/employer/home">Employer Home</a>
+                <a class="account-home__nav-link" href="/employer/find-a-candidate">Find a Candidate</a>
+                <a class="account-home__nav-link" href="/employer/postings">Tracking Postings</a>
+                <a class="account-home__nav-link is-active" href="/employer/applications">Manage Applications</a>
+                <a class="account-home__nav-link" href="/employer/companies">Manage Companies</a>
+            </div>
+            <div class="account-home__nav-actions">
+                <% if (accountType === 3) { %>
+                <a class="account-home__nav-link account-home__nav-link--mode" href="/candidate/home">Swap to Candidate Mode</a>
+                <% } else { %>
+                <a class="account-home__nav-link account-home__nav-link--mode" href="/employer/migrate">Migrate to Candidate Account</a>
+                <% } %>
+                <% if (isAdmin) { %>
+                <a class="account-home__nav-link account-home__nav-link--admin" href="/admin/control">Admin Control</a>
+                <% } %>
+            </div>
+        </nav>
+    </aside>
+
+    <section class="account-home__content employer-applications" aria-labelledby="employer-applications-title">
+        <div class="employer-applications__header">
+            <div>
+                <p class="account-home__eyebrow">Applications</p>
+                <h1 id="employer-applications-title" class="account-home__title employer-applications__title">
+                    Manage applications
+                </h1>
+                <p class="account-home__copy employer-applications__intro">
+                    Select a posting, then move candidates through the hiring pipeline.
+                </p>
+            </div>
+            <label class="employer-applications__posting-select">
+                <span>Viewing posting</span>
+                <select data-posting-select></select>
+            </label>
+        </div>
+
+        <section class="employer-applications__posting-summary" aria-live="polite" data-posting-summary></section>
+
+        <section class="employer-applications__board" aria-label="Application swim lanes" data-application-board></section>
+
+        <div class="employer-applications__empty" hidden data-empty-state>
+            <h2>Well this is awkward, it seems empty here...</h2>
+            <p>Create a posting and wait for candidates to apply before the board can do much.</p>
+            <a href="/employer/postings">Go to postings</a>
+        </div>
+
+        <div class="employer-applications__modal" hidden aria-hidden="true" data-profile-modal>
+            <div class="employer-applications__overlay" data-profile-close></div>
+            <section class="employer-applications__dialog" role="dialog" aria-modal="true" aria-labelledby="application-profile-title">
+                <button class="employer-applications__close" type="button" aria-label="Close candidate profile" data-profile-close>
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+                <div data-profile-content></div>
+            </section>
+        </div>
+    </section>
+</main>
+<script>
+    window.__employerApplications = <%- employerApplicationsJson %>;
+</script>
+<script src="/js/global.js"></script>
+<script src="/js/employer-applications.js"></script>
+</body>
+</html>

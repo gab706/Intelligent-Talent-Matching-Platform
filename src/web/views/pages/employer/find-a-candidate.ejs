@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Find a Candidate | Intelligent Talent Matching Platform</title>
+    <meta name="description" content="Search and match candidates in TalentMatch." />
+    <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
+    <link rel="stylesheet" href="/lib/css/toastr.min.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/account-home.css" />
+    <link rel="stylesheet" href="/css/employer-candidates.css" />
+    <script src="/lib/js/jquery.min.js"></script>
+    <script src="/lib/js/toastr.min.js"></script>
+</head>
+<body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
+<%- include('../../partials/public-header/public-header'); %>
+<main class="account-home account-home--employer">
+    <aside class="account-home__sidebar" aria-label="Employer navigation">
+        <nav class="account-home__nav">
+            <div class="account-home__nav-primary">
+                <a class="account-home__nav-link" href="/employer/home">Employer Home</a>
+                <a class="account-home__nav-link is-active" href="/employer/find-a-candidate">Find a Candidate</a>
+                <a class="account-home__nav-link" href="/employer/postings">Tracking Postings</a>
+                <a class="account-home__nav-link" href="/employer/applications">Manage Applications</a>
+                <a class="account-home__nav-link" href="/employer/companies">Manage Companies</a>
+            </div>
+            <div class="account-home__nav-actions">
+                <% if (accountType === 3) { %>
+                <a class="account-home__nav-link account-home__nav-link--mode" href="/candidate/home">Swap to Candidate Mode</a>
+                <% } else { %>
+                <a class="account-home__nav-link account-home__nav-link--mode" href="/employer/migrate">Migrate to Candidate Account</a>
+                <% } %>
+                <% if (isAdmin) { %>
+                <a class="account-home__nav-link account-home__nav-link--admin" href="/admin/control">Admin Control</a>
+                <% } %>
+            </div>
+        </nav>
+    </aside>
+
+    <section class="account-home__content employer-candidates" aria-labelledby="find-candidate-title">
+        <div class="employer-candidates__hero">
+            <h1 id="find-candidate-title">Find a Candidate</h1>
+            <label class="employer-candidates__search" for="candidate-search">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                <span class="sr-only">Search candidates</span>
+                <input id="candidate-search" type="search" placeholder="Search by keyword, skill, education, location, or profile text" autocomplete="off" data-candidate-search />
+                <button type="button" aria-label="Clear search" data-candidate-search-clear hidden>
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+            </label>
+        </div>
+
+        <div class="employer-candidates__toolbar">
+            <p data-candidate-count data-candidate-total="0">Showing 0 of 0</p>
+            <div class="employer-candidates__actions">
+                <button class="employer-candidates__filter-button" type="button" data-filter-open>
+                    <i class="fas fa-filter" aria-hidden="true"></i>
+                    Filter
+                    <span hidden data-filter-count></span>
+                </button>
+                <button class="employer-candidates__primary" type="button" data-match-open disabled>
+                    <i class="fas fa-brain" aria-hidden="true"></i>
+                    Intelligent
+                </button>
+            </div>
+        </div>
+
+        <section class="employer-candidates__recommended" hidden data-recommended-section>
+            <div class="employer-candidates__recommended-header">
+                <div>
+                    <h2>Recommended candidates</h2>
+                    <p data-recommended-label></p>
+                </div>
+                <button class="employer-candidates__filter-clear" type="button" data-recommended-clear>
+                    Clear recommendations
+                </button>
+            </div>
+            <div class="employer-candidates__recommendation-list" data-recommended-list></div>
+        </section>
+
+        <div class="employer-candidates__table-wrap">
+            <table class="employer-candidates__table">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Highest education</th>
+                    <th>Experience</th>
+                    <th>Availability</th>
+                </tr>
+                </thead>
+                <tbody data-candidate-list></tbody>
+            </table>
+        </div>
+        <p class="employer-candidates__empty" hidden data-candidate-empty>No candidates match that search.</p>
+        <nav class="employer-candidates__pagination" aria-label="Candidate pages" data-candidate-pagination></nav>
+
+        <div class="employer-candidates__modal" hidden aria-hidden="true" data-profile-modal>
+            <div class="employer-candidates__overlay" data-profile-close></div>
+            <section class="employer-candidates__dialog employer-candidates__dialog--profile" role="dialog" aria-modal="true" aria-labelledby="candidate-profile-title">
+                <button class="employer-candidates__close" type="button" aria-label="Close candidate profile" data-profile-close>
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+                <div data-profile-content></div>
+            </section>
+        </div>
+
+        <div class="employer-candidates__modal" hidden aria-hidden="true" data-filter-modal>
+            <div class="employer-candidates__overlay" data-filter-close></div>
+            <section class="employer-candidates__dialog employer-candidates__dialog--filters" role="dialog" aria-modal="true" aria-labelledby="filter-title">
+                <button class="employer-candidates__close" type="button" aria-label="Close filters" data-filter-close>
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+                <div>
+                    <h2 id="filter-title">Filter candidates</h2>
+                    <p class="employer-candidates__dialog-note">Choose the profile details you want the results to satisfy.</p>
+                </div>
+                <section class="employer-candidates__filters" aria-label="Candidate search filters">
+                    <label>
+                        <span>Skills</span>
+                        <input type="text" placeholder="python, cyber security" data-filter-skills />
+                    </label>
+                    <label>
+                        <span>Education level</span>
+                        <select data-filter-education>
+                            <option value="">Any education</option>
+                            <option value="CERTIFICATE_I">Certificate I</option>
+                            <option value="CERTIFICATE_II">Certificate II</option>
+                            <option value="CERTIFICATE_III">Certificate III</option>
+                            <option value="CERTIFICATE_IV">Certificate IV</option>
+                            <option value="DIPLOMA">Diploma</option>
+                            <option value="ADVANCED_DIPLOMA">Advanced Diploma</option>
+                            <option value="ASSOCIATE_DEGREE">Associate Degree</option>
+                            <option value="BACHELORS_DEGREE">Bachelor's Degree</option>
+                            <option value="GRADUATE_CERTIFICATE">Graduate Certificate</option>
+                            <option value="GRADUATE_DIPLOMA">Graduate Diploma</option>
+                            <option value="MASTERS_DEGREE">Master's Degree</option>
+                            <option value="DOCTORAL_DEGREE">Doctoral Degree</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Experience</span>
+                        <select data-filter-experience>
+                            <option value="">Any experience</option>
+                            <option value="0-1">0-1 years</option>
+                            <option value="1-3">1-3 years</option>
+                            <option value="3-5">3-5 years</option>
+                            <option value="5+">5+ years</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Working mode</span>
+                        <select data-filter-working-mode>
+                            <option value="">Any mode</option>
+                            <option value="REMOTE">Remote</option>
+                            <option value="ONSITE">On-site</option>
+                            <option value="HYBRID">Hybrid</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Preferred location</span>
+                        <input type="text" placeholder="Sydney" data-filter-location />
+                    </label>
+                    <label>
+                        <span>Job type</span>
+                        <select data-filter-job-type>
+                            <option value="">Any type</option>
+                            <option value="FULL_TIME">Full Time</option>
+                            <option value="PART_TIME">Part Time</option>
+                            <option value="CASUAL">Casual</option>
+                            <option value="CONTRACT">Contract</option>
+                            <option value="INTERNSHIP">Internship</option>
+                        </select>
+                    </label>
+                </section>
+                <div class="employer-candidates__filter-actions">
+                    <button class="employer-candidates__filter-clear" type="button" data-filter-clear>
+                        Clear filters
+                    </button>
+                    <button class="employer-candidates__primary" type="button" data-filter-apply>
+                        Apply filters
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        <div class="employer-candidates__modal" hidden aria-hidden="true" data-recommend-modal>
+            <div class="employer-candidates__overlay" data-recommend-close></div>
+            <section class="employer-candidates__dialog" role="dialog" aria-modal="true" aria-labelledby="recommend-title">
+                <button class="employer-candidates__close" type="button" aria-label="Close recommendation" data-recommend-close>
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+                <h2 id="recommend-title">Recommend candidate</h2>
+                <label class="employer-candidates__field">
+                    <span>Select active posting</span>
+                    <select data-recommend-posting></select>
+                </label>
+                <button class="employer-candidates__primary" type="button" data-recommend-submit disabled>
+                    <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                    Send recommendation
+                </button>
+            </section>
+        </div>
+
+        <div class="employer-candidates__modal" hidden aria-hidden="true" data-match-modal>
+            <div class="employer-candidates__overlay" data-match-close></div>
+            <section class="employer-candidates__dialog" role="dialog" aria-modal="true" aria-labelledby="match-title">
+                <button class="employer-candidates__close" type="button" aria-label="Close matching" data-match-close>
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+                <h2 id="match-title">Intelligent Matching</h2>
+                <label class="employer-candidates__field">
+                    <span>Select active posting</span>
+                    <select data-match-posting></select>
+                </label>
+                <button class="employer-candidates__primary" type="button" data-match-run>Show recommendations</button>
+            </section>
+        </div>
+    </section>
+</main>
+<script>
+    window.__candidateSearch = {
+        candidates: <%- candidatesJson %>,
+        postings: <%- postingsJson %>
+    };
+</script>
+<script src="/js/global.js"></script>
+<script src="/js/employer-candidates.js"></script>
+</body>
+</html>

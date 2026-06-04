@@ -9,9 +9,30 @@
     <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
     <link rel="stylesheet" href="/css/global.css" />
     <link rel="stylesheet" href="/css/account-home.css" />
+    <link rel="stylesheet" href="/css/employer-home.css" />
     <script src="/lib/js/jquery.min.js"></script>
 </head>
 <body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
+<%
+    const home = typeof employerHome !== 'undefined' ? employerHome : {
+        candidateCount: 0,
+        companies: [],
+        activePostings: [],
+        draftPostings: [],
+        closedPostings: [],
+        recentPostings: [],
+        closingSoon: [],
+        pendingInvitations: [],
+        stats: {
+            companyCount: 0,
+            activePostingCount: 0,
+            draftPostingCount: 0,
+            closedPostingCount: 0,
+            totalApplications: 0,
+            pendingInvitationCount: 0
+        }
+    };
+%>
 <%- include('../../partials/public-header/public-header'); %>
 <main class="account-home account-home--employer">
     <aside class="account-home__sidebar" aria-label="Employer navigation">
@@ -36,23 +57,114 @@
         </nav>
     </aside>
 
-    <section class="account-home__content" aria-labelledby="employer-home-title">
-        <p class="account-home__eyebrow">
-            Employer home
-        </p>
-        <h1 id="employer-home-title" class="account-home__title">
-            Welcome back <%= firstName || 'there' %>
-        </h1>
-        <p class="account-home__copy">
-            Connect to an existing company or create a company profile next so
-            TalentMatch can organise jobs, candidates, and hiring activity.
-        </p>
-        <p class="account-home__meta">
-            Server userId:
-            <strong>
-                <%= userId || 'No user session' %>
-            </strong>
-        </p>
+    <section class="account-home__content employer-home" aria-labelledby="employer-home-title">
+        <div class="employer-home__hero">
+            <div>
+                <p class="account-home__eyebrow">Employer home</p>
+                <h1 id="employer-home-title" class="account-home__title employer-home__title">
+                    Welcome back <%= firstName || 'there' %>
+                </h1>
+                <p class="account-home__copy employer-home__intro">
+                    Keep the essentials close: your companies, open roles, and the next move in the hiring flow.
+                </p>
+                <p class="employer-home__pulse">
+                    <% if (home.stats.activePostingCount) { %>
+                    <strong><%= home.stats.activePostingCount %> active role<%= home.stats.activePostingCount === 1 ? '' : 's' %></strong>
+                    <span><%= home.stats.totalApplications %> application<%= home.stats.totalApplications === 1 ? '' : 's' %> across your workspace.</span>
+                    <% } else if (home.stats.companyCount) { %>
+                    <strong>Ready for a role</strong>
+                    <span>Your company setup is in place.</span>
+                    <% } else { %>
+                    <strong>Company needed</strong>
+                    <span>Create or join an organisation before posting roles.</span>
+                    <% } %>
+                </p>
+            </div>
+            <div class="employer-home__hero-actions" aria-label="Employer quick actions">
+                <a class="employer-home__primary-link" href="/employer/postings">
+                    <i class="fas fa-plus" aria-hidden="true"></i>
+                    Create posting
+                </a>
+                <a class="employer-home__secondary-link" href="/employer/companies">
+                    <i class="fas fa-building" aria-hidden="true"></i>
+                    Manage companies
+                </a>
+            </div>
+        </div>
+
+        <section class="employer-home__stats" aria-label="Hiring snapshot">
+            <article class="employer-home__stat">
+                <span>Companies</span>
+                <strong><%= home.stats.companyCount %></strong>
+            </article>
+            <article class="employer-home__stat">
+                <span>Active postings</span>
+                <strong><%= home.stats.activePostingCount %></strong>
+            </article>
+            <article class="employer-home__stat">
+                <span>Candidate pool</span>
+                <strong><%= home.candidateCount %></strong>
+            </article>
+        </section>
+
+        <section class="employer-home__next" aria-labelledby="next-title">
+            <% if (!home.stats.companyCount) { %>
+            <i class="fas fa-building" aria-hidden="true"></i>
+            <div>
+                <p class="account-home__eyebrow">Next step</p>
+                <h2 id="next-title">Create or join a company</h2>
+                <p>Postings need a company profile before hiring can start.</p>
+            </div>
+            <a href="/employer/companies">Manage companies</a>
+            <% } else if (home.stats.activePostingCount) { %>
+            <i class="fas fa-user-tie" aria-hidden="true"></i>
+            <div>
+                <p class="account-home__eyebrow">Next step</p>
+                <h2 id="next-title">Review candidates</h2>
+                <p>Search the candidate pool or use Intelligent Matching from an active posting.</p>
+            </div>
+            <a href="/employer/find-a-candidate">Find candidates</a>
+            <% } else { %>
+            <i class="fas fa-briefcase" aria-hidden="true"></i>
+            <div>
+                <p class="account-home__eyebrow">Next step</p>
+                <h2 id="next-title">Create your first posting</h2>
+                <p>Start with a role title, requirements, and the company it belongs to.</p>
+            </div>
+            <a href="/employer/postings">Open postings</a>
+            <% } %>
+        </section>
+
+        <section class="employer-home__panel" aria-labelledby="postings-title">
+            <div class="employer-home__section-head">
+                <div>
+                    <p class="account-home__eyebrow">Postings</p>
+                    <h2 id="postings-title">Recent activity</h2>
+                </div>
+                <a href="/employer/postings">View all</a>
+            </div>
+            <% if (home.recentPostings.length) { %>
+            <div class="employer-home__posting-list">
+                <% home.recentPostings.slice(0, 3).forEach((posting) => { %>
+                <article class="employer-home__posting">
+                    <div>
+                        <strong><%= posting.jobTitle %></strong>
+                        <p><%= posting.companyName %> | <%= posting.jobLocation %></p>
+                    </div>
+                    <div class="employer-home__posting-meta">
+                        <span class="employer-home__status employer-home__status--<%= posting.status.toLowerCase() %>"><%= posting.status %></span>
+                        <small><%= posting.applicationCount %> application<%= posting.applicationCount === 1 ? '' : 's' %></small>
+                    </div>
+                </article>
+                <% }) %>
+            </div>
+            <% } else { %>
+            <div class="employer-home__empty">
+                <h3>No postings yet</h3>
+                <p>Create a posting once your company profile is ready.</p>
+            </div>
+            <% } %>
+        </section>
     </section>
 </main>
 <script src="/js/global.js"></script>

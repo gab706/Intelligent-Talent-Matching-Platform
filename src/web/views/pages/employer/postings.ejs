@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tracking Postings | Intelligent Talent Matching Platform</title>
+    <meta name="description" content="Track employer job postings in TalentMatch." />
+    <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
+    <link rel="stylesheet" href="/lib/css/toastr.min.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/account-home.css" />
+    <link rel="stylesheet" href="/css/employer-postings.css" />
+    <script src="/lib/js/jquery.min.js"></script>
+    <script src="/lib/js/toastr.min.js"></script>
+</head>
+<body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
+<%- include('../../partials/public-header/public-header'); %>
+<main class="account-home account-home--employer">
+    <aside class="account-home__sidebar" aria-label="Employer navigation">
+        <nav class="account-home__nav">
+            <div class="account-home__nav-primary">
+                <a class="account-home__nav-link" href="/employer/home">Employer Home</a>
+                <a class="account-home__nav-link" href="/employer/find-a-candidate">Find a Candidate</a>
+                <a class="account-home__nav-link is-active" href="/employer/postings">Tracking Postings</a>
+                <a class="account-home__nav-link" href="/employer/applications">Manage Applications</a>
+                <a class="account-home__nav-link" href="/employer/companies">Manage Companies</a>
+            </div>
+            <div class="account-home__nav-actions">
+                <% if (accountType === 3) { %>
+                <a class="account-home__nav-link account-home__nav-link--mode" href="/candidate/home">Swap to Candidate Mode</a>
+                <% } else { %>
+                <a class="account-home__nav-link account-home__nav-link--mode" href="/employer/migrate">Migrate to Candidate Account</a>
+                <% } %>
+                <% if (isAdmin) { %>
+                <a class="account-home__nav-link account-home__nav-link--admin" href="/admin/control">Admin Control</a>
+                <% } %>
+            </div>
+        </nav>
+    </aside>
+
+    <section class="account-home__content employer-postings" aria-labelledby="employer-postings-title">
+        <div class="employer-postings__header">
+            <div>
+                <p class="account-home__eyebrow">Tracking postings</p>
+                <h1 id="employer-postings-title" class="account-home__title employer-postings__title">
+                    Job postings
+                </h1>
+                <p class="account-home__copy employer-postings__intro">
+                    Track draft, active, and closed roles across the companies you are attached to.
+                </p>
+            </div>
+            <button class="employer-postings__primary" type="button" data-posting-open <%= hasCompanies ? '' : 'disabled' %>>
+                <i class="fas fa-plus" aria-hidden="true"></i>
+                Create posting
+            </button>
+        </div>
+
+        <section class="employer-postings__notice" hidden data-no-companies>
+            <p>
+                You need to be attached to at least one company before creating or tracking postings.
+            </p>
+            <a href="/employer/companies">
+                Go to manage companies
+            </a>
+        </section>
+
+        <div class="employer-postings__content" data-postings-content>
+            <p class="employer-postings__empty employer-postings__empty--page" hidden data-all-empty>
+                Well this is awkward, it seems empty here...
+            </p>
+
+            <section class="employer-postings__section" aria-labelledby="active-postings-title" hidden data-posting-section="ACTIVE">
+                <div class="employer-postings__section-header">
+                    <h2 id="active-postings-title">Active postings</h2>
+                    <span data-active-count>0</span>
+                </div>
+                <div class="employer-postings__list" data-active-postings></div>
+            </section>
+
+            <section class="employer-postings__section" aria-labelledby="planned-postings-title" hidden data-posting-section="DRAFT">
+                <div class="employer-postings__section-header">
+                    <h2 id="planned-postings-title">Planned postings</h2>
+                    <span data-planned-count>0</span>
+                </div>
+                <div class="employer-postings__list" data-planned-postings></div>
+            </section>
+
+            <details class="employer-postings__section employer-postings__section--past" open hidden data-posting-section="CLOSED">
+                <summary>
+                    <span>Past postings</span>
+                    <span data-past-count>0</span>
+                    <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                </summary>
+                <div class="employer-postings__list" data-past-postings></div>
+            </details>
+        </div>
+
+        <div class="employer-postings__modal" hidden aria-hidden="true" data-posting-modal>
+            <div class="employer-postings__modal-overlay" data-posting-close></div>
+            <section class="employer-postings__dialog" role="dialog" aria-modal="true" aria-labelledby="posting-modal-title">
+                <button class="employer-postings__modal-close" type="button" aria-label="Close posting form" data-posting-close>
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+                <div class="employer-postings__modal-header">
+                    <p class="account-home__eyebrow">Posting workflow</p>
+                    <h2 id="posting-modal-title" data-posting-modal-title>Create a posting</h2>
+                </div>
+                <div class="employer-postings__progress" aria-hidden="true">
+                    <span class="is-active" data-posting-progress="0"></span>
+                    <span data-posting-progress="1"></span>
+                    <span data-posting-progress="2"></span>
+                    <span data-posting-progress="3"></span>
+                </div>
+                <form class="employer-postings__form" data-posting-form novalidate>
+                    <input type="hidden" name="postingId" data-posting-id />
+                    <fieldset class="employer-postings__step is-active" data-posting-step="0">
+                        <legend>Role details</legend>
+                        <div class="employer-postings__form-grid">
+                            <label class="employer-postings__field">
+                                <span>Job Title</span>
+                                <input name="jobTitle" type="text" required />
+                            </label>
+                            <label class="employer-postings__field">
+                                <span>Company</span>
+                                <select name="companyId" required data-company-select></select>
+                            </label>
+                        </div>
+                        <label class="employer-postings__field">
+                            <span>Job Description</span>
+                            <textarea name="jobDescription" rows="5" required></textarea>
+                        </label>
+                    </fieldset>
+
+                    <fieldset class="employer-postings__step" data-posting-step="1">
+                        <legend>Requirements</legend>
+                        <div class="employer-postings__form-grid">
+                            <label class="employer-postings__field">
+                                <span>Required Education Level</span>
+                                <select name="requiredEducationLevel" required data-education-select></select>
+                            </label>
+                            <label class="employer-postings__field">
+                                <span>Required Years of Experience</span>
+                                <input name="requiredExperience" type="number" min="0" step="1" required />
+                            </label>
+                        </div>
+                        <label class="employer-postings__field">
+                            <span>Required Skills</span>
+                            <input type="text" data-skill-input placeholder="Type a skill and press Enter" />
+                            <input name="skills" type="hidden" required data-skills-value />
+                            <span class="employer-postings__skills" data-skill-list></span>
+                        </label>
+                    </fieldset>
+
+                    <fieldset class="employer-postings__step" data-posting-step="2">
+                        <legend>Work details</legend>
+                        <div class="employer-postings__form-grid">
+                            <label class="employer-postings__field">
+                                <span>Work Mode</span>
+                                <select name="workMode" required>
+                                    <option value="">Select mode</option>
+                                    <option value="REMOTE">Remote</option>
+                                    <option value="HYBRID">Hybrid</option>
+                                    <option value="ONSITE">On-site</option>
+                                </select>
+                            </label>
+                            <label class="employer-postings__field">
+                                <span>Job Location</span>
+                                <input name="jobLocation" type="text" required />
+                            </label>
+                        </div>
+                        <label class="employer-postings__field">
+                            <span>Job Type</span>
+                            <select name="jobType" required>
+                                <option value="">Select job type</option>
+                                <option value="FULL_TIME">Full Time</option>
+                                <option value="PART_TIME">Part Time</option>
+                                <option value="CASUAL">Casual</option>
+                                <option value="CONTRACT">Contract</option>
+                                <option value="INTERNSHIP">Internship</option>
+                            </select>
+                        </label>
+                    </fieldset>
+
+                    <fieldset class="employer-postings__step" data-posting-step="3">
+                        <legend>Salary and visibility</legend>
+                        <div class="employer-postings__form-grid">
+                            <label class="employer-postings__field">
+                                <span>Minimum Salary</span>
+                                <input name="salaryMin" type="number" min="0" step="1" required />
+                            </label>
+                            <label class="employer-postings__field">
+                                <span>Maximum Salary</span>
+                                <input name="salaryMax" type="number" min="0" step="1" required />
+                            </label>
+                        </div>
+                        <div class="employer-postings__form-grid">
+                            <label class="employer-postings__field">
+                                <span>Closing Date</span>
+                                <input name="closingDate" type="date" />
+                            </label>
+                            <label class="employer-postings__field">
+                                <span>Visibility Settings</span>
+                                <select name="status" required>
+                                    <option value="DRAFT">Draft</option>
+                                    <option value="ACTIVE">Active</option>
+                                    <option value="CLOSED">Closed</option>
+                                </select>
+                            </label>
+                        </div>
+                    </fieldset>
+                    <div class="employer-postings__actions">
+                        <button class="employer-postings__ghost" type="button" data-posting-back hidden>Back</button>
+                        <button class="employer-postings__primary" type="button" data-posting-next>Next</button>
+                        <button class="employer-postings__primary" type="submit" data-posting-submit>Save posting</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </section>
+</main>
+<script>
+    window.__employerPostings = <%- employerPostingsJson %>;
+</script>
+<script src="/js/global.js"></script>
+<script src="/js/employer-postings.js"></script>
+</body>
+</html>
