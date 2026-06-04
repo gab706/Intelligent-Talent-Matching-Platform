@@ -8,7 +8,7 @@ export default async function notificationReadWorker(
 ) {
 	try {
 		if (!req.session.isAuthenticated || !req.session.userId) {
-			return res.status(401).json({
+			return res.json({
 				success: false,
 				message: 'Please login to manage notifications.'
 			});
@@ -35,7 +35,7 @@ export default async function notificationReadWorker(
 			});
 		} else {
 			if (!notificationId || typeof notificationId !== 'string') {
-				return res.status(400).json({
+				return res.json({
 					success: false,
 					message: 'Invalid notification.'
 				});
@@ -52,14 +52,14 @@ export default async function notificationReadWorker(
 			});
 
 			if (!notification) {
-				return res.status(404).json({
+				return res.json({
 					success: false,
 					message: 'Notification could not be found.'
 				});
 			}
 
 			if (notification.isRead) {
-				return res.status(409).json({
+				return res.json({
 					success: false,
 					message: 'This notification has already been read.'
 				});

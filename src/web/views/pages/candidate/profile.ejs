@@ -51,9 +51,13 @@
         </p>
 
         <div class="candidate-profile__top-actions">
+            <button class="candidate-profile__export" type="button" data-candidate-profile-export>
+                <i class="fas fa-file-pdf" aria-hidden="true"></i>
+                Export
+            </button>
             <button class="candidate-profile__edit" type="button" data-candidate-profile-edit>
                 <i class="fas fa-pen" aria-hidden="true"></i>
-                Edit candidate profile
+                Edit
             </button>
         </div>
 
@@ -221,6 +225,8 @@
 <script>
     window.__candidateProfile = <%- candidateProfileJson %>;
 </script>
+<script src="/lib/js/pdfmake.min.js"></script>
+<script src="/lib/js/vfs_fonts.js"></script>
 <script src="/js/candidate-profile.js"></script>
 <script src="/js/global.js"></script>
 </body>

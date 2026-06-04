@@ -8,7 +8,7 @@ export default async function searchEmployersWorker(
 ) {
     try {
         if (!req.session.isAuthenticated || !req.session.userId || req.session.accountType === 1) {
-            return res.status(401).json({
+            return res.json({
                 success: false,
                 message: 'Please login as an employer.'
             });

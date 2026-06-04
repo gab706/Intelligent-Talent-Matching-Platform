@@ -191,7 +191,7 @@ export default async function registerWorker(
                 if (saveErr)
                     return next(saveErr);
 
-                return res.status(201).json({
+                return res.json({
                     success: true,
                     message:
                         accountType === EMPLOYER_ACCOUNT_TYPE

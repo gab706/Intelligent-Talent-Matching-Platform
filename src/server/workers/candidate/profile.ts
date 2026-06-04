@@ -253,7 +253,7 @@ export default async function candidateProfileWorker(
 ) {
     try {
         if (!req.session.isAuthenticated || !req.session.userId) {
-            return res.status(401).json({
+            return res.json({
                 success: false,
                 message: 'Please login to update your candidate profile.'
             });

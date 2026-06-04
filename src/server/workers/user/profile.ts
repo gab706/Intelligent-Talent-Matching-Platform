@@ -146,7 +146,7 @@ export default async function profileWorker(
 ) {
     try {
         if (!req.session.isAuthenticated || !req.session.userId) {
-            return res.status(401).json({
+            return res.json({
                 success: false,
                 message: 'Please log in to update your profile.'
             });
@@ -189,7 +189,7 @@ export default async function profileWorker(
         });
 
         if (!user) {
-            return res.status(404).json({
+            return res.json({
                 success: false,
                 message: 'User account could not be found.'
             });

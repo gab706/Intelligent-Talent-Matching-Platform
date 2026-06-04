@@ -216,6 +216,301 @@ $(function () {
         `;
     };
 
+    const hasText = function (value) {
+        return String(value || "").trim().length > 0;
+    };
+
+    const cleanPdfText = function (value) {
+        return String(value || "")
+            .replace(/\r\n/g, "\n")
+            .replace(/\r/g, "\n")
+            .trim();
+    };
+
+    const compactLine = function (items) {
+        return items.filter(hasText).join(" | ");
+    };
+
+    const getOptionalLabel = function (map, value) {
+        return hasText(value) ? getLabel(map, value, "") : "";
+    };
+
+    const exportResumePdf = function () {
+        if (!window.pdfMake) {
+            showMessage("PDF export is unavailable. Please refresh and try again.");
+            return;
+        }
+
+        const personal = profile.personal || {};
+        const preferences = profile.preferences || {};
+        const education = sortMostToLeastRecent(profile.education || []);
+        const experience = sortMostToLeastRecent(profile.experience || []);
+        const fullName = [personal.firstName, personal.lastName].filter(hasText).join(" ") || "Candidate";
+        const nameParts = [personal.firstName, personal.lastName].filter(hasText);
+        const filenameBase = [personal.firstName, personal.lastName]
+            .filter(hasText)
+            .join("_")
+            .replace(/[^a-z0-9_-]/gi, "") || "Candidate";
+        const normaliseName = function () {
+            if (nameParts.length >= 2)
+                return `${nameParts[0].toUpperCase()}\n${nameParts.slice(1).join(" ").toUpperCase()}`;
+
+            return fullName.toUpperCase();
+        };
+        const cleanLines = function (value) {
+            return cleanPdfText(value).split("\n").map(line => line.trim()).filter(Boolean);
+        };
+        const makeColumns = function (items, columnCount = 2) {
+            const values = items.filter(hasText);
+            const columns = Array.from({ length: Math.min(columnCount, Math.max(1, values.length)) }, () => []);
+
+            values.forEach((item, index) => {
+                columns[index % columns.length].push(item);
+            });
+
+            return columns.map(itemsForColumn => ({
+                width: '*',
+                ul: itemsForColumn,
+                style: 'compactList'
+            }));
+        };
+        const sideStack = [
+            { text: normaliseName(), style: 'sideName' }
+        ];
+        const addSideSection = function (title, content) {
+            if (!content || (Array.isArray(content) && !content.length))
+                return;
+
+            sideStack.push({ text: title, style: 'sideHeader' });
+
+            if (Array.isArray(content)) {
+                sideStack.push({
+                    ul: content,
+                    style: 'sideList'
+                });
+                return;
+            }
+
+            sideStack.push(content);
+        };
+        const contactLines = [
+            personal.email,
+            personal.phone,
+            preferences.preferredLocation
+        ].filter(hasText);
+        const languageRows = (profile.languages || [])
+            .map(item => [item.name, getOptionalLabel(labelMaps.fluency, item.fluency)].filter(hasText).join(' - '))
+            .filter(hasText);
+        const mainStack = [];
+        const addMainSection = function (title, content) {
+            if (!content || (Array.isArray(content) && !content.length))
+                return;
+
+            mainStack.push({
+                text: title,
+                style: 'sectionHeader',
+                margin: mainStack.length ? [0, 4, 0, 5] : [0, 0, 0, 5]
+            });
+
+            if (Array.isArray(content))
+                mainStack.push(...content);
+            else
+                mainStack.push(content);
+        };
+        const experienceBlocks = experience.flatMap(item => {
+            const duties = cleanLines(item.duties);
+            const block = [
+                {
+                    table: {
+                        widths: ['*', 105],
+                        body: [[
+                            {
+                                stack: [
+                                    { text: item.jobTitle || 'Job title not set', style: 'roleTitle' },
+                                    {
+                                        text: [
+                                            item.company,
+                                            item.location,
+                                            getOptionalLabel(labelMaps.workingMode, item.workType)
+                                        ].filter(hasText).join(' · '),
+                                        style: 'subText'
+                                    }
+                                ]
+                            },
+                            { text: formatDateRange(item), style: 'date', alignment: 'right' }
+                        ]]
+                    },
+                    layout: 'noBorders'
+                }
+            ];
+
+            if (duties.length) {
+                block.push({
+                    text: cleanPdfText(item.duties),
+                    style: 'mainText'
+                });
+            }
+
+            return block;
+        });
+        const educationRows = education.map((item, index) => [
+            {
+                stack: [
+                    { text: formatEducationTitle(item), style: 'itemTitle' },
+                    { text: item.school || 'School not set', style: 'subText' }
+                ],
+                margin: index ? [0, 8, 0, 0] : [0, 0, 0, 0]
+            },
+            {
+                text: formatDateRange(item),
+                style: 'date',
+                alignment: 'right',
+                margin: index ? [0, 8, 0, 0] : [0, 0, 0, 0]
+            }
+        ]);
+
+        if (contactLines.length) {
+            sideStack.push({ text: 'CONTACT', style: 'sideHeader' });
+            contactLines.forEach(line => {
+                sideStack.push({ text: line, style: 'sideText' });
+            });
+        }
+        addSideSection('TECHNICAL SKILLS', profile.skills || []);
+        addSideSection('CERTIFICATIONS', profile.certifications || []);
+        addSideSection('LANGUAGES', languageRows);
+        addMainSection('Professional Summary', hasText(preferences.profileSummary)
+            ? { text: preferences.profileSummary, style: 'bodyText' }
+            : null);
+        addMainSection('Experience', experienceBlocks);
+        addMainSection('Education', educationRows.length ? {
+            table: {
+                widths: ['*', 105],
+                body: educationRows
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 12]
+        } : null);
+
+        if ((profile.skills || []).length) {
+            addMainSection('Skills', {
+                columns: makeColumns(profile.skills || [], 2),
+                columnGap: 18
+            });
+        }
+
+        const dd = {
+            pageSize: 'A4',
+            pageMargins: [32, 28, 32, 28],
+            background: function () {
+                return [
+                    {
+                        canvas: [
+                            { type: 'rect', x: 0, y: 0, w: 595.28, h: 841.89, color: '#F3F6F9' },
+                            { type: 'rect', x: 32, y: 28, w: 150, h: 785, color: '#1F4E79' }
+                        ]
+                    }
+                ];
+            },
+            content: [
+                {
+                    columns: [
+                        {
+                            width: 150,
+                            stack: sideStack,
+                            margin: [10, 12, 14, 0]
+                        },
+                        {
+                            width: '*',
+                            stack: mainStack,
+                            margin: [24, 10, 8, 0]
+                        }
+                    ]
+                }
+            ],
+            styles: {
+                sideName: {
+                    fontSize: 19,
+                    bold: true,
+                    color: '#FFFFFF',
+                    lineHeight: 1.05,
+                    margin: [0, 0, 0, 26]
+                },
+                sideHeader: {
+                    fontSize: 8.6,
+                    bold: true,
+                    color: '#FFFFFF',
+                    margin: [0, 13, 0, 4],
+                    characterSpacing: 0.6
+                },
+                sideText: {
+                    fontSize: 8.2,
+                    color: '#EAF2F8',
+                    lineHeight: 1.32
+                },
+                sideList: {
+                    fontSize: 8.1,
+                    color: '#EAF2F8',
+                    lineHeight: 1.25,
+                    margin: [0, 0, 0, 0]
+                },
+                sectionHeader: {
+                    fontSize: 12.4,
+                    bold: true,
+                    color: '#1F4E79',
+                    margin: [0, 0, 0, 5]
+                },
+                bodyText: {
+                    fontSize: 8.9,
+                    color: '#374151',
+                    lineHeight: 1.25,
+                    margin: [0, 0, 0, 10]
+                },
+                roleTitle: {
+                    fontSize: 10.2,
+                    bold: true,
+                    color: '#111827'
+                },
+                itemTitle: {
+                    fontSize: 9.8,
+                    bold: true,
+                    color: '#111827'
+                },
+                subText: {
+                    fontSize: 8.4,
+                    color: '#5B6472'
+                },
+                date: {
+                    fontSize: 8,
+                    color: '#6B7280'
+                },
+                mainList: {
+                    fontSize: 8.6,
+                    color: '#374151',
+                    lineHeight: 1.22,
+                    margin: [0, 3, 0, 9]
+                },
+                mainText: {
+                    fontSize: 8.6,
+                    color: '#374151',
+                    lineHeight: 1.22,
+                    margin: [0, 4, 0, 9]
+                },
+                compactList: {
+                    fontSize: 8.5,
+                    color: '#374151',
+                    lineHeight: 1.22,
+                    margin: [0, 0, 0, 0]
+                }
+            },
+            defaultStyle: {
+                fontSize: 9,
+                color: '#111827'
+            }
+        };
+
+        window.pdfMake.createPdf(dd).download(`${filenameBase}_Resume.pdf`);
+    };
+
     const getHighestEducation = function (education) {
         if (!education.length)
             return null;
@@ -311,6 +606,13 @@ $(function () {
 
             <section class="candidate-profile__view-section">
                 <div class="candidate-profile__view-heading">
+                    <h2>Profile Summary</h2>
+                </div>
+                <p class="candidate-profile__view-copy">${escapeHtml(preferences.profileSummary || "No profile summary added yet.")}</p>
+            </section>
+
+            <section class="candidate-profile__view-section">
+                <div class="candidate-profile__view-heading">
                     <h2>Education</h2>
                     <p><strong>Highest Education Level:</strong> ${formatCurrentHighestEducation(highestEducation)}</p>
                 </div>
@@ -377,13 +679,6 @@ $(function () {
 
             <section class="candidate-profile__view-section">
                 <div class="candidate-profile__view-heading">
-                    <h2>Profile Summary</h2>
-                </div>
-                <p class="candidate-profile__view-copy">${escapeHtml(preferences.profileSummary || "No profile summary added yet.")}</p>
-            </section>
-
-            <section class="candidate-profile__view-section">
-                <div class="candidate-profile__view-heading">
                     <h2>Portfolio</h2>
                 </div>
                 ${renderPortfolioLinks(viewProfile.portfolioLinks || [])}
@@ -420,6 +715,7 @@ $(function () {
         $("[data-candidate-profile-form]").prop("hidden", !isEditMode);
         $("[data-candidate-profile-view]").prop("hidden", isEditMode);
         $("[data-candidate-profile-edit]").prop("hidden", isEditMode);
+        $("[data-candidate-profile-export]").prop("hidden", isEditMode);
     };
 
     const renderChips = function (items, $container, removeAttribute) {
@@ -847,6 +1143,10 @@ $(function () {
 
     $("[data-candidate-profile-edit]").on("click", function () {
         setMode("edit");
+    });
+
+    $("[data-candidate-profile-export]").on("click", function () {
+        exportResumePdf();
     });
 
     $("[data-candidate-profile-cancel]").on("click", function () {

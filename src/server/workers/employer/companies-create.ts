@@ -162,7 +162,7 @@ export default async function companiesCreateWorker(
 ) {
     try {
         if (!req.session.isAuthenticated || !req.session.userId || req.session.accountType === 1) {
-            return res.status(401).json({
+            return res.json({
                 success: false,
                 message: 'Please login as an employer.'
             });
@@ -185,7 +185,7 @@ export default async function companiesCreateWorker(
         });
 
         if (!employer) {
-            return res.status(404).json({
+            return res.json({
                 success: false,
                 message: 'Employer account could not be found.'
             });
@@ -326,7 +326,7 @@ export default async function companiesCreateWorker(
             return createdCompany;
         });
 
-        return res.status(201).json({
+        return res.json({
             success: true,
             message: 'Company created successfully.',
             companyId: company.id

@@ -19,17 +19,20 @@
 
 .candidate-profile__form[hidden],
 .candidate-profile__view[hidden],
-.candidate-profile__edit[hidden] {
+.candidate-profile__edit[hidden],
+.candidate-profile__export[hidden] {
     display: none;
 }
 
 .candidate-profile__top-actions {
     display: flex;
     justify-content: flex-end;
+    gap: 10px;
     margin-top: 22px;
 }
 
 .candidate-profile__edit,
+.candidate-profile__export,
 .candidate-profile__cancel {
     min-height: 42px;
     padding: 0 14px;
@@ -46,8 +49,21 @@
     font-weight: 800;
 }
 
+.candidate-profile__edit {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: #ffffff;
+}
+
 .candidate-profile__edit:hover,
-.candidate-profile__edit:focus-visible,
+.candidate-profile__edit:focus-visible {
+    border-color: var(--color-primary-hover);
+    background: var(--color-primary-hover);
+    color: #ffffff;
+}
+
+.candidate-profile__export:hover,
+.candidate-profile__export:focus-visible,
 .candidate-profile__cancel:hover,
 .candidate-profile__cancel:focus-visible {
     border-color: var(--color-primary);
