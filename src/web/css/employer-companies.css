@@ -636,6 +636,11 @@ body.is-company-create-open {
     cursor: pointer;
 }
 
+.employer-companies__logo-upload--edit {
+    max-width: 520px;
+    margin-bottom: 4px;
+}
+
 .employer-companies__logo-upload > span:first-child {
     color: var(--color-muted);
     font-size: 0.82rem;

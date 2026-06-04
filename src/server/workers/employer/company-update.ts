@@ -1,6 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
+import crypto from 'node:crypto';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { prisma } from '../../database/prisma.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const companyImagesDir = path.join(__dirname, '../../../web/images/companies');
+const MAX_UPLOAD_BYTES = 1024 * 1024 * 8;
 const ORGANISATION_TYPES = new Set([
     'PRIVATE_COMPANY',
     'PUBLIC_COMPANY',
@@ -10,8 +18,140 @@ const ORGANISATION_TYPES = new Set([
     'STARTUP'
 ]);
 
+type MultipartFile = {
+    filename: string;
+    mimeType: string;
+    buffer: Buffer;
+};
+
 function clean(value: unknown, max = 500): string {
     return String(value || '').trim().slice(0, max);
+}
+
+function getBoundary(contentType: string): string | null {
+    const match = contentType.match(/boundary=(?:"([^"]+)"|([^;]+))/);
+    return match?.[1] || match?.[2] || null;
+}
+
+async function readRequestBuffer(req: Request): Promise<Buffer> {
+    const chunks: Buffer[] = [];
+    let totalBytes = 0;
+
+    for await (const chunk of req) {
+        const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+        totalBytes += buffer.length;
+
+        if (totalBytes > MAX_UPLOAD_BYTES)
+            throw new Error('Company upload is too large.');
+
+        chunks.push(buffer);
+    }
+
+    return Buffer.concat(chunks);
+}
+
+async function parseMultipart(req: Request) {
+    const contentType = String(req.headers['content-type'] || '');
+    const boundaryValue = getBoundary(contentType);
+
+    if (!boundaryValue)
+        throw new Error('Invalid company form submission.');
+
+    const bodyBuffer = await readRequestBuffer(req);
+    const body = bodyBuffer.toString('binary');
+    const boundary = `--${boundaryValue}`;
+    const fields: Record<string, string> = {};
+    const files: Record<string, MultipartFile> = {};
+
+    for (const rawPart of body.split(boundary).slice(1, -1)) {
+        const part = rawPart.replace(/^\r\n/, '').replace(/\r\n$/, '');
+        const headerEnd = part.indexOf('\r\n\r\n');
+
+        if (headerEnd === -1)
+            continue;
+
+        const rawHeaders = part.slice(0, headerEnd);
+        const content = part.slice(headerEnd + 4);
+        const headers = Object.fromEntries(
+            rawHeaders
+                .split('\r\n')
+                .map(header => {
+                    const separatorIndex = header.indexOf(':');
+                    return [
+                        header.slice(0, separatorIndex).trim().toLowerCase(),
+                        header.slice(separatorIndex + 1).trim()
+                    ];
+                })
+                .filter(([name]) => name)
+        );
+        const disposition = headers['content-disposition'] || '';
+        const name = disposition.match(/name="([^"]+)"/)?.[1];
+
+        if (!name)
+            continue;
+
+        const filename = disposition.match(/filename="([^"]*)"/)?.[1];
+        const buffer = Buffer.from(content, 'binary');
+
+        if (filename) {
+            files[name] = {
+                filename,
+                mimeType: headers['content-type'] || '',
+                buffer
+            };
+            continue;
+        }
+
+        fields[name] = buffer.toString('utf8');
+    }
+
+    return {
+        fields,
+        files
+    };
+}
+
+function getImageExtension(file: MultipartFile): string | null {
+    const extension = path.extname(file.filename).toLowerCase().replace('.', '');
+
+    if (['jpg', 'jpeg'].includes(extension))
+        return 'jpg';
+
+    if (extension === 'png')
+        return 'png';
+
+    if (extension === 'webp')
+        return 'webp';
+
+    if (file.mimeType === 'image/jpeg')
+        return 'jpg';
+
+    if (file.mimeType === 'image/png')
+        return 'png';
+
+    if (file.mimeType === 'image/webp')
+        return 'webp';
+
+    return null;
+}
+
+async function saveImage(file?: MultipartFile): Promise<string | undefined> {
+    if (!file || !file.buffer.length)
+        return undefined;
+
+    const extension = getImageExtension(file);
+
+    if (!extension)
+        throw new Error('Company images must be JPG, PNG, or WebP files.');
+
+    const hash = crypto.randomBytes(24).toString('hex');
+
+    await fs.mkdir(companyImagesDir, {
+        recursive: true
+    });
+    await fs.writeFile(path.join(companyImagesDir, `${hash}.${extension}`), file.buffer);
+
+    return hash;
 }
 
 export default async function companyUpdateWorker(
@@ -27,17 +167,26 @@ export default async function companyUpdateWorker(
             });
         }
 
-        const companyId = clean(req.body?.companyId, 80);
-        const name = clean(req.body?.name, 180);
-        const description = clean(req.body?.description, 1000);
-        const industry = clean(req.body?.industry, 160);
-        const location = clean(req.body?.location, 180);
-        const email = clean(req.body?.email, 180);
-        const phone = clean(req.body?.phone, 80);
-        const website = clean(req.body?.website, 500);
-        const brandColour = clean(req.body?.brandColour, 20);
-        const size = clean(req.body?.size, 80);
-        const organisationType = clean(req.body?.organisationType, 60);
+        const isMultipart = String(req.headers['content-type'] || '').includes('multipart/form-data');
+        const parsed = isMultipart
+            ? await parseMultipart(req)
+            : {
+                fields: req.body || {},
+                files: {}
+            };
+        const fields = parsed.fields;
+        const files = parsed.files as Record<string, MultipartFile>;
+        const companyId = clean(fields.companyId, 80);
+        const name = clean(fields.name, 180);
+        const description = clean(fields.description, 1000);
+        const industry = clean(fields.industry, 160);
+        const location = clean(fields.location, 180);
+        const email = clean(fields.email, 180);
+        const phone = clean(fields.phone, 80);
+        const website = clean(fields.website, 500);
+        const brandColour = clean(fields.brandColour, 20);
+        const size = clean(fields.size, 80);
+        const organisationType = clean(fields.organisationType, 60);
 
         if (!companyId || !name || !description || !industry || !location || !email || !phone || !size || !organisationType) {
             return res.json({
@@ -112,6 +261,8 @@ export default async function companyUpdateWorker(
             }
         }
 
+        const logoHash = await saveImage(files.logo);
+
         await prisma.company.update({
             where: {
                 id: companyId
@@ -126,7 +277,12 @@ export default async function companyUpdateWorker(
                 website: website || null,
                 brandColour: brandColour || null,
                 size,
-                organisationType: organisationType as never
+                organisationType: organisationType as never,
+                ...(logoHash
+                    ? {
+                        avatarHash: logoHash
+                    }
+                    : {})
             }
         });
 

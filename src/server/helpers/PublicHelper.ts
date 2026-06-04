@@ -18,7 +18,9 @@ export default async function SharedController(req: Request, res: Response, next
 	res.payload.isAccountHomePage = [
 		'/candidate/home',
 		'/candidate/profile',
-		'/employer/home'
+		'/candidate/migrate',
+		'/employer/home',
+		'/employer/migrate'
 	].includes(req.path) || req.path.startsWith('/employer/companies');
 	res.payload.avatarPath = '/images/avatar/default.png';
 	res.payload.notifications = [];

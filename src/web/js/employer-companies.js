@@ -171,6 +171,15 @@ $(function () {
                 <div class="employer-companies__company-layout employer-companies__company-layout--edit">
                     <form class="employer-companies__form employer-companies__edit-page-form" data-company-edit-form>
                         <input type="hidden" name="companyId" value="${escapeHtml(company.id)}" />
+                        <label class="employer-companies__logo-upload employer-companies__logo-upload--edit">
+                            <span>Company Logo</span>
+                            <input name="logo" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-logo-input />
+                            <span class="employer-companies__logo-preview">
+                                ${company.logoUrl
+                                    ? `<img src="${escapeHtml(company.logoUrl)}" alt="" />`
+                                    : '<i class="fas fa-image" aria-hidden="true"></i>'}
+                            </span>
+                        </label>
                         <label class="employer-companies__field">
                             <span>Company Name</span>
                             <input name="name" type="text" required value="${escapeHtml(company.name || "")}" />
@@ -434,6 +443,12 @@ $(function () {
         $("[data-edit-brand-colour]").val(company.brandColour || "#2563eb");
         $("[data-edit-size]").val(company.size || "");
         $("[data-edit-organisation-type]").val(company.organisationType || "");
+        $("[data-edit-logo-upload] input").val("");
+        $("[data-edit-logo-preview]").html(
+            company.logoUrl
+                ? `<img src="${escapeHtml(company.logoUrl)}" alt="" />`
+                : '<i class="fas fa-image" aria-hidden="true"></i>'
+        );
         $("[data-company-editor]").prop("hidden", false);
     };
 
@@ -588,9 +603,9 @@ $(function () {
             $(input).closest(".employer-companies__field, .employer-companies__logo-upload").removeClass("is-invalid");
     });
 
-    $("[data-company-logo-input]").on("change", function () {
+    $(document).on("change", "[data-company-logo-input], [data-logo-input]", function () {
         const file = this.files && this.files[0];
-        const $preview = $("[data-company-logo-preview]");
+        const $preview = $(this).closest(".employer-companies__logo-upload").find(".employer-companies__logo-preview");
 
         if (!file) {
             $preview.html('<i class="fas fa-image" aria-hidden="true"></i>');
@@ -877,13 +892,11 @@ $(function () {
     $(document).on("submit", "[data-company-edit-form]", async function (event) {
         event.preventDefault();
 
-        const values = Object.fromEntries(new FormData(this).entries());
+        const formData = new FormData(this);
+        const values = Object.fromEntries(formData.entries());
         const response = await fetch("/employer/company-update", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(values)
+            body: formData
         });
         const result = await response.json();
 
