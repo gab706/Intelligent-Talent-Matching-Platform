@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Migrate Account | Intelligent Talent Matching Platform</title>
+    <meta name="description" content="Migrate your TalentMatch employer account to a flexible account." />
+    <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
+    <link rel="stylesheet" href="/lib/css/toastr.min.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/account-home.css" />
+    <link rel="stylesheet" href="/css/migrate.css" />
+    <script src="/lib/js/jquery.min.js"></script>
+    <script src="/lib/js/toastr.min.js"></script>
+</head>
+<body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
+<%- include('../../partials/public-header/public-header'); %>
+<main class="account-home account-home--employer">
+    <aside class="account-home__sidebar" aria-label="Employer navigation">
+        <nav class="account-home__nav">
+            <div class="account-home__nav-primary">
+                <a class="account-home__nav-link" href="/employer/home">Employer Home</a>
+                <a class="account-home__nav-link" href="/employer/find-a-candidate">Find a Candidate</a>
+                <a class="account-home__nav-link" href="/employer/postings">Tracking Postings</a>
+                <a class="account-home__nav-link" href="/employer/applications">Manage Applications</a>
+                <a class="account-home__nav-link" href="/employer/companies">Manage Companies</a>
+            </div>
+            <div class="account-home__nav-actions">
+                <a class="account-home__nav-link account-home__nav-link--mode is-active" href="/employer/migrate">Migrate to Candidate Account</a>
+                <% if (isAdmin) { %>
+                <a class="account-home__nav-link account-home__nav-link--admin" href="/admin/control">Admin Control</a>
+                <% } %>
+            </div>
+        </nav>
+    </aside>
+
+    <section class="account-home__content migrate-page" aria-labelledby="employer-migrate-title">
+        <p class="account-home__eyebrow">
+            Account migration
+        </p>
+        <h1 id="employer-migrate-title" class="account-home__title migrate-page__title">
+            Migrate to a flexible account
+        </h1>
+        <p class="account-home__copy migrate-page__copy">
+            Add candidate access to your existing employer account so you can move
+            between employer and candidate workflows from the same TalentMatch login.
+        </p>
+        <div class="migrate-page__summary" aria-label="Migration details">
+            <p>
+                Your employer profile and company access will stay in place.
+            </p>
+            <p>
+                TalentMatch will create an empty candidate profile connected to this account.
+            </p>
+            <p>
+                After migration, your account type will be Flexible.
+            </p>
+        </div>
+        <button class="migrate-page__action" type="button" data-migrate-open>
+            <i class="fas fa-right-left" aria-hidden="true"></i>
+            Migrate account
+        </button>
+    </section>
+</main>
+
+<div class="migrate-modal" aria-hidden="true" data-migrate-modal>
+    <div class="migrate-modal__overlay"></div>
+    <section class="migrate-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="employer-migrate-modal-title">
+        <button class="migrate-modal__close" type="button" aria-label="Close" data-migrate-close>
+            <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+        <p class="migrate-modal__eyebrow">
+            Confirm migration
+        </p>
+        <h2 id="employer-migrate-modal-title" class="migrate-modal__title">
+            Are you sure?
+        </h2>
+        <p class="migrate-modal__text">
+            This will migrate your account to a flexible account and cannot be reversed.
+        </p>
+        <div class="migrate-modal__actions">
+            <button class="migrate-modal__cancel" type="button" data-migrate-close>
+                Cancel
+            </button>
+            <button class="migrate-modal__confirm" type="button" data-migrate-confirm data-migrate-mode="employer">
+                Confirm migration
+            </button>
+        </div>
+    </section>
+</div>
+
+<script src="/js/global.js"></script>
+<script src="/js/migrate.js"></script>
+</body>
+</html>

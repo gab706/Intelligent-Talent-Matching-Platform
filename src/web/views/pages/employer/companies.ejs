@@ -157,6 +157,13 @@
 
             <form class="employer-companies__form" data-company-edit-form>
                 <input type="hidden" name="companyId" data-edit-company-id />
+                <label class="employer-companies__logo-upload employer-companies__logo-upload--edit" data-edit-logo-upload>
+                    <span>Company Logo</span>
+                    <input name="logo" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-logo-input />
+                    <span class="employer-companies__logo-preview" data-edit-logo-preview>
+                        <i class="fas fa-image" aria-hidden="true"></i>
+                    </span>
+                </label>
                 <label class="employer-companies__field">
                     <span>Company Name</span>
                     <input name="name" type="text" required data-edit-name />
