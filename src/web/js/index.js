@@ -37,6 +37,8 @@ $(function () {
     if ($progressiveSearch.length) {
         const $keywordInput = $progressiveSearch.find("#home-search-keywords");
         const $locationInput = $progressiveSearch.find("#home-search-location");
+        const isAuthenticated = String($progressiveSearch.attr("data-authenticated") || "") === "true";
+        const accountType = Number($progressiveSearch.attr("data-account-type") || 0);
 
         const updateSearchState = function () {
             const hasKeyword = String($keywordInput.val() || "").trim().length > 0;
@@ -52,6 +54,31 @@ $(function () {
 
         $keywordInput.on("input", updateSearchState);
         $locationInput.on("input", updateSearchState);
+
+        $progressiveSearch.on("submit", function (event) {
+            event.preventDefault();
+
+            if (!isAuthenticated) {
+                window.location.href = "/candidate/register";
+                return;
+            }
+
+            if (accountType === 2) {
+                window.location.href = "/employer/migrate";
+                return;
+            }
+
+            const params = new URLSearchParams();
+            const keyword = String($keywordInput.val() || "").trim();
+            const location = String($locationInput.val() || "").trim();
+
+            if (keyword)
+                params.set("keyword", keyword);
+            if (location)
+                params.set("location", location);
+
+            window.location.href = `/candidate/find-a-job${params.toString() ? `?${params.toString()}` : ""}`;
+        });
 
         updateSearchState();
     }

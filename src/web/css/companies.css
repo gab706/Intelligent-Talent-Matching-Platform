@@ -392,6 +392,18 @@ body:has(.company-page) .public-header:not(.is-scrolled) .public-header__brand-s
     color: var(--color-muted);
 }
 
+body:has(.company-page) .public-header:not(.is-scrolled) .public-header__link:hover,
+body:has(.company-page) .public-header:not(.is-scrolled) .public-header__link:focus-visible,
+body:has(.company-page) .public-header:not(.is-scrolled) .public-header__link-item--dropdown:hover .public-header__dropdown-trigger,
+body:has(.company-page) .public-header:not(.is-scrolled) .public-header__link-item--dropdown.is-open .public-header__dropdown-trigger,
+body:has(.company-page) .public-header:not(.is-scrolled) .public-header__link-item--dropdown:focus-within .public-header__dropdown-trigger,
+body:has(.company-page) .public-header:not(.is-scrolled) .public-header__mobile-toggle:hover,
+body:has(.company-page) .public-header:not(.is-scrolled) .public-header__mobile-toggle:focus-visible,
+body:has(.company-page) .public-header:not(.is-scrolled) .public-header__help-toggle:hover,
+body:has(.company-page) .public-header:not(.is-scrolled) .public-header__help-toggle:focus-visible {
+    color: var(--color-primary);
+}
+
 .company-page__hero,
 .company-page__tabs,
 .company-page__not-found {

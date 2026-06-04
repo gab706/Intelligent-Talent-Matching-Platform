@@ -39,9 +39,34 @@ function statusLabel(value: string): string {
     return labels[value] || value;
 }
 
-function formatApplication(application: any) {
-    const job = application.job;
+function formatJob(job: any) {
+    return {
+        id: job.id,
+        jobTitle: job.jobTitle,
+        companyName: job.company?.name || '',
+        companyIndustry: job.company?.industry || '',
+        companyInformation: job.companyInformation || '',
+        jobDescription: job.jobDescription || '',
+        jobLocation: job.jobLocation,
+        workMode: job.workMode,
+        jobType: job.jobType || '',
+        requiredExperience: job.requiredExperience,
+        requiredEducationLevel: job.requiredEducationLevel,
+        requiredEducationLabel: QUALIFICATION_LABELS[job.requiredEducationLevel] || job.requiredEducationLevel,
+        salaryMin: job.salaryMin,
+        salaryMax: job.salaryMax,
+        salaryRange: job.salaryMin || job.salaryMax
+            ? [job.salaryMin ? `$${job.salaryMin.toLocaleString('en-AU')}` : '', job.salaryMax ? `$${job.salaryMax.toLocaleString('en-AU')}` : ''].filter(Boolean).join(' - ')
+            : '',
+        closingDate: job.closingDate ? job.closingDate.toISOString().slice(0, 10) : '',
+        closingDateLabel: dateLabel(job.closingDate),
+        status: job.status,
+        isActive: job.isActive,
+        skills: job.skills.map((item: any) => item.skill.name)
+    };
+}
 
+function formatApplication(application: any) {
     return {
         id: application.id,
         status: application.status,
@@ -51,30 +76,16 @@ function formatApplication(application: any) {
         appliedAtLabel: dateLabel(application.createdAt),
         updatedAtLabel: dateLabel(application.updatedAt),
         canWithdraw: !['HIRED', 'REJECTED', 'WITHDRAWN'].includes(application.status),
-        job: {
-            id: job.id,
-            jobTitle: job.jobTitle,
-            companyName: job.company?.name || '',
-            companyIndustry: job.company?.industry || '',
-            companyInformation: job.companyInformation || '',
-            jobDescription: job.jobDescription || '',
-            jobLocation: job.jobLocation,
-            workMode: job.workMode,
-            jobType: job.jobType || '',
-            requiredExperience: job.requiredExperience,
-            requiredEducationLevel: job.requiredEducationLevel,
-            requiredEducationLabel: QUALIFICATION_LABELS[job.requiredEducationLevel] || job.requiredEducationLevel,
-            salaryMin: job.salaryMin,
-            salaryMax: job.salaryMax,
-            salaryRange: job.salaryMin || job.salaryMax
-                ? [job.salaryMin ? `$${job.salaryMin.toLocaleString('en-AU')}` : '', job.salaryMax ? `$${job.salaryMax.toLocaleString('en-AU')}` : ''].filter(Boolean).join(' - ')
-                : '',
-            closingDate: job.closingDate ? job.closingDate.toISOString().slice(0, 10) : '',
-            closingDateLabel: dateLabel(job.closingDate),
-            status: job.status,
-            isActive: job.isActive,
-            skills: job.skills.map((item: any) => item.skill.name)
-        }
+        job: formatJob(application.job)
+    };
+}
+
+function formatSavedJob(savedJob: any) {
+    return {
+        id: savedJob.id,
+        savedAt: savedJob.createdAt.toISOString(),
+        savedAtLabel: dateLabel(savedJob.createdAt),
+        job: formatJob(savedJob.job)
     };
 }
 
@@ -90,69 +101,122 @@ export default async function candidateApplicationsHelper(
         if (req.session.accountType === 2)
             return res.redirect('/employer/home');
 
-        const candidate = await prisma.candidate.findUnique({
-            where: {
-                userId: req.session.userId
-            },
-            select: {
-                id: true,
-                applications: {
-                    select: {
-                        id: true,
-                        status: true,
-                        coverLetter: true,
-                        createdAt: true,
-                        updatedAt: true,
-                        job: {
-                            select: {
-                                id: true,
-                                jobTitle: true,
-                                companyInformation: true,
-                                jobDescription: true,
-                                requiredEducationLevel: true,
-                                requiredExperience: true,
-                                workMode: true,
-                                jobLocation: true,
-                                salaryMin: true,
-                                salaryMax: true,
-                                jobType: true,
-                                closingDate: true,
-                                status: true,
-                                isActive: true,
-                                company: {
-                                    select: {
-                                        name: true,
-                                        industry: true
-                                    }
-                                },
-                                skills: {
-                                    select: {
-                                        skill: {
-                                            select: {
-                                                name: true
-                                            }
+        const [candidate, savedJobs] = await Promise.all([
+            prisma.candidate.findUnique({
+                where: {
+                    userId: req.session.userId
+                },
+                select: {
+                    id: true,
+                    applications: {
+                        select: {
+                            id: true,
+                            status: true,
+                            coverLetter: true,
+                            createdAt: true,
+                            updatedAt: true,
+                            job: {
+                                select: {
+                                    id: true,
+                                    jobTitle: true,
+                                    companyInformation: true,
+                                    jobDescription: true,
+                                    requiredEducationLevel: true,
+                                    requiredExperience: true,
+                                    workMode: true,
+                                    jobLocation: true,
+                                    salaryMin: true,
+                                    salaryMax: true,
+                                    jobType: true,
+                                    closingDate: true,
+                                    status: true,
+                                    isActive: true,
+                                    company: {
+                                        select: {
+                                            name: true,
+                                            industry: true
                                         }
                                     },
-                                    orderBy: {
-                                        skill: {
-                                            name: 'asc'
+                                    skills: {
+                                        select: {
+                                            skill: {
+                                                select: {
+                                                    name: true
+                                                }
+                                            }
+                                        },
+                                        orderBy: {
+                                            skill: {
+                                                name: 'asc'
+                                            }
                                         }
                                     }
                                 }
                             }
+                        },
+                        orderBy: {
+                            updatedAt: 'desc'
                         }
-                    },
-                    orderBy: {
-                        updatedAt: 'desc'
                     }
                 }
-            }
-        });
+            }),
+            prisma.savedJob.findMany({
+                where: {
+                    userId: req.session.userId
+                },
+                select: {
+                    id: true,
+                    createdAt: true,
+                    job: {
+                        select: {
+                            id: true,
+                            jobTitle: true,
+                            companyInformation: true,
+                            jobDescription: true,
+                            requiredEducationLevel: true,
+                            requiredExperience: true,
+                            workMode: true,
+                            jobLocation: true,
+                            salaryMin: true,
+                            salaryMax: true,
+                            jobType: true,
+                            closingDate: true,
+                            status: true,
+                            isActive: true,
+                            company: {
+                                select: {
+                                    name: true,
+                                    industry: true
+                                }
+                            },
+                            skills: {
+                                select: {
+                                    skill: {
+                                        select: {
+                                            name: true
+                                        }
+                                    }
+                                },
+                                orderBy: {
+                                    skill: {
+                                        name: 'asc'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                orderBy: {
+                    createdAt: 'desc'
+                }
+            })
+        ]);
 
         if (!candidate)
             return res.redirect('/candidate/profile');
 
         const applications = candidate.applications.map(formatApplication);
+        const formattedSavedJobs = savedJobs.map(formatSavedJob);
         const statusCounts = applications.reduce((counts: Record<string, number>, application: { status: string }) => {
             counts[application.status] = (counts[application.status] || 0) + 1;
             return counts;
@@ -162,9 +226,11 @@ export default async function candidateApplicationsHelper(
             ...res.payload,
             userId: req.session.userId,
             applications,
+            savedJobs: formattedSavedJobs,
             statusCounts,
             candidateApplicationsJson: JSON.stringify({
                 applications,
+                savedJobs: formattedSavedJobs,
                 statusCounts
             }).replace(/</g, '\\u003c')
         });

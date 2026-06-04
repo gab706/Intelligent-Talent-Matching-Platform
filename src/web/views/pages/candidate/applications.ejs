@@ -55,6 +55,17 @@
             </a>
         </div>
 
+        <div class="candidate-applications__modes" aria-label="Application views">
+            <button class="is-active" type="button" data-view-mode="applications">
+                Applications
+                <span><%= applications.length %></span>
+            </button>
+            <button type="button" data-view-mode="saved">
+                Saved jobs
+                <span><%= savedJobs.length %></span>
+            </button>
+        </div>
+
         <section class="candidate-applications__summary" aria-label="Application status summary">
             <button type="button" class="is-active" data-status-filter="ALL">
                 <span>All</span>

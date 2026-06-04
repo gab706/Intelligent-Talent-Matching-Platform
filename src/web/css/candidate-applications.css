@@ -41,6 +41,48 @@
     color: #fff;
 }
 
+.candidate-applications__modes {
+    display: inline-flex;
+    gap: 6px;
+    margin-bottom: 18px;
+    padding: 5px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-soft);
+}
+
+.candidate-applications__modes button {
+    min-height: 38px;
+    padding: 0 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-muted);
+    font-weight: 850;
+}
+
+.candidate-applications__modes button.is-active {
+    background: var(--color-surface);
+    color: var(--color-text);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.candidate-applications__modes span {
+    min-width: 24px;
+    min-height: 24px;
+    padding: 0 7px;
+    display: inline-grid;
+    place-items: center;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-primary) 10%, var(--color-surface));
+    color: var(--color-primary);
+    font-size: 0.76rem;
+    font-weight: 900;
+}
+
 .candidate-applications__summary {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -123,6 +165,11 @@
     color: var(--color-primary);
 }
 
+.candidate-applications__status--saved {
+    background: color-mix(in srgb, var(--color-primary) 10%, var(--color-surface));
+    color: var(--color-primary);
+}
+
 .candidate-applications__status--shortlisted {
     background: color-mix(in srgb, #f59e0b 14%, var(--color-surface));
     color: #b45309;
@@ -187,6 +234,12 @@
     border: 1px solid var(--color-border);
     background: var(--color-surface);
     color: var(--color-text);
+}
+
+.candidate-applications__actions .candidate-applications__primary-action {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: #fff;
 }
 
 .candidate-applications__actions .candidate-applications__danger {
@@ -291,6 +344,16 @@
 }
 
 @media (max-width: 620px) {
+    .candidate-applications__modes {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .candidate-applications__modes button {
+        justify-content: center;
+    }
+
     .candidate-applications__summary {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }

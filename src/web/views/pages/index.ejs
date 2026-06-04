@@ -32,7 +32,15 @@
                 recommendations shaped by skills, experience, location, and work
                 preferences.
             </p>
-            <form class="home-search" action="/candidate/search" method="get" role="search" data-progressive-search>
+            <form
+                    class="home-search"
+                    action="/candidate/find-a-job"
+                    method="get"
+                    role="search"
+                    data-progressive-search
+                    data-authenticated="<%= isAuthenticated ? 'true' : 'false' %>"
+                    data-account-type="<%= accountType || '' %>"
+            >
                 <div class="home-search__field home-search__field--keywords">
                     <label for="home-search-keywords" class="home-search__label">
                         What are you looking for?

@@ -153,7 +153,7 @@
                             <a class="public-header__dropdown-link" href="/candidate/find-a-job">
                                 Find a Job
                             </a>
-                            <a class="public-header__dropdown-link" href="/candidate/register">
+                            <a class="public-header__dropdown-link" href="<%= showAccountHeader && isFlexAccount ? '/candidate/profile' : '/candidate/register' %>">
                                 Build your Profile
                             </a>
                         </div>
@@ -172,7 +172,7 @@
                             <a class="public-header__dropdown-link" href="/employer/find-a-candidate">
                                 Find a Candidate
                             </a>
-                            <a class="public-header__dropdown-link" href="/employer/register">
+                            <a class="public-header__dropdown-link" href="<%= showAccountHeader && isFlexAccount ? '/employer/companies' : '/employer/register' %>">
                                 Build your Company Profile
                             </a>
                         </div>

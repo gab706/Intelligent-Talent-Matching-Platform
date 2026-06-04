@@ -17,6 +17,8 @@ export default async function SharedController(req: Request, res: Response, next
 				: 'Candidate';
 	res.payload.isAccountHomePage = [
 		'/candidate/home',
+		'/candidate/find-a-job',
+		'/candidate/applications',
 		'/candidate/profile',
 		'/candidate/migrate',
 		'/employer/home',

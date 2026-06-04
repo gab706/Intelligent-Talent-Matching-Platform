@@ -21,6 +21,18 @@ $(function () {
             return map;
         }, new Map());
 
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.has("q") && !searchParams.has("keyword")) {
+        const query = String(searchParams.get("q") || "").trim();
+        if (query)
+            $("[name='keyword']").val(query);
+    }
+    if (searchParams.has("location")) {
+        const location = String(searchParams.get("location") || "").trim();
+        if (location)
+            $("[name='location']").val(location);
+    }
+
     const escapeHtml = value => String(value || "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")

@@ -221,8 +221,10 @@ export function formatJob(job: any) {
 }
 
 export function normaliseFilters(query: Record<string, unknown>): JobFilters {
+    const keyword = query.keyword || query.q || '';
+
     return {
-        keyword: String(query.keyword || '').trim().slice(0, 180),
+        keyword: String(keyword).trim().slice(0, 180),
         location: String(query.location || '').trim().slice(0, 180),
         workMode: String(query.workMode || '').trim().slice(0, 30),
         jobType: String(query.jobType || '').trim().slice(0, 40),
