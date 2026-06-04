@@ -136,7 +136,7 @@ $(function () {
                         ${company.logoUrl ? `<img class="employer-companies__logo" src="${escapeHtml(company.logoUrl)}" alt="" />` : '<span class="employer-companies__logo"></span>'}
                         <div>
                             <h3>${escapeHtml(company.name)}</h3>
-                            <p class="employer-companies__meta">${escapeHtml(company.industry || "Industry not set")} / ${escapeHtml(company.location || "Location not set")}</p>
+                            <p class="employer-companies__meta">${escapeHtml(company.industry || "Industry not set")} | ${escapeHtml(company.location || "Location not set")}</p>
                         </div>
                     </div>
                     <p>${escapeHtml(company.description || "No company description added.")}</p>
@@ -207,7 +207,7 @@ $(function () {
                             </label>
                             <label class="employer-companies__field">
                                 <span>Company Website</span>
-                                <input name="website" type="url" placeholder="https://example.com" value="${escapeHtml(company.website || "")}" />
+                                <input name="website" type="text" placeholder="www.example.com.au" value="${escapeHtml(company.website || "")}" />
                             </label>
                             <label class="employer-companies__field">
                                 <span>Brand Colour</span>
@@ -471,7 +471,7 @@ $(function () {
                         ${company.logoUrl ? `<img class="employer-companies__logo" src="${escapeHtml(company.logoUrl)}" alt="" />` : '<span class="employer-companies__logo"></span>'}
                         <div>
                             <h3>${escapeHtml(company.name)}</h3>
-                            <p class="employer-companies__meta">${escapeHtml(company.industry || "Industry not set")} / ${escapeHtml(company.location || "Location not set")}</p>
+                            <p class="employer-companies__meta">${escapeHtml(company.industry || "Industry not set")} | ${escapeHtml(company.location || "Location not set")}</p>
                         </div>
                     </div>
                     <p>${escapeHtml(company.description || "No company description added.")}</p>

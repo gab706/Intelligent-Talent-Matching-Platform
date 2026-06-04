@@ -101,7 +101,7 @@
             <% if (companyPage) { %>
             <div class="employer-companies__header-actions">
                 <% if (!isCompanyEditPage) { %>
-                <a class="employer-companies__ghost" href="/employer/companies">Back to Overview</a>
+                <a class="employer-companies__ghost" href="/employer/companies">Back</a>
                 <% } %>
                 <% if (canManageActiveCompany && !isCompanyEditPage) { %>
                 <a class="employer-companies__primary" href="/employer/companies/<%= encodeURIComponent(activeCompanyData.name) %>/edit">
@@ -191,7 +191,7 @@
                     </label>
                     <label class="employer-companies__field">
                         <span>Company Website</span>
-                        <input name="website" type="url" placeholder="https://example.com" data-edit-website />
+                        <input name="website" type="text" placeholder="www.example.com.au" data-edit-website />
                     </label>
                     <label class="employer-companies__field">
                         <span>Brand Colour</span>
@@ -284,7 +284,7 @@
                         </div>
                         <label class="employer-companies__field">
                             <span>Company Website</span>
-                            <input name="website" type="url" placeholder="https://example.com" />
+                            <input name="website" type="text" placeholder="www.example.com.au" />
                         </label>
                         <div class="employer-companies__grid">
                             <label class="employer-companies__field">

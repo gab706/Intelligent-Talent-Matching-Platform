@@ -29,6 +29,18 @@ function clean(value: unknown, max = 500): string {
     return String(value || '').trim().slice(0, max);
 }
 
+function normaliseWebsite(value: unknown): string | null {
+    const website = clean(value, 500);
+
+    if (!website)
+        return null;
+
+    if (/^https?:\/\//i.test(website))
+        return website;
+
+    return `https://${website}`;
+}
+
 function getBoundary(contentType: string): string | null {
     const match = contentType.match(/boundary=(?:"([^"]+)"|([^;]+))/);
     return match?.[1] || match?.[2] || null;
@@ -198,7 +210,7 @@ export default async function companiesCreateWorker(
         const location = clean(fields.location, 180);
         const email = clean(fields.email, 180);
         const phone = clean(fields.phone, 80);
-        const website = clean(fields.website, 500);
+        const website = normaliseWebsite(fields.website);
         const brandColour = clean(fields.brandColour, 20);
         const size = clean(fields.size, 80);
         const organisationType = clean(fields.organisationType, 60);
@@ -280,7 +292,7 @@ export default async function companiesCreateWorker(
                     location,
                     email,
                     phone,
-                    website: website || null,
+                    website,
                     brandColour: brandColour || null,
                     size,
                     organisationType: organisationType as never,

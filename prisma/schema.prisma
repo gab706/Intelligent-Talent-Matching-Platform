@@ -158,14 +158,14 @@ model Candidate {
   portfolioUrl String?
   linkedinUrl  String?
 
-  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  skills       CandidateSkill[]
-  applications JobApplication[]
-  educationRecords CandidateEducation[]
+  user              User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skills            CandidateSkill[]
+  applications      JobApplication[]
+  educationRecords  CandidateEducation[]
   experienceRecords CandidateExperience[]
-  portfolioLinks CandidatePortfolioLink[]
-  certifications CandidateCertification[]
-  languages CandidateLanguage[]
+  portfolioLinks    CandidatePortfolioLink[]
+  certifications    CandidateCertification[]
+  languages         CandidateLanguage[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -187,7 +187,7 @@ model CandidateEducation {
   major             String?
   fromDate          DateTime?
   toDate            DateTime?
-  isCurrent         Boolean @default(false)
+  isCurrent         Boolean                    @default(false)
 
   candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
 
@@ -203,14 +203,14 @@ model CandidateExperience {
   id          String @id @default(uuid())
   candidateId String
 
-  company      String
-  jobTitle     String
-  workType     WorkingMode
-  location     String?
-  duties       String?
-  fromDate     DateTime?
-  toDate       DateTime?
-  isCurrent    Boolean @default(false)
+  company   String
+  jobTitle  String
+  workType  WorkingMode
+  location  String?
+  duties    String?
+  fromDate  DateTime?
+  toDate    DateTime?
+  isCurrent Boolean     @default(false)
 
   candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
 
@@ -274,11 +274,11 @@ model Employer {
   id     String @id @default(uuid())
   userId String @unique
 
-  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  companies   EmployerCompany[]
-  sentCompanyInvitations CompanyInvitation[] @relation("CompanyInvitationSender")
+  user                       User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companies                  EmployerCompany[]
+  sentCompanyInvitations     CompanyInvitation[] @relation("CompanyInvitationSender")
   receivedCompanyInvitations CompanyInvitation[] @relation("CompanyInvitationRecipient")
-  jobPostings JobPosting[]
+  jobPostings                JobPosting[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -291,20 +291,20 @@ model Company {
   id        String @id @default(uuid())
   ownedById String
 
-  name        String
-  email       String?
-  phone       String?
-  website     String?
-  location    String?
-  industry    String?
-  description String?
-  avatarHash  String?
-  brandColour String?
-  size        String?
+  name             String
+  email            String?
+  phone            String?
+  website          String?
+  location         String?
+  industry         String?
+  description      String?
+  avatarHash       String?
+  brandColour      String?
+  size             String?
   organisationType OrganisationType?
-  values      String?
+  values           String?
 
-  ownedBy     User              @relation("CompanyOwner", fields: [ownedById], references: [id], onDelete: Restrict)
+  ownedBy     User                @relation("CompanyOwner", fields: [ownedById], references: [id], onDelete: Restrict)
   employers   EmployerCompany[]
   invitations CompanyInvitation[]
   jobPostings JobPosting[]
@@ -312,12 +312,12 @@ model Company {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([name])
   @@index([ownedById])
   @@index([location])
   @@index([industry])
   @@index([organisationType])
   @@index([createdAt])
-  @@unique([name])
   @@map("companies")
 }
 
