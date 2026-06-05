@@ -26,7 +26,7 @@ export default async function SharedController(req: Request, res: Response, next
 		'/employer/applications',
 		'/employer/migrate',
 		'/employer/postings'
-	].includes(req.path) || req.path.startsWith('/employer/companies');
+	].includes(req.path) || req.path.startsWith('/employer/companies') || req.path.startsWith('/admin');
 	res.payload.avatarPath = '/images/avatar/default.png';
 	res.payload.notifications = [];
 	res.payload.unreadNotificationCount = 0;

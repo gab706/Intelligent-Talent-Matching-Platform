@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Home | Intelligent Talent Matching Platform</title>
+    <meta name="description" content="Admin home for TalentMatch." />
+    <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/account-home.css" />
+    <link rel="stylesheet" href="/css/admin-home.css" />
+    <script src="/lib/js/jquery.min.js"></script>
+</head>
+<body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
+<%- include('../../partials/public-header/public-header'); %>
+<main class="account-home account-home--admin">
+    <aside class="account-home__sidebar" aria-label="Admin navigation">
+        <nav class="account-home__nav">
+            <div class="account-home__nav-primary">
+                <a class="account-home__nav-link is-active" href="/admin/home">Admin Home</a>
+                <a class="account-home__nav-link" href="/admin/users">Site Users</a>
+                <a class="account-home__nav-link" href="/admin/notification-log">Notification Log</a>
+            </div>
+            <div class="account-home__nav-actions">
+                <a class="account-home__nav-link account-home__nav-link--mode" href="/candidate/home">Back to Public</a>
+            </div>
+        </nav>
+    </aside>
+
+    <section class="account-home__content admin-home" aria-labelledby="admin-home-title">
+        <div class="admin-home__header">
+            <p class="account-home__eyebrow">Admin home</p>
+            <h1 id="admin-home-title" class="account-home__title admin-home__title">
+                Welcome back <%= firstName || 'there' %>
+            </h1>
+            <p class="account-home__copy admin-home__intro">
+                Keep an eye on platform access, member activity, suspended accounts, and notification traffic from one place.
+            </p>
+        </div>
+
+        <section class="admin-home__stats" aria-label="Platform summary">
+            <% stats.forEach(stat => { %>
+            <article class="admin-home__stat">
+                <p><%= stat.label %></p>
+                <strong><%= stat.value %></strong>
+                <span><%= stat.meta %></span>
+            </article>
+            <% }) %>
+        </section>
+
+        <section class="admin-home__recent" aria-labelledby="recent-notifications-title">
+            <div class="admin-home__section-header">
+                <div>
+                    <h2 id="recent-notifications-title">Recent Notifications</h2>
+                    <p>Newest notification records across the site.</p>
+                </div>
+                <a href="/admin/notification-log">View all</a>
+            </div>
+            <% if (recentNotifications.length) { %>
+            <div class="admin-home__notification-list">
+                <% recentNotifications.forEach(notification => { %>
+                <article class="admin-home__notification">
+                    <div>
+                        <span><%= notification.type %></span>
+                        <h3><%= notification.title %></h3>
+                        <p><%= notification.message %></p>
+                    </div>
+                    <div class="admin-home__notification-meta">
+                        <strong><%= notification.isRead ? 'Read' : 'Unread' %></strong>
+                        <small><%= notification.recipient %></small>
+                        <small><%= notification.createdAtLabel %></small>
+                    </div>
+                </article>
+                <% }) %>
+            </div>
+            <% } else { %>
+            <p class="admin-home__empty">No notifications have been sent yet.</p>
+            <% } %>
+        </section>
+    </section>
+</main>
+<script src="/js/global.js"></script>
+</body>
+</html>

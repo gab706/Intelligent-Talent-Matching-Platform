@@ -1,0 +1,58 @@
+.admin-notifications {
+    width: 100%;
+}
+
+.admin-notifications__header {
+    margin-bottom: 28px;
+}
+
+.admin-notifications__title {
+    margin-bottom: 14px;
+}
+
+.admin-notifications__copy {
+    max-width: 640px;
+}
+
+.admin-notifications__toolbar {
+    justify-content: flex-start;
+}
+
+.admin-notifications__table {
+    min-width: 1180px;
+}
+
+.admin-notifications__content {
+    min-width: 320px;
+    max-width: 520px;
+    white-space: normal;
+}
+
+.admin-notifications__read {
+    color: var(--color-primary);
+}
+
+.admin-notifications__delete {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: transparent;
+    color: var(--color-muted);
+}
+
+.admin-notifications__delete:hover,
+.admin-notifications__delete:focus-visible {
+    color: #dc2626;
+}
+
+body.dark-mode .admin-notifications__delete:hover,
+body.dark-mode .admin-notifications__delete:focus-visible {
+    color: #f87171;
+}
+
+.admin-notifications__empty {
+    margin-top: 16px;
+}

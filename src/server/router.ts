@@ -31,6 +31,10 @@ router.get('/', (_req: Request, res: Response) =>
 	res.redirect('/index'));
 
 router.get('/logout', LogoutHelper);
+router.get('/admin/control', (_req: Request, res: Response) =>
+	res.redirect('/admin/home'));
+router.get('/admin/notification-audit-log', (_req: Request, res: Response) =>
+	res.redirect('/admin/notification-log'));
 
 router.get('/employer/companies/:companyName/view', PublicHelper, EmployerCompaniesHelper);
 router.get('/employer/companies/:companyName/edit', PublicHelper, EmployerCompaniesHelper);

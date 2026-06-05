@@ -1,0 +1,122 @@
+.admin-users {
+    width: 100%;
+    --admin-active-color: #047857;
+}
+
+body.dark-mode .admin-users {
+    --admin-active-color: #34d399;
+}
+
+.admin-users__header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
+}
+
+.admin-users__title {
+    margin-bottom: 14px;
+}
+
+.admin-users__copy {
+    max-width: 560px;
+}
+
+.admin-users__search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 0 1 400px;
+}
+
+.admin-users__search .employer-candidates__search {
+    width: 100%;
+    min-height: 46px;
+    margin: 0;
+    padding-right: 22px;
+    box-shadow: none;
+}
+
+.admin-users__clear {
+    min-height: 40px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.admin-users__clear:hover,
+.admin-users__clear:focus-visible {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.admin-users__toolbar {
+    justify-content: flex-start;
+}
+
+.admin-users__table {
+    min-width: 900px;
+}
+
+.admin-users .employer-candidates__page {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.admin-users__member {
+    color: var(--color-primary);
+}
+
+.admin-users__active-now {
+    color: var(--admin-active-color);
+    font-weight: 850;
+}
+
+.admin-users__manage {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-users__manage button {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: transparent;
+    color: var(--color-muted);
+}
+
+.admin-users__manage button:hover,
+.admin-users__manage button:focus-visible {
+    color: var(--color-primary);
+}
+
+.admin-users__empty {
+    margin-top: 16px;
+}
+
+@media (max-width: 820px) {
+    .admin-users__header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-users__search {
+        flex: none;
+        width: 100%;
+    }
+}

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Site Users | Intelligent Talent Matching Platform</title>
+    <meta name="description" content="Review site users in TalentMatch." />
+    <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
+    <link rel="stylesheet" href="/lib/css/toastr.min.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/account-home.css" />
+    <link rel="stylesheet" href="/css/employer-candidates.css" />
+    <link rel="stylesheet" href="/css/admin-home.css" />
+    <link rel="stylesheet" href="/css/admin-users.css" />
+    <script src="/lib/js/jquery.min.js"></script>
+    <script src="/lib/js/toastr.min.js"></script>
+</head>
+<body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
+<%- include('../../partials/public-header/public-header'); %>
+<main class="account-home account-home--admin">
+    <aside class="account-home__sidebar" aria-label="Admin navigation">
+        <nav class="account-home__nav">
+            <div class="account-home__nav-primary">
+                <a class="account-home__nav-link" href="/admin/home">Admin Home</a>
+                <a class="account-home__nav-link is-active" href="/admin/users">Site Users</a>
+                <a class="account-home__nav-link" href="/admin/notification-log">Notification Log</a>
+            </div>
+            <div class="account-home__nav-actions">
+                <a class="account-home__nav-link account-home__nav-link--mode" href="/candidate/home">Back to Public</a>
+            </div>
+        </nav>
+    </aside>
+
+    <section class="account-home__content admin-users employer-candidates" aria-labelledby="site-users-title">
+        <div class="admin-users__header">
+            <div>
+                <p class="account-home__eyebrow">Admin</p>
+                <h1 id="site-users-title" class="account-home__title admin-users__title">Site Users</h1>
+                <p class="account-home__copy admin-users__copy">View everyone registered on the platform.</p>
+            </div>
+            <form class="admin-users__search" method="get" action="/admin/users">
+                <label class="employer-candidates__search" for="site-user-search">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                    <span class="sr-only">Search site users</span>
+                    <input id="site-user-search" name="search" type="search" placeholder="Search users" value="<%= searchQuery %>" autocomplete="off" />
+                </label>
+                <% if (searchQuery) { %>
+                <a class="admin-users__clear" href="/admin/users">Clear</a>
+                <% } %>
+            </form>
+        </div>
+
+        <div class="employer-candidates__toolbar admin-users__toolbar">
+            <p>Showing <%= showingCount %> of <%= totalUsers %></p>
+        </div>
+
+        <div class="employer-candidates__table-wrap">
+            <table class="employer-candidates__table admin-users__table">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Type</th>
+                    <th>Member</th>
+                    <th>Last Active</th>
+                    <th>Manage</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% users.forEach(user => { %>
+                <tr data-user-row="<%= user.id %>">
+                    <td><%= user.name %></td>
+                    <td><%= user.role %></td>
+                    <td><%= user.type %></td>
+                    <td class="admin-users__member">
+                        <% if (user.isMember) { %>
+                        <i class="fas fa-check" aria-label="Member"></i>
+                        <% } %>
+                    </td>
+                    <td>
+                        <span class="<%= user.isActiveNow ? 'admin-users__active-now' : '' %>"><%= user.lastActiveLabel %></span>
+                    </td>
+                    <td>
+                        <div class="admin-users__manage" aria-label="Manage <%= user.name %>">
+                            <% if (!user.isCurrentUser) { %>
+                            <button type="button" aria-label="<%= user.isSuspended ? 'Unlock' : 'Lock' %> account for <%= user.name %>" data-user-status-toggle="<%= user.id %>" data-user-name="<%= user.name %>" data-is-suspended="<%= user.isSuspended ? 'true' : 'false' %>">
+                                <i class="fas <%= user.isSuspended ? 'fa-unlock' : 'fa-lock' %>" aria-hidden="true"></i>
+                            </button>
+                            <% } %>
+                        </div>
+                    </td>
+                </tr>
+                <% }) %>
+                </tbody>
+            </table>
+        </div>
+        <% if (!users.length) { %>
+        <p class="employer-candidates__empty admin-users__empty">No users match that search.</p>
+        <% } %>
+        <% if (totalUsers > 0) { %>
+        <nav class="employer-candidates__pagination" aria-label="Site user pages">
+            <% for (let page = 1; page <= pageCount; page += 1) { %>
+            <a class="employer-candidates__page <%= page === currentPage ? 'is-active' : '' %>" href="/admin/users?page=<%= page %><%= searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : '' %>"><%= page %></a>
+            <% } %>
+        </nav>
+        <% } %>
+    </section>
+</main>
+<script src="/js/global.js"></script>
+<script src="/js/admin-users.js"></script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notification Log | Intelligent Talent Matching Platform</title>
+    <meta name="description" content="Review site notifications in TalentMatch." />
+    <link rel="stylesheet" href="/lib/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/lib/css/modern-normalize.min.css" />
+    <link rel="stylesheet" href="/lib/css/toastr.min.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/account-home.css" />
+    <link rel="stylesheet" href="/css/employer-candidates.css" />
+    <link rel="stylesheet" href="/css/admin-home.css" />
+    <link rel="stylesheet" href="/css/admin-notifications.css" />
+    <script src="/lib/js/jquery.min.js"></script>
+    <script src="/lib/js/toastr.min.js"></script>
+</head>
+<body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
+<%- include('../../partials/public-header/public-header'); %>
+<main class="account-home account-home--admin">
+    <aside class="account-home__sidebar" aria-label="Admin navigation">
+        <nav class="account-home__nav">
+            <div class="account-home__nav-primary">
+                <a class="account-home__nav-link" href="/admin/home">Admin Home</a>
+                <a class="account-home__nav-link" href="/admin/users">Site Users</a>
+                <a class="account-home__nav-link is-active" href="/admin/notification-log">Notification Log</a>
+            </div>
+            <div class="account-home__nav-actions">
+                <a class="account-home__nav-link account-home__nav-link--mode" href="/candidate/home">Back to Public</a>
+            </div>
+        </nav>
+    </aside>
+
+    <section class="account-home__content admin-notifications employer-candidates" aria-labelledby="notification-log-title">
+        <div class="admin-notifications__header">
+            <p class="account-home__eyebrow">Admin</p>
+            <h1 id="notification-log-title" class="account-home__title admin-notifications__title">Notification Log</h1>
+            <p class="account-home__copy admin-notifications__copy">A full record of notifications sent across the site.</p>
+        </div>
+
+        <div class="employer-candidates__toolbar admin-notifications__toolbar">
+            <p>Showing <span data-notification-count><%= notifications.length %></span> of <span data-notification-total><%= notifications.length %></span></p>
+        </div>
+
+        <div class="employer-candidates__table-wrap">
+            <table class="employer-candidates__table admin-notifications__table">
+                <thead>
+                <tr>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Type</th>
+                    <th>Title</th>
+                    <th>Content</th>
+                    <th>Read</th>
+                    <th>Manage</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% notifications.forEach(notification => { %>
+                <tr data-notification-row="<%= notification.id %>">
+                    <td><%= notification.from %></td>
+                    <td><%= notification.to %></td>
+                    <td><%= notification.type %></td>
+                    <td><%= notification.title %></td>
+                    <td class="admin-notifications__content"><%= notification.message %></td>
+                    <td class="admin-notifications__read">
+                        <% if (notification.isRead) { %>
+                        <i class="fas fa-check" aria-label="Read"></i>
+                        <% } %>
+                    </td>
+                    <td>
+                        <button class="admin-notifications__delete" type="button" aria-label="Delete notification" data-notification-delete="<%= notification.id %>">
+                            <i class="fas fa-trash" aria-hidden="true"></i>
+                        </button>
+                    </td>
+                </tr>
+                <% }) %>
+                </tbody>
+            </table>
+        </div>
+        <p class="employer-candidates__empty admin-notifications__empty" <%= notifications.length ? 'hidden' : '' %> data-notification-empty>No notifications found.</p>
+    </section>
+</main>
+<script src="/js/global.js"></script>
+<script src="/js/admin-notifications.js"></script>
+</body>
+</html>
