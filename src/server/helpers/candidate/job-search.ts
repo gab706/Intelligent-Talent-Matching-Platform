@@ -21,7 +21,7 @@ export type JobFilters = {
     location: string;
     workMode: string;
     jobType: string;
-    skill: string;
+    skills: string[];
     requiredExperience: string;
     salaryMin: string;
     salaryMax: string;
@@ -139,6 +139,24 @@ function parseNumber(value: string): number | null {
     return Number.isFinite(number) && number >= 0 ? number : null;
 }
 
+function normaliseStringList(value: unknown): string[] {
+    const values = Array.isArray(value) ? value : [value];
+    const seen = new Set<string>();
+
+    return values
+        .flatMap(item => String(item || '').split(','))
+        .map(item => item.trim().slice(0, 100))
+        .filter(item => {
+            const key = normalise(item);
+
+            if (!item || seen.has(key))
+                return false;
+
+            seen.add(key);
+            return true;
+        });
+}
+
 function dateLabel(value: Date | null): string {
     if (!value)
         return '';
@@ -228,7 +246,7 @@ export function normaliseFilters(query: Record<string, unknown>): JobFilters {
         location: String(query.location || '').trim().slice(0, 180),
         workMode: String(query.workMode || '').trim().slice(0, 30),
         jobType: String(query.jobType || '').trim().slice(0, 40),
-        skill: String(query.skill || '').trim().slice(0, 100),
+        skills: normaliseStringList(query.skill),
         requiredExperience: String(query.requiredExperience || '').trim().slice(0, 10),
         salaryMin: String(query.salaryMin || '').trim().slice(0, 12),
         salaryMax: String(query.salaryMax || '').trim().slice(0, 12),
@@ -303,7 +321,7 @@ export function searchJobs(jobs: any[], filters: JobFilters) {
         const locationMatch = !filters.location || fuzzyAllTermMatches(filters.location, job.jobLocation);
         const workModeMatch = !filters.workMode || job.workMode === filters.workMode;
         const jobTypeMatch = !filters.jobType || job.jobType === filters.jobType;
-        const skillMatch = !filters.skill || fuzzyAllTermMatches(filters.skill, job.skills.join(' '));
+        const skillMatch = !filters.skills.length || filters.skills.every(skill => fuzzyAllTermMatches(skill, job.skills.join(' ')));
         const experienceMatch = requiredExperience === null || job.requiredExperience <= requiredExperience;
         const educationMatch = requiredEducationRank < 0 || qualificationRank(job.requiredEducationLevel) <= requiredEducationRank;
         const salaryMinMatch = salaryMin === null || (job.salaryMax !== null && job.salaryMax >= salaryMin);

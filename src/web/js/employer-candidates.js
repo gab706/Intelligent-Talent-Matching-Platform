@@ -16,6 +16,7 @@ $(function () {
     let currentPage = 1;
     let matched = [];
     let recommendationCandidateId = "";
+    let filterSkills = [];
 
     const escapeHtml = value => String(value || "")
         .replace(/&/g, "&amp;")
@@ -211,7 +212,7 @@ $(function () {
 
     function getFilters() {
         return {
-            skills: String($("[data-filter-skills]").val() || ""),
+            skills: [...filterSkills],
             education: String($("[data-filter-education]").val() || ""),
             experience: String($("[data-filter-experience]").val() || ""),
             workingMode: String($("[data-filter-working-mode]").val() || ""),
@@ -222,7 +223,14 @@ $(function () {
 
     function getActiveFilterCount() {
         const filters = getFilters();
-        return Object.values(filters).filter(value => normalise(value)).length;
+        return [
+            filters.skills.length ? filters.skills.join(" ") : "",
+            filters.education,
+            filters.experience,
+            filters.workingMode,
+            filters.location,
+            filters.jobType
+        ].filter(value => normalise(value)).length;
     }
 
     function updateFilterCount() {
@@ -231,9 +239,103 @@ $(function () {
         $count.prop("hidden", count === 0).text(count);
     }
 
+    function filterLabel(key, value) {
+        const labels = {
+            skills: "Skills",
+            education: "Education",
+            experience: "Experience",
+            workingMode: "Working mode",
+            location: "Location",
+            jobType: "Job type"
+        };
+        const selectLabels = {
+            education: qualificationLabel(value),
+            workingMode: enumLabel(value),
+            jobType: enumLabel(value)
+        };
+
+        return `${labels[key]}: ${selectLabels[key] || value}`;
+    }
+
+    function renderFilterSkills() {
+        $("[data-filter-skill-list]").html(filterSkills.map(skill => `
+            <span class="employer-candidates__filter-chip">
+                ${escapeHtml(skill)}
+                <button type="button" aria-label="Remove ${escapeHtml(skill)}" data-filter-skill-remove="${escapeHtml(skill)}">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+            </span>
+        `).join(""));
+    }
+
+    function renderActiveFilters() {
+        const filters = getFilters();
+        const activeFilters = [
+            filters.skills.length ? ["skills", filterSkills.join(", ")] : null,
+            filters.education ? ["education", filters.education] : null,
+            filters.experience ? ["experience", filters.experience] : null,
+            filters.workingMode ? ["workingMode", filters.workingMode] : null,
+            filters.location ? ["location", filters.location] : null,
+            filters.jobType ? ["jobType", filters.jobType] : null
+        ].filter(Boolean);
+        const $activeFilters = $("[data-active-filters]");
+
+        $activeFilters.prop("hidden", activeFilters.length === 0);
+        $("[data-filter-clear-outside]").prop("hidden", activeFilters.length === 0);
+        $activeFilters.html(activeFilters.map(([key, value]) => `
+            <span class="employer-candidates__filter-chip">
+                ${escapeHtml(filterLabel(key, value))}
+                <button type="button" aria-label="Remove ${escapeHtml(filterLabel(key, value))}" data-filter-remove="${escapeHtml(key)}">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+            </span>
+        `).join(""));
+    }
+
+    function addFilterSkill(value) {
+        const skill = String(value || "").trim().replace(/\s+/g, " ");
+
+        if (!skill)
+            return;
+
+        if (!filterSkills.some(item => normalise(item) === normalise(skill)))
+            filterSkills.push(skill);
+
+        $("[data-filter-skill-input]").val("");
+        renderFilterSkills();
+    }
+
+    function clearFilters() {
+        filterSkills = [];
+        $("[data-filter-location]").val("");
+        $("[data-filter-education], [data-filter-experience], [data-filter-working-mode], [data-filter-job-type]").val("");
+        $("[data-filter-skill-input]").val("");
+        renderFilterSkills();
+        filterCandidates();
+    }
+
+    function removeFilter(key) {
+        if (key === "skills")
+            filterSkills = [];
+        if (key === "education")
+            $("[data-filter-education]").val("");
+        if (key === "experience")
+            $("[data-filter-experience]").val("");
+        if (key === "workingMode")
+            $("[data-filter-working-mode]").val("");
+        if (key === "location")
+            $("[data-filter-location]").val("");
+        if (key === "jobType")
+            $("[data-filter-job-type]").val("");
+
+        renderFilterSkills();
+        filterCandidates();
+    }
+
     function candidateMatchesFilters(candidate, filters) {
         const preferences = ((candidate.profile || {}).preferences || {});
-        const skillsMatch = fuzzyAllTermsMatch(filters.skills, candidate.skillTokens, candidate.skillText);
+        const skillsMatch = !filters.skills.length
+            || filters.skills.every(skill => fuzzyAllTermsMatch(skill, candidate.skillTokens, candidate.skillText));
         const educationMatch = candidateMeetsEducation(candidate, filters.education);
         const experienceMatch = candidateMeetsExperience(candidate, filters.experience);
         const workingModeMatch = !filters.workingMode || preferences.preferredWorkingMode === filters.workingMode;
@@ -293,6 +395,7 @@ $(function () {
         currentPage = 1;
         $("[data-candidate-search-clear]").prop("hidden", !normalise(query));
         updateFilterCount();
+        renderActiveFilters();
         renderRows();
     };
 
@@ -321,38 +424,53 @@ $(function () {
                 ? ["Job type", enumLabel(preferences.preferredJobType)]
                 : null
         ].filter(Boolean);
+        const pillList = items => items && items.length
+            ? `<div class="candidate-info__pills">${items.map(item => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+            : "";
+        const factRowsHtml = profileItems.reduce((rows, item, index) => {
+            if (index % 2 === 0)
+                rows.push([]);
+
+            rows[rows.length - 1].push(item);
+            return rows;
+        }, []).map(row => `
+            <div class="candidate-info__fact-row ${row.length === 1 ? "candidate-info__fact-row--single" : ""}">
+                ${row.map(item => `
+                    <div class="candidate-info__fact">
+                        <span>${escapeHtml(item[0])}</span>
+                        <p>${escapeHtml(item[1])}</p>
+                    </div>
+                `).join("")}
+            </div>
+        `).join("");
         const profileHtml = profileItems.length
             ? `
-                <section class="employer-candidates__profile-section">
-                    <h3>Profile</h3>
-                    <div class="employer-candidates__profile-grid">
-                        ${profileItems.map(item => `<div class="employer-candidates__profile-item"><span>${escapeHtml(item[0])}</span><p>${escapeHtml(item[1])}</p></div>`).join("")}
-                    </div>
+                <section class="candidate-info__section candidate-info__section--flush">
+                    <div class="candidate-info__fact-grid">${factRowsHtml}</div>
                 </section>
             `
             : "";
         const summaryHtml = preferences.profileSummary
             ? `
-                <section class="employer-candidates__profile-section">
-                    <h3>Summary</h3>
+                <section class="candidate-info__section candidate-info__summary">
                     <p>${escapeHtml(preferences.profileSummary)}</p>
                 </section>
             `
             : "";
         const skillsHtml = (profile.skills || []).length
             ? `
-                <section class="employer-candidates__profile-section">
+                <section class="candidate-info__section">
                     <h3>Skills</h3>
-                    <div class="employer-candidates__tag-list">${profile.skills.map(skill => `<span class="employer-candidates__tag">${escapeHtml(skill)}</span>`).join("")}</div>
+                    ${pillList(profile.skills)}
                 </section>
             `
             : "";
         const educationHtml = (profile.education || []).length
             ? `
-                <section class="employer-candidates__profile-section">
+                <section class="candidate-info__section">
                     <h3>Education</h3>
                     ${(profile.education || []).map(item => `
-                        <div class="employer-candidates__profile-item">
+                        <div class="candidate-info__row">
                             <strong>${escapeHtml(qualificationLabel(item.qualificationType))}${item.major ? ` in ${escapeHtml(item.major)}` : ""}</strong>
                             ${item.school ? `<p>${escapeHtml(item.school)}</p>` : ""}
                         </div>
@@ -362,15 +480,15 @@ $(function () {
             : "";
         const experienceHtml = (profile.experience || []).length
             ? `
-                <section class="employer-candidates__profile-section">
+                <section class="candidate-info__section">
                     <h3>Experience</h3>
                     ${(profile.experience || []).map(item => `
-                        <div class="employer-candidates__profile-item">
+                        <div class="candidate-info__row">
                             <strong>${escapeHtml(item.jobTitle || "Role")}</strong>
                             ${[item.company, item.location, item.workType ? enumLabel(item.workType) : ""].filter(Boolean).length
                                 ? `<p>${escapeHtml([item.company, item.location, item.workType ? enumLabel(item.workType) : ""].filter(Boolean).join(" | "))}</p>`
                                 : ""}
-                            ${item.duties ? `<p>${escapeHtml(item.duties)}</p>` : ""}
+                            ${item.duties ? `<p class="candidate-info__long-text">${escapeHtml(item.duties)}</p>` : ""}
                         </div>
                     `).join("")}
                 </section>
@@ -378,17 +496,17 @@ $(function () {
             : "";
         const certificationsHtml = (profile.certifications || []).length
             ? `
-                <section class="employer-candidates__profile-section">
+                <section class="candidate-info__section">
                     <h3>Certifications</h3>
-                    <div class="employer-candidates__tag-list">${profile.certifications.map(certification => `<span class="employer-candidates__tag">${escapeHtml(certification)}</span>`).join("")}</div>
+                    ${pillList(profile.certifications)}
                 </section>
             `
             : "";
         const languagesHtml = (profile.languages || []).length
             ? `
-                <section class="employer-candidates__profile-section">
+                <section class="candidate-info__section">
                     <h3>Languages</h3>
-                    <div class="employer-candidates__tag-list">${profile.languages.map(item => `<span class="employer-candidates__tag">${escapeHtml(item.name)}${item.fluency ? ` | ${escapeHtml(enumLabel(item.fluency))}` : ""}</span>`).join("")}</div>
+                    ${pillList(profile.languages.map(item => `${item.name}${item.fluency ? ` | ${enumLabel(item.fluency)}` : ""}`))}
                 </section>
             `
             : "";
@@ -399,10 +517,10 @@ $(function () {
         ].filter(Boolean);
         const portfolioHtml = portfolioItems.length
             ? `
-                <section class="employer-candidates__profile-section">
+                <section class="candidate-info__section">
                     <h3>Portfolio</h3>
                     ${portfolioItems.map(item => `
-                        <div class="employer-candidates__profile-item">
+                        <div class="candidate-info__row">
                             <strong>${escapeHtml(item.label)}</strong>
                             <p><a href="${escapeHtml(item.url)}" target="_blank" rel="noopener">${escapeHtml(item.url)}</a></p>
                         </div>
@@ -412,16 +530,13 @@ $(function () {
             : "";
 
         $("[data-profile-content]").html(`
-            <div class="employer-candidates__profile-header">
+            <div class="candidate-info">
+            <div class="candidate-info__header">
                 <img src="${escapeHtml(personal.avatarPath)}" alt="" />
                 <div>
                     <h2 id="candidate-profile-title">${escapeHtml(candidate.fullName)}</h2>
-                    ${contact ? `<p class="employer-candidates__empty">${escapeHtml(contact)}</p>` : ""}
+                    ${contact ? `<p>${escapeHtml(contact)}</p>` : ""}
                 </div>
-                <button class="employer-candidates__profile-recommend" type="button" data-recommend-open data-recommend-candidate-id="${escapeHtml(candidate.id)}" ${postings.length ? "" : "disabled"}>
-                    <i class="fas fa-paper-plane" aria-hidden="true"></i>
-                    Recommend
-                </button>
             </div>
             ${summaryHtml}
             ${profileHtml}
@@ -431,6 +546,13 @@ $(function () {
             ${certificationsHtml}
             ${languagesHtml}
             ${portfolioHtml}
+            <footer class="candidate-info__footer">
+                <button class="employer-candidates__profile-recommend" type="button" data-recommend-open data-recommend-candidate-id="${escapeHtml(candidate.id)}" ${postings.length ? "" : "disabled"}>
+                    <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                    Recommend
+                </button>
+            </footer>
+            </div>
         `);
         $("[data-profile-modal]").prop("hidden", false).attr("aria-hidden", "false");
     };
@@ -465,6 +587,7 @@ $(function () {
     });
     $("[data-match-open]").prop("disabled", !postings.length);
     $("[data-recommend-submit]").prop("disabled", !postings.length);
+    renderFilterSkills();
     filterCandidates();
 
     $("[data-candidate-search]").on("input", filterCandidates);
@@ -478,11 +601,24 @@ $(function () {
         filterCandidates();
         $("[data-filter-modal]").prop("hidden", true).attr("aria-hidden", "true");
     });
-    $("[data-filter-clear]").on("click", function () {
-        $("[data-filter-skills], [data-filter-location]").val("");
-        $("[data-filter-education], [data-filter-experience], [data-filter-working-mode], [data-filter-job-type]").val("");
-        filterCandidates();
+    $("[data-filter-clear], [data-filter-clear-outside]").on("click", function () {
+        clearFilters();
         $("[data-filter-modal]").prop("hidden", true).attr("aria-hidden", "true");
+    });
+    $("[data-filter-skill-input]").on("keydown", function (event) {
+        if (event.key !== "Enter")
+            return;
+
+        event.preventDefault();
+        addFilterSkill($(this).val());
+    });
+    $("[data-filter-skill-list]").on("click", "[data-filter-skill-remove]", function () {
+        const skill = String($(this).attr("data-filter-skill-remove") || "");
+        filterSkills = filterSkills.filter(item => item !== skill);
+        renderFilterSkills();
+    });
+    $("[data-active-filters]").on("click", "[data-filter-remove]", function () {
+        removeFilter(String($(this).attr("data-filter-remove") || ""));
     });
     $("[data-candidate-search-clear]").on("click", function () {
         $("[data-candidate-search]").val("").trigger("input").trigger("focus");

@@ -76,7 +76,7 @@
         <section class="candidate-home__stats" aria-label="Candidate snapshot">
             <article class="candidate-home__stat">
                 <span>Applications</span>
-                <strong><%= (home.statusCounts.APPLIED || 0) + (home.statusCounts.SHORTLISTED || 0) + (home.statusCounts.HIRED || 0) + (home.statusCounts.REJECTED || 0) + (home.statusCounts.WITHDRAWN || 0) %></strong>
+                <strong><%= (home.statusCounts.APPLIED || 0) + (home.statusCounts.SHORTLISTED || 0) + (home.statusCounts.HIRED || 0) + (home.statusCounts.REJECTED || 0) %></strong>
             </article>
             <article class="candidate-home__stat">
                 <span>Shortlisted</span>
@@ -86,34 +86,6 @@
                 <span>Saved jobs</span>
                 <strong><%= home.savedJobCount %></strong>
             </article>
-        </section>
-
-        <section class="candidate-home__next" aria-labelledby="candidate-next-title">
-            <% if (home.profileTasks.length) { %>
-            <i class="fas fa-user-check" aria-hidden="true"></i>
-            <div>
-                <p class="account-home__eyebrow">Next step</p>
-                <h2 id="candidate-next-title"><%= home.profileTasks[0] %></h2>
-                <p>Complete more of your profile to improve job recommendations.</p>
-            </div>
-            <a href="/candidate/profile">Update profile</a>
-            <% } else if (home.recentApplications.length) { %>
-            <i class="fas fa-clipboard-list" aria-hidden="true"></i>
-            <div>
-                <p class="account-home__eyebrow">Next step</p>
-                <h2 id="candidate-next-title">Check application progress</h2>
-                <p>Review status changes and manage any active applications.</p>
-            </div>
-            <a href="/candidate/applications">Track applications</a>
-            <% } else { %>
-            <i class="fas fa-briefcase" aria-hidden="true"></i>
-            <div>
-                <p class="account-home__eyebrow">Next step</p>
-                <h2 id="candidate-next-title">Apply for your first role</h2>
-                <p>Search active postings or use recommendations shaped by your profile.</p>
-            </div>
-            <a href="/candidate/find-a-job">Find jobs</a>
-            <% } %>
         </section>
 
         <section class="candidate-home__panel" aria-labelledby="candidate-activity-title">

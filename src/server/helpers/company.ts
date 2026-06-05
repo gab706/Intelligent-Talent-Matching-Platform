@@ -38,9 +38,35 @@ type PublicPosting = {
     jobTitle: string;
     workMode: string;
     jobLocation: string;
+    jobType: string;
+    requiredExperience: number;
+    requiredEducationLevel: string;
+    salaryMin: number | null;
+    salaryMax: number | null;
     closingDate: Date | null;
     status: string;
 };
+
+function applyHref(posting: PublicPosting): string {
+    const params = new URLSearchParams();
+    const entries: Array<[string, string | number | null]> = [
+        ['keyword', posting.jobTitle],
+        ['location', posting.jobLocation],
+        ['workMode', posting.workMode],
+        ['jobType', posting.jobType],
+        ['requiredExperience', posting.requiredExperience],
+        ['educationLevel', posting.requiredEducationLevel],
+        ['salaryMin', posting.salaryMin],
+        ['salaryMax', posting.salaryMax]
+    ];
+
+    entries.forEach(([key, value]) => {
+        if (value !== null && value !== '')
+            params.set(key, String(value));
+    });
+
+    return `/candidate/find-a-job?${params.toString()}`;
+}
 
 type PublicStaffMember = {
     employer: {
@@ -104,6 +130,11 @@ export default async function companyHelper(
                         jobTitle: true,
                         workMode: true,
                         jobLocation: true,
+                        jobType: true,
+                        requiredExperience: true,
+                        requiredEducationLevel: true,
+                        salaryMin: true,
+                        salaryMax: true,
                         closingDate: true,
                         status: true
                     },
@@ -128,6 +159,12 @@ export default async function companyHelper(
                 jobTitle: posting.jobTitle,
                 workMode: posting.workMode,
                 jobLocation: posting.jobLocation,
+                jobType: posting.jobType,
+                requiredExperience: posting.requiredExperience,
+                requiredEducationLevel: posting.requiredEducationLevel,
+                salaryMin: posting.salaryMin,
+                salaryMax: posting.salaryMax,
+                applyHref: applyHref(posting),
                 closingDate: posting.closingDate ? posting.closingDate.toISOString().slice(0, 10) : ''
             }));
 

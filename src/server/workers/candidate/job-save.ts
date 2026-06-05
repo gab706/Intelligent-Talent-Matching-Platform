@@ -19,36 +19,14 @@ export default async function candidateJobSaveWorker(
         }
 
         const jobId = clean(req.params.jobId, 80);
-        const [candidate, job] = await Promise.all([
-            prisma.candidate.findUnique({
-                where: {
-                    userId: req.session.userId
-                },
-                select: {
-                    id: true
-                }
-            }),
-            prisma.jobPosting.findFirst({
-                where: {
-                    id: jobId,
-                    status: 'ACTIVE',
-                    isActive: true,
-                    OR: [
-                        {
-                            closingDate: null
-                        },
-                        {
-                            closingDate: {
-                                gt: new Date()
-                            }
-                        }
-                    ]
-                },
-                select: {
-                    id: true
-                }
-            })
-        ]);
+        const candidate = await prisma.candidate.findUnique({
+            where: {
+                userId: req.session.userId
+            },
+            select: {
+                id: true
+            }
+        });
 
         if (!candidate) {
             return res.json({
@@ -56,6 +34,41 @@ export default async function candidateJobSaveWorker(
                 message: 'Candidate profile could not be found.'
             });
         }
+
+        if (req.method === 'DELETE') {
+            await prisma.savedJob.deleteMany({
+                where: {
+                    userId: req.session.userId,
+                    jobId
+                }
+            });
+
+            return res.json({
+                success: true,
+                message: 'Job unsaved.'
+            });
+        }
+
+        const job = await prisma.jobPosting.findFirst({
+            where: {
+                id: jobId,
+                status: 'ACTIVE',
+                isActive: true,
+                OR: [
+                    {
+                        closingDate: null
+                    },
+                    {
+                        closingDate: {
+                            gt: new Date()
+                        }
+                    }
+                ]
+            },
+            select: {
+                id: true
+            }
+        });
 
         if (!job) {
             return res.json({

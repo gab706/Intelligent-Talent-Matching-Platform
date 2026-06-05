@@ -46,7 +46,6 @@ enum ApplicationStatus {
   APPLIED
   SHORTLISTED
   REJECTED
-  WITHDRAWN
   HIRED
 }
 

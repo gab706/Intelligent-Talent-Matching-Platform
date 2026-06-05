@@ -46,7 +46,7 @@
                     Track applications
                 </h1>
                 <p class="account-home__copy candidate-applications__intro">
-                    See where each application is up to, review job details, and withdraw applications that are still active.
+                    See where each application is up to and review job details.
                 </p>
             </div>
             <a class="candidate-applications__primary" href="/candidate/find-a-job">
@@ -86,10 +86,6 @@
             <button type="button" data-status-filter="REJECTED">
                 <span>Rejected</span>
                 <strong><%= statusCounts.REJECTED || 0 %></strong>
-            </button>
-            <button type="button" data-status-filter="WITHDRAWN">
-                <span>Withdrawn</span>
-                <strong><%= statusCounts.WITHDRAWN || 0 %></strong>
             </button>
         </section>
 

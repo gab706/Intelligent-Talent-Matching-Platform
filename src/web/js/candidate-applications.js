@@ -11,7 +11,7 @@ $(function () {
 
     const state = window.__candidateApplications || { applications: [], savedJobs: [], statusCounts: {} };
     const applications = state.applications || [];
-    const savedJobs = state.savedJobs || [];
+    let savedJobs = state.savedJobs || [];
     const appliedJobIds = new Set(applications.map(application => application.job && application.job.id).filter(Boolean));
     let activeStatus = "ALL";
     let activeMode = "applications";
@@ -36,77 +36,64 @@ $(function () {
     const findApplication = id => applications.find(application => application.id === id);
     const findSavedJob = id => savedJobs.find(savedJob => savedJob.id === id);
 
-    const statusClass = status => `candidate-applications__status--${String(status || "").toLowerCase()}`;
-
     const renderJobMeta = function (job, extra = "") {
         return `
             <div class="candidate-applications__meta">
                 <span><i class="fas fa-map-marker-alt" aria-hidden="true"></i>${escapeHtml(job.jobLocation)}</span>
                 <span><i class="fas fa-briefcase" aria-hidden="true"></i>${escapeHtml(label(job.workMode))}</span>
-                ${job.salaryRange ? `<span><i class="fas fa-dollar-sign" aria-hidden="true"></i>${escapeHtml(job.salaryRange)}</span>` : ""}
                 ${extra}
             </div>
         `;
     };
 
-    const renderSkills = function (skills, detail = false) {
-        if (!skills || !skills.length)
+    const renderList = function (items) {
+        const values = (items || []).filter(Boolean);
+        if (!values.length)
             return "";
 
-        return `
-            <div class="candidate-applications__skills${detail ? " candidate-applications__skills--detail" : ""}">
-                ${skills.map(skill => `<span>${escapeHtml(skill)}</span>`).join("")}
-            </div>
-        `;
+        return `<ul>${values.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
     };
 
     const renderJobDetails = function (job, context = {}) {
-        const statusText = context.statusLabel || context.savedAtLabel && `Saved ${context.savedAtLabel}` || "Job details";
-        const timeline = context.appliedAtLabel
-            ? `<section><h3>Application timeline</h3><p>Applied ${escapeHtml(context.appliedAtLabel)}. Last updated ${escapeHtml(context.updatedAtLabel)}.</p></section>`
-            : context.savedAtLabel
-                ? `<section><h3>Saved job</h3><p>Saved ${escapeHtml(context.savedAtLabel)}.</p></section>`
-                : "";
+        const appliedLabel = context.appliedAtLabel || "";
 
         $("[data-application-detail]").html(`
             <div class="candidate-applications__detail-head">
-                <p class="account-home__eyebrow">${escapeHtml(statusText)}</p>
+                <p class="account-home__eyebrow">${escapeHtml(job.companyName)}${job.companyIndustry ? ` | ${escapeHtml(job.companyIndustry)}` : ""}</p>
                 <h2 id="application-detail-title">${escapeHtml(job.jobTitle)}</h2>
-                <p>${escapeHtml(job.companyName)}${job.companyIndustry ? ` | ${escapeHtml(job.companyIndustry)}` : ""}</p>
-            </div>
-            <div class="candidate-applications__detail-meta">
-                <span><i class="fas fa-map-marker-alt" aria-hidden="true"></i>${escapeHtml(job.jobLocation)}</span>
-                <span><i class="fas fa-briefcase" aria-hidden="true"></i>${escapeHtml(label(job.workMode))}</span>
-                ${job.jobType ? `<span><i class="fas fa-clock" aria-hidden="true"></i>${escapeHtml(label(job.jobType))}</span>` : ""}
-                <span><i class="fas fa-user-graduate" aria-hidden="true"></i>${escapeHtml(job.requiredEducationLabel)}</span>
-                <span><i class="fas fa-chart-line" aria-hidden="true"></i>${escapeHtml(job.requiredExperience)}+ years</span>
-                ${job.salaryRange ? `<span><i class="fas fa-dollar-sign" aria-hidden="true"></i>${escapeHtml(job.salaryRange)}</span>` : ""}
-                ${job.closingDateLabel ? `<span><i class="fas fa-calendar-alt" aria-hidden="true"></i>Closes ${escapeHtml(job.closingDateLabel)}</span>` : ""}
-            </div>
-            ${renderSkills(job.skills || [], true)}
-            ${timeline}
-            <section>
-                <h3>Job description</h3>
-                <p>${escapeHtml(job.jobDescription)}</p>
-            </section>
-            ${job.companyInformation ? `<section><h3>Company information</h3><p>${escapeHtml(job.companyInformation)}</p></section>` : ""}
-            ${context.coverLetter ? `<section><h3>Cover letter</h3><p>${escapeHtml(context.coverLetter)}</p></section>` : ""}
-            ${context.canWithdraw ? `
-                <div class="candidate-applications__actions">
-                    <button class="candidate-applications__danger" type="button" data-withdraw-application="${escapeHtml(context.id)}">
-                        <i class="fas fa-ban" aria-hidden="true"></i>
-                        Withdraw application
-                    </button>
+                <div class="candidate-applications__detail-meta">
+                    <span><i class="fas fa-map-marker-alt" aria-hidden="true"></i>${escapeHtml(job.jobLocation)}</span>
+                    <span><i class="fas fa-briefcase" aria-hidden="true"></i>${escapeHtml(label(job.workMode))}</span>
+                    ${job.jobType ? `<span><i class="fas fa-clock" aria-hidden="true"></i>${escapeHtml(label(job.jobType))}</span>` : ""}
+                    ${job.salaryRange ? `<span><i class="fas fa-dollar-sign" aria-hidden="true"></i>${escapeHtml(job.salaryRange)}</span>` : ""}
                 </div>
-            ` : ""}
-            ${context.savedJobId && !appliedJobIds.has(job.id) ? `
-                <div class="candidate-applications__actions">
+            </div>
+            <div class="candidate-applications__detail-body">
+                <section>
+                    <h3>Job description</h3>
+                    <p>${escapeHtml(job.jobDescription)}</p>
+                </section>
+                <section>
+                    <h3>Required Background</h3>
+                    ${renderList([
+                        `Minimum degree: ${job.requiredEducationLabel || "Not specified"}`,
+                        `Minimum experience: ${job.requiredExperience || 0}+ years`
+                    ])}
+                </section>
+                ${(job.skills || []).length ? `<section><h3>Desired Skills</h3>${renderList(job.skills)}</section>` : ""}
+            </div>
+            <footer class="candidate-applications__modal-footer">
+                ${context.savedJobId && !appliedJobIds.has(job.id) ? `
                     <button class="candidate-applications__primary-action" type="button" data-apply-saved-job="${escapeHtml(job.id)}">
                         <i class="fas fa-paper-plane" aria-hidden="true"></i>
                         Apply
                     </button>
-                </div>
-            ` : ""}
+                    <button type="button" data-unsave-job="${escapeHtml(job.id)}">
+                        <i class="fas fa-bookmark" aria-hidden="true"></i>
+                        Unsave
+                    </button>
+                ` : `<p class="candidate-applications__applied-notice">Applied on ${escapeHtml(appliedLabel || "this job")}</p>`}
+            </footer>
         `);
         $("[data-application-modal]").prop("hidden", false).attr("aria-hidden", "false");
     };
@@ -125,23 +112,15 @@ $(function () {
             return `
                 <article class="candidate-applications__item" data-application-id="${escapeHtml(application.id)}">
                     <div>
-                        <span class="candidate-applications__status ${statusClass(application.status)}">${escapeHtml(application.statusLabel)}</span>
                         <h2>${escapeHtml(job.jobTitle)}</h2>
                         <p>${escapeHtml(job.companyName)}${job.companyIndustry ? ` | ${escapeHtml(job.companyIndustry)}` : ""}</p>
                     </div>
                     ${renderJobMeta(job, `<span><i class="fas fa-calendar-check" aria-hidden="true"></i>Applied ${escapeHtml(application.appliedAtLabel)}</span>`)}
-                    ${renderSkills((job.skills || []).slice(0, 6))}
                     <div class="candidate-applications__actions">
                         <button type="button" data-view-application="${escapeHtml(application.id)}">
                             <i class="fas fa-eye" aria-hidden="true"></i>
                             Details
                         </button>
-                        ${application.canWithdraw ? `
-                            <button class="candidate-applications__danger" type="button" data-withdraw-application="${escapeHtml(application.id)}">
-                                <i class="fas fa-ban" aria-hidden="true"></i>
-                                Withdraw
-                            </button>
-                        ` : ""}
                     </div>
                 </article>
             `;
@@ -157,20 +136,22 @@ $(function () {
             return `
                 <article class="candidate-applications__item" data-saved-job-id="${escapeHtml(savedJob.id)}">
                     <div>
-                        <span class="candidate-applications__status candidate-applications__status--saved">Saved</span>
                         <h2>${escapeHtml(job.jobTitle)}</h2>
                         <p>${escapeHtml(job.companyName)}${job.companyIndustry ? ` | ${escapeHtml(job.companyIndustry)}` : ""}</p>
                     </div>
                     ${renderJobMeta(job, `<span><i class="fas fa-bookmark" aria-hidden="true"></i>Saved ${escapeHtml(savedJob.savedAtLabel)}</span>`)}
-                    ${renderSkills((job.skills || []).slice(0, 6))}
                     <div class="candidate-applications__actions">
-                        <button type="button" data-view-saved-job="${escapeHtml(savedJob.id)}">
-                            <i class="fas fa-eye" aria-hidden="true"></i>
-                            Details
-                        </button>
                         <button class="candidate-applications__primary-action" type="button" data-apply-saved-job="${escapeHtml(job.id)}" ${alreadyApplied ? "disabled" : ""}>
                             <i class="fas fa-paper-plane" aria-hidden="true"></i>
                             ${alreadyApplied ? "Applied" : "Apply"}
+                        </button>
+                        <button type="button" data-unsave-job="${escapeHtml(job.id)}">
+                            <i class="fas fa-bookmark" aria-hidden="true"></i>
+                            Unsave
+                        </button>
+                        <button type="button" data-view-saved-job="${escapeHtml(savedJob.id)}">
+                            <i class="fas fa-eye" aria-hidden="true"></i>
+                            Details
                         </button>
                     </div>
                 </article>
@@ -195,7 +176,7 @@ $(function () {
             return result;
         }, {});
         $("[data-status-filter='ALL'] strong").text(applications.length);
-        ["APPLIED", "SHORTLISTED", "HIRED", "REJECTED", "WITHDRAWN"].forEach(status => {
+        ["APPLIED", "SHORTLISTED", "HIRED", "REJECTED"].forEach(status => {
             $(`[data-status-filter='${status}'] strong`).text(counts[status] || 0);
         });
     };
@@ -252,6 +233,9 @@ $(function () {
 
             appliedJobIds.add(jobId);
             $buttons.text("Applied").prop("disabled", true);
+            savedJobs = savedJobs.filter(savedJob => savedJob.job.id !== jobId);
+            renderApplications();
+            $("[data-application-modal]").prop("hidden", true).attr("aria-hidden", "true");
             showMessage(result.message || "Application submitted.", "success");
         } catch (err) {
             console.error(err);
@@ -260,44 +244,34 @@ $(function () {
         }
     });
 
-    $(document).on("click", "[data-withdraw-application]", async function () {
-        const applicationId = String($(this).attr("data-withdraw-application") || "");
-        const application = findApplication(applicationId);
-        if (!application || !application.canWithdraw)
+    $(document).on("click", "[data-unsave-job]", async function () {
+        const jobId = String($(this).attr("data-unsave-job") || "");
+        if (!jobId)
             return;
 
-        const confirmed = window.confirm("Withdraw this application?");
-        if (!confirmed)
-            return;
-
-        const $button = $(this);
-        $button.prop("disabled", true);
+        const $buttons = $(`[data-unsave-job='${jobId}']`);
+        $buttons.prop("disabled", true);
         try {
-            const response = await fetch("/candidate/application-withdraw", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ applicationId })
+            const response = await fetch(`/candidate/jobs/${encodeURIComponent(jobId)}/save`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" }
             });
             const result = await response.json();
 
             if (!response.ok || !result.success) {
-                $button.prop("disabled", false);
-                showMessage(result.message || "Unable to withdraw application.");
+                $buttons.prop("disabled", false);
+                showMessage(result.message || "Unable to unsave this job.");
                 return;
             }
 
-            application.status = "WITHDRAWN";
-            application.statusLabel = "Withdrawn";
-            application.canWithdraw = false;
-            application.updatedAtLabel = "Today";
-            updateCounts();
+            savedJobs = savedJobs.filter(savedJob => savedJob.job.id !== jobId);
             renderApplications();
             $("[data-application-modal]").prop("hidden", true).attr("aria-hidden", "true");
-            showMessage(result.message || "Application withdrawn.", "success");
+            showMessage(result.message || "Job unsaved.", "success");
         } catch (err) {
             console.error(err);
-            $button.prop("disabled", false);
-            showMessage("Unable to withdraw application.");
+            $buttons.prop("disabled", false);
+            showMessage("Unable to unsave this job.");
         }
     });
 

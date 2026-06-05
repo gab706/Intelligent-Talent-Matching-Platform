@@ -32,8 +32,7 @@ function statusLabel(value: string): string {
         APPLIED: 'Applied',
         SHORTLISTED: 'Shortlisted',
         HIRED: 'Accepted',
-        REJECTED: 'Rejected',
-        WITHDRAWN: 'Withdrawn'
+        REJECTED: 'Rejected'
     };
 
     return labels[value] || value;
@@ -75,7 +74,7 @@ function formatApplication(application: any) {
         appliedAt: application.createdAt.toISOString(),
         appliedAtLabel: dateLabel(application.createdAt),
         updatedAtLabel: dateLabel(application.updatedAt),
-        canWithdraw: !['HIRED', 'REJECTED', 'WITHDRAWN'].includes(application.status),
+        canWithdraw: false,
         job: formatJob(application.job)
     };
 }
@@ -216,7 +215,10 @@ export default async function candidateApplicationsHelper(
             return res.redirect('/candidate/profile');
 
         const applications = candidate.applications.map(formatApplication);
-        const formattedSavedJobs = savedJobs.map(formatSavedJob);
+        const appliedJobIds = new Set(applications.map((application: { job: { id: string } }) => application.job.id));
+        const formattedSavedJobs = savedJobs
+            .map(formatSavedJob)
+            .filter((savedJob: { job: { id: string } }) => !appliedJobIds.has(savedJob.job.id));
         const statusCounts = applications.reduce((counts: Record<string, number>, application: { status: string }) => {
             counts[application.status] = (counts[application.status] || 0) + 1;
             return counts;

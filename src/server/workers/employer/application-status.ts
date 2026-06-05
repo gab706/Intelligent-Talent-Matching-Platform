@@ -2,22 +2,21 @@ import { Request, Response, NextFunction } from 'express';
 import type { Prisma } from '../../../../prisma/generated/client.js';
 import { prisma } from '../../database/prisma.js';
 
-const STATUSES = new Set(['APPLIED', 'SHORTLISTED', 'HIRED', 'REJECTED', 'WITHDRAWN']);
+const STATUSES = new Set(['APPLIED', 'SHORTLISTED', 'HIRED', 'REJECTED']);
 
 function clean(value: unknown, max = 120): string {
     return String(value || '').trim().slice(0, max);
 }
 
-function statusLabel(status: string): string {
-    const labels: Record<string, string> = {
-        APPLIED: 'Applied',
-        SHORTLISTED: 'Shortlisted',
-        HIRED: 'Accepted',
-        REJECTED: 'Rejected',
-        WITHDRAWN: 'Withdrawn'
+function statusMessage(status: string, role: string, company: string): string {
+    const messages: Record<string, string> = {
+        APPLIED: `Thank you for applying for the ${role} role at ${company}.`,
+        SHORTLISTED: `Congratulations, you have been shortlisted for the ${role} role at ${company}. Someone will be in touch soon.`,
+        HIRED: `Congratulations!! ${company} would like to offer you the role of ${role}`,
+        REJECTED: `Thank you for taking the time to apply for the ${role} role at ${company}. Unfortunately you have been unsuccessful this time.`
     };
 
-    return labels[status] || status;
+    return messages[status] || `Your application for the ${role} role at ${company} has been updated.`;
 }
 
 export default async function applicationStatusWorker(
@@ -86,6 +85,7 @@ export default async function applicationStatusWorker(
                 job: {
                     select: {
                         jobTitle: true,
+                        status: true,
                         company: {
                             select: {
                                 name: true
@@ -100,6 +100,13 @@ export default async function applicationStatusWorker(
             return res.json({
                 success: false,
                 message: 'Application could not be found.'
+            });
+        }
+
+        if (application.job.status === 'CLOSED') {
+            return res.json({
+                success: false,
+                message: 'Closed postings are view only.'
             });
         }
 
@@ -126,7 +133,7 @@ export default async function applicationStatusWorker(
                     senderId: req.session.userId,
                     type: 'APPLICATION',
                     title: 'Application Updated',
-                    message: `Your application for ${application.job.jobTitle} at ${application.job.company.name} has been moved to ${statusLabel(status)}.`
+                    message: statusMessage(status, application.job.jobTitle, application.job.company.name)
                 }
             });
         });

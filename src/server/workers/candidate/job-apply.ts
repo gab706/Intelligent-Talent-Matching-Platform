@@ -1,8 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
+import type { Prisma } from '../../../../prisma/generated/client.js';
 import { prisma } from '../../database/prisma.js';
 
 function clean(value: unknown, max = 120): string {
     return String(value || '').trim().slice(0, max);
+}
+
+function dateLabel(value: Date): string {
+    return new Intl.DateTimeFormat('en-AU', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    }).format(value);
 }
 
 export default async function candidateJobApplyWorker(
@@ -25,7 +34,8 @@ export default async function candidateJobApplyWorker(
                     userId: req.session.userId
                 },
                 select: {
-                    id: true
+                    id: true,
+                    userId: true
                 }
             }),
             prisma.jobPosting.findFirst({
@@ -45,7 +55,13 @@ export default async function candidateJobApplyWorker(
                     ]
                 },
                 select: {
-                    id: true
+                    id: true,
+                    jobTitle: true,
+                    company: {
+                        select: {
+                            name: true
+                        }
+                    }
                 }
             })
         ]);
@@ -83,16 +99,33 @@ export default async function candidateJobApplyWorker(
             });
         }
 
-        await prisma.jobApplication.create({
-            data: {
-                candidateId: candidate.id,
-                jobId: job.id
-            }
+        const application = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+            const createdApplication = await tx.jobApplication.create({
+                data: {
+                    candidateId: candidate.id,
+                    jobId: job.id
+                },
+                select: {
+                    createdAt: true
+                }
+            });
+
+            await tx.notification.create({
+                data: {
+                    recipientId: candidate.userId,
+                    type: 'APPLICATION',
+                    title: 'Application Submitted',
+                    message: `Thank you for applying for the ${job.jobTitle} role at ${job.company.name}.`
+                }
+            });
+
+            return createdApplication;
         });
 
         return res.json({
             success: true,
-            message: 'Application submitted.'
+            message: 'Application submitted.',
+            appliedAtLabel: dateLabel(application.createdAt)
         });
     } catch (err) {
         return next(err);

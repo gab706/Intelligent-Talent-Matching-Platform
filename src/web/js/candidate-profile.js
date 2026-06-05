@@ -164,11 +164,10 @@ $(function () {
         if (!item)
             return "Not set";
 
-        const label = getLabel(labelMaps.qualification, item.qualificationType);
-        const major = item.major ? ` / ${escapeHtml(item.major)}` : "";
+        const title = formatEducationTitle(item);
         const currentNote = item.isCurrent ? " (In Progress)" : "";
 
-        return `${escapeHtml(label)}${major}${escapeHtml(currentNote)}`;
+        return `${escapeHtml(title)}${escapeHtml(currentNote)}`;
     };
 
     const formatEducationTitle = function (item) {
@@ -375,7 +374,6 @@ $(function () {
                 sideStack.push({ text: line, style: 'sideText' });
             });
         }
-        addSideSection('TECHNICAL SKILLS', profile.skills || []);
         addSideSection('CERTIFICATIONS', profile.certifications || []);
         addSideSection('LANGUAGES', languageRows);
         addMainSection('Professional Summary', hasText(preferences.profileSummary)

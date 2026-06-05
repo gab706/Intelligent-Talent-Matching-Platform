@@ -55,6 +55,9 @@
         <div class="employer-candidates__toolbar">
             <p data-candidate-count data-candidate-total="0">Showing 0 of 0</p>
             <div class="employer-candidates__actions">
+                <button class="employer-candidates__filter-clear" type="button" hidden data-filter-clear-outside>
+                    Clear filters
+                </button>
                 <button class="employer-candidates__filter-button" type="button" data-filter-open>
                     <i class="fas fa-filter" aria-hidden="true"></i>
                     Filter
@@ -66,6 +69,7 @@
                 </button>
             </div>
         </div>
+        <div class="employer-candidates__active-filters" hidden data-active-filters></div>
 
         <section class="employer-candidates__recommended" hidden data-recommended-section>
             <div class="employer-candidates__recommended-header">
@@ -118,10 +122,6 @@
                 </div>
                 <section class="employer-candidates__filters" aria-label="Candidate search filters">
                     <label>
-                        <span>Skills</span>
-                        <input type="text" placeholder="python, cyber security" data-filter-skills />
-                    </label>
-                    <label>
                         <span>Education level</span>
                         <select data-filter-education>
                             <option value="">Any education</option>
@@ -173,6 +173,11 @@
                             <option value="INTERNSHIP">Internship</option>
                         </select>
                     </label>
+                    <label class="employer-candidates__skill-filter">
+                        <span>Skills</span>
+                        <input type="text" placeholder="Press enter to add a skill" data-filter-skill-input />
+                        <div class="employer-candidates__skill-list" data-filter-skill-list></div>
+                    </label>
                 </section>
                 <div class="employer-candidates__filter-actions">
                     <button class="employer-candidates__filter-clear" type="button" data-filter-clear>
@@ -196,10 +201,12 @@
                     <span>Select active posting</span>
                     <select data-recommend-posting></select>
                 </label>
-                <button class="employer-candidates__primary" type="button" data-recommend-submit disabled>
-                    <i class="fas fa-paper-plane" aria-hidden="true"></i>
-                    Send recommendation
-                </button>
+                <div class="employer-candidates__dialog-actions">
+                    <button class="employer-candidates__primary" type="button" data-recommend-submit disabled>
+                        <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                        Send recommendation
+                    </button>
+                </div>
             </section>
         </div>
 
@@ -214,7 +221,9 @@
                     <span>Select active posting</span>
                     <select data-match-posting></select>
                 </label>
-                <button class="employer-candidates__primary" type="button" data-match-run>Show recommendations</button>
+                <div class="employer-candidates__dialog-actions">
+                    <button class="employer-candidates__primary" type="button" data-match-run>Show recommendations</button>
+                </div>
             </section>
         </div>
     </section>

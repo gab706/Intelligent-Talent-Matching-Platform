@@ -60,13 +60,16 @@
 }
 
 .find-job-page__search {
-    margin-bottom: 34px;
+    margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: minmax(260px, 75%) auto;
+    gap: 10px;
+    align-items: center;
 }
 
 .find-job-page__keyword {
     position: relative;
     min-height: 58px;
-    margin-bottom: 14px;
     padding: 0 18px;
     display: flex;
     align-items: center;
@@ -75,6 +78,67 @@
     border-radius: 999px;
     background: var(--color-surface);
     color: var(--color-muted);
+}
+
+.find-job-page__tabs {
+    width: fit-content;
+    margin-bottom: 18px;
+    padding: 5px;
+    display: inline-flex;
+    gap: 6px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-soft);
+}
+
+.find-job-page__tabs button {
+    min-height: 38px;
+    padding: 0 13px;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-muted);
+    font-weight: 850;
+}
+
+.find-job-page__tabs button.is-active {
+    background: var(--color-surface);
+    color: var(--color-text);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.find-job-page__search-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.find-job-page__active-filters {
+    margin: -4px 0 22px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.find-job-page__active-filters a,
+.find-job-page__skill-chip {
+    min-height: 32px;
+    padding: 0 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 999px;
+    background: var(--color-surface-soft);
+    color: var(--color-text);
+    font-size: 0.86rem;
+    font-weight: 820;
+}
+
+.find-job-page__active-filters i,
+.find-job-page__skill-chip i {
+    color: var(--color-primary);
+    font-size: 0.78rem;
 }
 
 .find-job-page__keyword:focus-within,
@@ -138,7 +202,6 @@
 }
 
 .find-job-page__filter-actions {
-    margin-top: 14px;
     display: flex;
     justify-content: flex-end;
     gap: 10px;
@@ -146,7 +209,10 @@
 
 .find-job-page__filter-actions a,
 .find-job-page__filter-actions button,
-.find-job-page__actions button {
+.find-job-page__clear-filters,
+.find-job-page__filter-button,
+.find-job-page__actions button,
+.find-job-page__modal-footer button {
     min-height: 40px;
     padding: 0 13px;
     display: inline-flex;
@@ -160,8 +226,30 @@
     font-weight: 850;
 }
 
+.find-job-page__clear-filters:hover,
+.find-job-page__clear-filters:focus-visible {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.find-job-page__filter-button span {
+    min-width: 22px;
+    height: 22px;
+    padding: 0 7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: var(--color-primary);
+    color: #fff;
+    font-size: 0.75rem;
+    line-height: 1;
+    font-weight: 900;
+}
+
 .find-job-page__filter-actions button,
-.find-job-page__actions .find-job-page__apply {
+.find-job-page__actions .find-job-page__apply,
+.find-job-page__modal-footer .find-job-page__apply {
     border-color: var(--color-primary);
     background: var(--color-primary);
     color: #fff;
@@ -174,7 +262,6 @@
 
 .find-job-page__results,
 .find-job-page__recommendations {
-    margin-top: 34px;
     padding-top: 24px;
     border-top: 1px solid color-mix(in srgb, var(--color-primary) 16%, var(--color-border));
 }
@@ -243,6 +330,13 @@
     color: var(--color-primary);
 }
 
+.find-job-page__applied-notice {
+    margin: 0;
+    color: var(--color-primary);
+    font-size: 0.95rem;
+    font-weight: 850;
+}
+
 .find-job-page__skills {
     margin-top: 12px;
     display: flex;
@@ -304,11 +398,49 @@
     max-height: min(820px, calc(100vh - 48px));
     overflow-y: auto;
     display: grid;
-    gap: 18px;
-    padding: 24px;
+    gap: 24px;
+    padding: 34px 28px 24px;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     background: var(--color-surface);
+}
+
+.find-job-page__dialog--filters {
+    width: min(760px, 100%);
+}
+
+.find-job-page__dialog [data-job-detail] {
+    display: grid;
+    gap: 34px;
+}
+
+.find-job-page__skill-filter {
+    grid-column: 1 / -1;
+}
+
+.find-job-page__skill-chips {
+    min-height: 34px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.find-job-page__skill-chip button {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    display: inline-grid;
+    place-items: center;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+}
+
+.find-job-page__skill-empty {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+    font-weight: 650;
+    text-transform: none;
 }
 
 .find-job-page__close {
@@ -324,6 +456,9 @@
 }
 
 .find-job-page__detail-head {
+    display: grid;
+    gap: 14px;
+    padding: 4px 44px 2px 0;
     padding-right: 44px;
 }
 
@@ -332,10 +467,14 @@
     font-size: clamp(1.8rem, 4vw, 3rem);
 }
 
+.find-job-page__dialog-note {
+    margin-top: 4px;
+}
+
 .find-job-page__detail-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 9px 16px;
+    gap: 10px 18px;
 }
 
 .find-job-page__detail-meta span {
@@ -349,13 +488,35 @@
     color: var(--color-primary);
 }
 
+.find-job-page__detail-body {
+    display: grid;
+    gap: 30px;
+}
+
 .find-job-page__dialog section {
-    padding-top: 16px;
-    border-top: 1px solid var(--color-border);
+    padding-top: 0;
 }
 
 .find-job-page__dialog h3 {
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+    font-size: 1.13rem;
+    font-weight: 900;
+}
+
+.find-job-page__dialog ul {
+    margin: 0;
+    padding-left: 0;
+    list-style-position: inside;
+    color: var(--color-muted);
+    line-height: 1.6;
+}
+
+.find-job-page__modal-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 9px;
+    padding-top: 4px;
 }
 
 @media (max-width: 1020px) {
@@ -367,6 +528,7 @@
 @media (max-width: 680px) {
     .find-job-page__notice,
     .find-job-page__filters,
+    .find-job-page__search,
     .find-job-page__job-main,
     .find-job-page__section-head {
         grid-template-columns: 1fr;
@@ -376,5 +538,13 @@
     .find-job-page__filter-actions {
         justify-content: stretch;
         flex-direction: column-reverse;
+    }
+
+    .find-job-page__tabs,
+    .find-job-page__search-actions,
+    .find-job-page__filter-actions a,
+    .find-job-page__filter-actions button,
+    .find-job-page__filter-button {
+        width: 100%;
     }
 }

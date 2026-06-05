@@ -23,6 +23,7 @@ export default async function SharedController(req: Request, res: Response, next
 		'/candidate/migrate',
 		'/employer/home',
 		'/employer/find-a-candidate',
+		'/employer/applications',
 		'/employer/migrate',
 		'/employer/postings'
 	].includes(req.path) || req.path.startsWith('/employer/companies');

@@ -22,7 +22,8 @@
 
 .candidate-applications__primary,
 .candidate-applications__actions button,
-.candidate-applications__empty a {
+.candidate-applications__empty a,
+.candidate-applications__modal-footer button {
     min-height: 40px;
     padding: 0 14px;
     display: inline-flex;
@@ -85,7 +86,7 @@
 
 .candidate-applications__summary {
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     margin-bottom: 26px;
     padding: 16px 0;
     border-top: 1px solid color-mix(in srgb, var(--color-primary) 16%, var(--color-border));
@@ -180,8 +181,7 @@
     color: #15803d;
 }
 
-.candidate-applications__status--rejected,
-.candidate-applications__status--withdrawn {
+.candidate-applications__status--rejected {
     background: color-mix(in srgb, #dc2626 10%, var(--color-surface));
     color: #dc2626;
 }
@@ -236,7 +236,8 @@
     color: var(--color-text);
 }
 
-.candidate-applications__actions .candidate-applications__primary-action {
+.candidate-applications__actions .candidate-applications__primary-action,
+.candidate-applications__modal-footer .candidate-applications__primary-action {
     border-color: var(--color-primary);
     background: var(--color-primary);
     color: #fff;
@@ -285,11 +286,16 @@
     max-height: min(820px, calc(100vh - 48px));
     overflow-y: auto;
     display: grid;
-    gap: 18px;
-    padding: 24px;
+    gap: 24px;
+    padding: 34px 28px 24px;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     background: var(--color-surface);
+}
+
+.candidate-applications__dialog [data-application-detail] {
+    display: grid;
+    gap: 34px;
 }
 
 .candidate-applications__close {
@@ -305,6 +311,9 @@
 }
 
 .candidate-applications__detail-head {
+    display: grid;
+    gap: 14px;
+    padding: 4px 44px 2px 0;
     padding-right: 44px;
 }
 
@@ -314,13 +323,48 @@
 }
 
 .candidate-applications__dialog section {
-    padding-top: 16px;
-    border-top: 1px solid var(--color-border);
+    padding-top: 0;
 }
 
 .candidate-applications__dialog h3 {
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     color: var(--color-text);
+    font-size: 1.13rem;
+    font-weight: 900;
+}
+
+.candidate-applications__dialog ul {
+    margin: 0;
+    padding-left: 0;
+    list-style-position: inside;
+    color: var(--color-muted);
+    line-height: 1.6;
+}
+
+.candidate-applications__detail-body {
+    display: grid;
+    gap: 30px;
+}
+
+.candidate-applications__modal-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 9px;
+    padding-top: 4px;
+}
+
+.candidate-applications__modal-footer button {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+}
+
+.candidate-applications__applied-notice {
+    margin: 0;
+    color: var(--color-primary);
+    font-size: 0.95rem;
+    font-weight: 850;
 }
 
 @media (max-width: 960px) {

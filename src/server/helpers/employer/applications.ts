@@ -156,6 +156,11 @@ export default async function employerApplicationsHelper(
                                 id: true,
                                 name: true,
                                 jobPostings: {
+                                    where: {
+                                        status: {
+                                            not: 'DRAFT'
+                                        }
+                                    },
                                     select: {
                                         id: true,
                                         jobTitle: true,
@@ -269,6 +274,7 @@ export default async function employerApplicationsHelper(
         return res.render('pages/employer/applications', {
             ...res.payload,
             userId: req.session.userId,
+            postings,
             employerApplicationsJson: JSON.stringify({
                 postings
             }).replace(/</g, '\\u003c')

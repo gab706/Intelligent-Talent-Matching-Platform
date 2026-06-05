@@ -119,7 +119,7 @@
                             <% } %>
                         </p>
                     </div>
-                    <a href="<%= !isAuthenticated ? '/candidate/register' : accountType === 2 ? '/employer/migrate' : '#' %>" aria-label="Apply for <%= posting.jobTitle %>">Apply</a>
+                    <a href="<%= !isAuthenticated ? '/candidate/register' : accountType === 2 ? '/employer/migrate' : posting.applyHref %>" aria-label="Apply for <%= posting.jobTitle %>">Apply</a>
                 </article>
                 <% }); %>
             </div>

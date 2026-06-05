@@ -7,6 +7,17 @@ import {
     searchJobs
 } from './job-search.js';
 
+function dateLabel(value: Date | null): string {
+    if (!value)
+        return '';
+
+    return new Intl.DateTimeFormat('en-AU', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    }).format(value);
+}
+
 export default async function candidateFindJobHelper(
     req: Request,
     res: Response,
@@ -69,21 +80,21 @@ export default async function candidateFindJobHelper(
                     candidateId: user.candidate.id
                 },
                 select: {
-                    jobId: true
+                    jobId: true,
+                    createdAt: true
                 }
             }),
             getRecommendedJobsForCandidate(user.candidate.id, user.isMember)
         ]);
         const jobs = searchJobs(activeJobs, filters);
         const savedJobIds = user.savedJobs.map((savedJob: { jobId: string }) => savedJob.jobId);
-        const appliedJobIds = applications.map((application: { jobId: string }) => application.jobId);
-        const candidateProfileIncomplete =
-            !user.candidate.profileSummary ||
-            !user.candidate.preferredWorkingMode ||
-            !user.candidate.preferredLocation ||
-            !user.candidate.preferredJobType ||
-            !user.candidate.skills.length;
-
+        const appliedJobs = applications.reduce((result: Record<string, { appliedAtLabel: string }>, application: { jobId: string; createdAt: Date }) => {
+            result[application.jobId] = {
+                appliedAtLabel: dateLabel(application.createdAt)
+            };
+            return result;
+        }, {});
+        const appliedJobIds = Object.keys(appliedJobs);
         return res.render('pages/candidate/find-a-job', {
             ...res.payload,
             user,
@@ -92,15 +103,17 @@ export default async function candidateFindJobHelper(
             recommendedJobs,
             savedJobIds,
             appliedJobIds,
+            appliedJobs,
             filters,
             searchQuery: filters.keyword,
             isMember: user.isMember,
-            candidateProfileIncomplete,
             findJobJson: JSON.stringify({
                 jobs,
                 recommendedJobs,
                 savedJobIds,
-                appliedJobIds
+                appliedJobIds,
+                appliedJobs,
+                filters
             }).replace(/</g, '\\u003c')
         });
     } catch (err) {

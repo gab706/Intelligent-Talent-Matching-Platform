@@ -200,8 +200,7 @@
     color: #15803d;
 }
 
-.candidate-home__status--rejected,
-.candidate-home__status--withdrawn {
+.candidate-home__status--rejected {
     background: color-mix(in srgb, #dc2626 10%, var(--color-surface));
     color: #dc2626;
 }

@@ -122,7 +122,7 @@ $(function () {
         $list.empty();
 
         if (!data.companies.length) {
-            $list.append('<p class="employer-companies__empty">You are not attached to any companies yet.</p>');
+            $list.append('<p class="employer-companies__empty">Well this is awkward, it seems empty here...</p>');
             return;
         }
 

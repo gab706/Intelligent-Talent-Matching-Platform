@@ -15,6 +15,55 @@
     <script src="/lib/js/toastr.min.js"></script>
 </head>
 <body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
+<%
+    const filterLabels = {
+        workMode: { REMOTE: 'Remote', ONSITE: 'On-site', HYBRID: 'Hybrid' },
+        jobType: { FULL_TIME: 'Full Time', PART_TIME: 'Part Time', CASUAL: 'Casual', CONTRACT: 'Contract', INTERNSHIP: 'Internship' },
+        educationLevel: {
+            CERTIFICATE_I: 'Certificate I',
+            CERTIFICATE_II: 'Certificate II',
+            CERTIFICATE_III: 'Certificate III',
+            CERTIFICATE_IV: 'Certificate IV',
+            DIPLOMA: 'Diploma',
+            ADVANCED_DIPLOMA: 'Advanced Diploma',
+            ASSOCIATE_DEGREE: 'Associate Degree',
+            BACHELORS_DEGREE: "Bachelor's Degree",
+            GRADUATE_CERTIFICATE: 'Graduate Certificate',
+            GRADUATE_DIPLOMA: 'Graduate Diploma',
+            MASTERS_DEGREE: "Master's Degree",
+            DOCTORAL_DEGREE: 'Doctoral Degree'
+        }
+    };
+    const filterQueryEntries = [];
+    if (filters.keyword) filterQueryEntries.push(['keyword', filters.keyword]);
+    if (filters.location) filterQueryEntries.push(['location', filters.location]);
+    if (filters.workMode) filterQueryEntries.push(['workMode', filters.workMode]);
+    if (filters.jobType) filterQueryEntries.push(['jobType', filters.jobType]);
+    if (filters.requiredExperience) filterQueryEntries.push(['requiredExperience', filters.requiredExperience]);
+    if (filters.educationLevel) filterQueryEntries.push(['educationLevel', filters.educationLevel]);
+    if (filters.salaryMin) filterQueryEntries.push(['salaryMin', filters.salaryMin]);
+    if (filters.salaryMax) filterQueryEntries.push(['salaryMax', filters.salaryMax]);
+    (filters.skills || []).forEach(skill => filterQueryEntries.push(['skill', skill]));
+    const removeFilterHref = function (removeKey) {
+        const params = new URLSearchParams();
+        filterQueryEntries.forEach(([key, value]) => {
+            if (key !== removeKey)
+                params.append(key, value);
+        });
+        const query = params.toString();
+        return query ? `/candidate/find-a-job?${query}` : '/candidate/find-a-job';
+    };
+    const activeFilters = [
+        filters.location ? { key: 'location', label: `Location: ${filters.location}` } : null,
+        filters.workMode ? { key: 'workMode', label: `Work mode: ${filterLabels.workMode[filters.workMode] || filters.workMode}` } : null,
+        filters.jobType ? { key: 'jobType', label: `Job type: ${filterLabels.jobType[filters.jobType] || filters.jobType}` } : null,
+        filters.requiredExperience ? { key: 'requiredExperience', label: `Experience: ${filters.requiredExperience}+ years` } : null,
+        filters.educationLevel ? { key: 'educationLevel', label: `Education: ${filterLabels.educationLevel[filters.educationLevel] || filters.educationLevel}` } : null,
+        filters.salaryMin ? { key: 'salaryMin', label: `Salary min: ${Number.isFinite(Number(filters.salaryMin)) ? `$${Number(filters.salaryMin).toLocaleString('en-AU')}` : filters.salaryMin}` } : null,
+        filters.salaryMax ? { key: 'salaryMax', label: `Salary max: ${Number.isFinite(Number(filters.salaryMax)) ? `$${Number(filters.salaryMax).toLocaleString('en-AU')}` : filters.salaryMax}` } : null,
+        (filters.skills || []).length ? { key: 'skill', label: `Skills: ${(filters.skills || []).join(', ')}` } : null
+    ].filter(Boolean);
+%>
 <%- include('../../partials/public-header/public-header'); %>
 <main class="account-home account-home--candidate">
     <aside class="account-home__sidebar" aria-label="Candidate navigation">
@@ -42,124 +91,80 @@
         <div class="find-job-page__hero">
             <p class="account-home__eyebrow">Find Jobs</p>
             <h1 id="find-job-title" class="account-home__title find-job-page__title">
-                Find roles that match how you work.
+                Find what works for you.
             </h1>
             <p class="account-home__copy find-job-page__intro">
                 Search active postings, filter by role details, and compare those results with TalentMatch recommendations.
             </p>
         </div>
 
-        <% if (candidateProfileIncomplete) { %>
-        <section class="find-job-page__notice">
-            <i class="fas fa-user-edit" aria-hidden="true"></i>
-            <div>
-                <strong>Candidate profile incomplete</strong>
-                <p>Add your skills, preferences, summary, and location to improve recommendation quality.</p>
+        <div class="find-job-page__tabs" aria-label="Job views">
+            <button class="is-active" type="button" data-job-tab="search">Search Jobs</button>
+            <button type="button" data-job-tab="recommended">Recommended Jobs</button>
+        </div>
+
+        <section class="find-job-page__results" aria-labelledby="job-results-title" data-job-panel="search">
+            <form id="find-job-search-form" class="find-job-page__search" method="get" action="/candidate/find-a-job" data-find-job-form>
+                <label class="find-job-page__keyword">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                    <span class="sr-only">Keyword</span>
+                    <input type="search" name="keyword" value="<%= filters.keyword %>" placeholder="Search title, company, location, description, or skills" autocomplete="off" />
+                </label>
+                <div class="find-job-page__search-actions">
+                    <% if (activeFilters.length) { %>
+                    <a class="find-job-page__clear-filters" href="/candidate/find-a-job">Clear filters</a>
+                    <% } %>
+                    <button class="find-job-page__filter-button" type="button" data-job-filter-open>
+                        <i class="fas fa-filter" aria-hidden="true"></i>
+                        Filter
+                        <% if (activeFilters.length) { %>
+                        <span><%= activeFilters.length %></span>
+                        <% } %>
+                    </button>
+                </div>
+            </form>
+
+            <% if (activeFilters.length) { %>
+            <div class="find-job-page__active-filters" aria-label="Active filters">
+                <% activeFilters.forEach((filter) => { %>
+                <a href="<%= removeFilterHref(filter.key) %>">
+                    <span><%= filter.label %></span>
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </a>
+                <% }) %>
             </div>
-            <a href="/candidate/profile">Update profile</a>
-        </section>
-        <% } %>
+            <% } %>
 
-        <form class="find-job-page__search" method="get" action="/candidate/find-a-job">
-            <label class="find-job-page__keyword">
-                <i class="fas fa-search" aria-hidden="true"></i>
-                <span class="sr-only">Keyword</span>
-                <input type="search" name="keyword" value="<%= filters.keyword %>" placeholder="Search title, company, location, description, or skills" autocomplete="off" />
-            </label>
-
-            <section class="find-job-page__filters" aria-label="Job filters">
-                <label>
-                    <span>Location</span>
-                    <input type="text" name="location" value="<%= filters.location %>" placeholder="Sydney" />
-                </label>
-                <label>
-                    <span>Work mode</span>
-                    <select name="workMode">
-                        <option value="">Any mode</option>
-                        <option value="REMOTE" <%= filters.workMode === 'REMOTE' ? 'selected' : '' %>>Remote</option>
-                        <option value="ONSITE" <%= filters.workMode === 'ONSITE' ? 'selected' : '' %>>On-site</option>
-                        <option value="HYBRID" <%= filters.workMode === 'HYBRID' ? 'selected' : '' %>>Hybrid</option>
-                    </select>
-                </label>
-                <label>
-                    <span>Job type</span>
-                    <select name="jobType">
-                        <option value="">Any type</option>
-                        <option value="FULL_TIME" <%= filters.jobType === 'FULL_TIME' ? 'selected' : '' %>>Full Time</option>
-                        <option value="PART_TIME" <%= filters.jobType === 'PART_TIME' ? 'selected' : '' %>>Part Time</option>
-                        <option value="CASUAL" <%= filters.jobType === 'CASUAL' ? 'selected' : '' %>>Casual</option>
-                        <option value="CONTRACT" <%= filters.jobType === 'CONTRACT' ? 'selected' : '' %>>Contract</option>
-                        <option value="INTERNSHIP" <%= filters.jobType === 'INTERNSHIP' ? 'selected' : '' %>>Internship</option>
-                    </select>
-                </label>
-                <label>
-                    <span>Skill</span>
-                    <input type="text" name="skill" value="<%= filters.skill %>" placeholder="Python" />
-                </label>
-                <label>
-                    <span>Experience</span>
-                    <input type="number" min="0" name="requiredExperience" value="<%= filters.requiredExperience %>" placeholder="Years you can meet" />
-                </label>
-                <label>
-                    <span>Education</span>
-                    <select name="educationLevel">
-                        <option value="">Any level</option>
-                        <option value="CERTIFICATE_I" <%= filters.educationLevel === 'CERTIFICATE_I' ? 'selected' : '' %>>Certificate I</option>
-                        <option value="CERTIFICATE_II" <%= filters.educationLevel === 'CERTIFICATE_II' ? 'selected' : '' %>>Certificate II</option>
-                        <option value="CERTIFICATE_III" <%= filters.educationLevel === 'CERTIFICATE_III' ? 'selected' : '' %>>Certificate III</option>
-                        <option value="CERTIFICATE_IV" <%= filters.educationLevel === 'CERTIFICATE_IV' ? 'selected' : '' %>>Certificate IV</option>
-                        <option value="DIPLOMA" <%= filters.educationLevel === 'DIPLOMA' ? 'selected' : '' %>>Diploma</option>
-                        <option value="ADVANCED_DIPLOMA" <%= filters.educationLevel === 'ADVANCED_DIPLOMA' ? 'selected' : '' %>>Advanced Diploma</option>
-                        <option value="ASSOCIATE_DEGREE" <%= filters.educationLevel === 'ASSOCIATE_DEGREE' ? 'selected' : '' %>>Associate Degree</option>
-                        <option value="BACHELORS_DEGREE" <%= filters.educationLevel === 'BACHELORS_DEGREE' ? 'selected' : '' %>>Bachelor's Degree</option>
-                        <option value="GRADUATE_CERTIFICATE" <%= filters.educationLevel === 'GRADUATE_CERTIFICATE' ? 'selected' : '' %>>Graduate Certificate</option>
-                        <option value="GRADUATE_DIPLOMA" <%= filters.educationLevel === 'GRADUATE_DIPLOMA' ? 'selected' : '' %>>Graduate Diploma</option>
-                        <option value="MASTERS_DEGREE" <%= filters.educationLevel === 'MASTERS_DEGREE' ? 'selected' : '' %>>Master's Degree</option>
-                        <option value="DOCTORAL_DEGREE" <%= filters.educationLevel === 'DOCTORAL_DEGREE' ? 'selected' : '' %>>Doctoral Degree</option>
-                    </select>
-                </label>
-                <label>
-                    <span>Salary min</span>
-                    <input type="number" min="0" name="salaryMin" value="<%= filters.salaryMin %>" placeholder="70000" />
-                </label>
-                <label>
-                    <span>Salary max</span>
-                    <input type="number" min="0" name="salaryMax" value="<%= filters.salaryMax %>" placeholder="120000" />
-                </label>
-            </section>
-
-            <div class="find-job-page__filter-actions">
-                <a href="/candidate/find-a-job">Clear</a>
-                <button type="submit">
-                    <i class="fas fa-filter" aria-hidden="true"></i>
-                    Search jobs
-                </button>
-            </div>
-        </form>
-
-        <section class="find-job-page__results" aria-labelledby="job-results-title">
             <div class="find-job-page__section-head">
                 <div>
                     <p class="account-home__eyebrow">Search results</p>
                     <h2 id="job-results-title">Job Results</h2>
                 </div>
-                <span><%= jobs.length %> active match<%= jobs.length === 1 ? '' : 'es' %></span>
+                <span data-search-result-count><%= jobs.length %> active match<%= jobs.length === 1 ? '' : 'es' %></span>
             </div>
             <% if (jobs.length) { %>
-            <div class="find-job-page__job-list">
+            <div class="find-job-page__job-list" data-search-results-list>
                 <% jobs.forEach((job) => { %>
-                <%- include('../../partials/candidate-job-card', { job, savedJobIds, appliedJobIds, showScore: false }) %>
+                <%- include('../../partials/candidate-job-card', { job, savedJobIds, appliedJobIds, appliedJobs, showScore: false }) %>
                 <% }) %>
             </div>
             <% } else { %>
-            <div class="find-job-page__empty">
+            <div class="find-job-page__empty" data-search-empty>
                 <h3>No jobs found</h3>
                 <p>Try widening the keyword or removing one of the filters.</p>
             </div>
             <% } %>
+            <% if (jobs.length) { %>
+            <div class="find-job-page__empty" data-search-empty hidden>
+                <h3>No jobs found</h3>
+                <p>Try widening the keyword or removing one of the filters.</p>
+            </div>
+            <% } else { %>
+            <div class="find-job-page__job-list" data-search-results-list></div>
+            <% } %>
         </section>
 
-        <section class="find-job-page__recommendations" aria-labelledby="recommended-jobs-title">
+        <section class="find-job-page__recommendations" aria-labelledby="recommended-jobs-title" data-job-panel="recommended" hidden>
             <div class="find-job-page__section-head">
                 <div>
                     <p class="account-home__eyebrow">Recommended for You</p>
@@ -170,7 +175,7 @@
             <% if (recommendedJobs.length) { %>
             <div class="find-job-page__job-list">
                 <% recommendedJobs.forEach((job) => { %>
-                <%- include('../../partials/candidate-job-card', { job, savedJobIds, appliedJobIds, showScore: true }) %>
+                <%- include('../../partials/candidate-job-card', { job, savedJobIds, appliedJobIds, appliedJobs, showScore: true }) %>
                 <% }) %>
             </div>
             <% } else { %>
@@ -180,6 +185,91 @@
             </div>
             <% } %>
         </section>
+
+        <div class="find-job-page__modal" hidden aria-hidden="true" data-job-filter-modal>
+            <div class="find-job-page__overlay" data-job-filter-close></div>
+            <section class="find-job-page__dialog find-job-page__dialog--filters" role="dialog" aria-modal="true" aria-labelledby="job-filter-title">
+                <button class="find-job-page__close" type="button" aria-label="Close filters" data-job-filter-close>
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+                <div>
+                    <h2 id="job-filter-title">Filter jobs</h2>
+                    <p class="find-job-page__dialog-note">Choose the role details you want results to match.</p>
+                </div>
+                <section class="find-job-page__filters" aria-label="Job filters">
+                    <label>
+                        <span>Location</span>
+                        <input form="find-job-search-form" type="text" name="location" value="<%= filters.location %>" placeholder="Sydney" />
+                    </label>
+                    <label>
+                        <span>Work mode</span>
+                        <select form="find-job-search-form" name="workMode">
+                            <option value="">Any mode</option>
+                            <option value="REMOTE" <%= filters.workMode === 'REMOTE' ? 'selected' : '' %>>Remote</option>
+                            <option value="ONSITE" <%= filters.workMode === 'ONSITE' ? 'selected' : '' %>>On-site</option>
+                            <option value="HYBRID" <%= filters.workMode === 'HYBRID' ? 'selected' : '' %>>Hybrid</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Job type</span>
+                        <select form="find-job-search-form" name="jobType">
+                            <option value="">Any type</option>
+                            <option value="FULL_TIME" <%= filters.jobType === 'FULL_TIME' ? 'selected' : '' %>>Full Time</option>
+                            <option value="PART_TIME" <%= filters.jobType === 'PART_TIME' ? 'selected' : '' %>>Part Time</option>
+                            <option value="CASUAL" <%= filters.jobType === 'CASUAL' ? 'selected' : '' %>>Casual</option>
+                            <option value="CONTRACT" <%= filters.jobType === 'CONTRACT' ? 'selected' : '' %>>Contract</option>
+                            <option value="INTERNSHIP" <%= filters.jobType === 'INTERNSHIP' ? 'selected' : '' %>>Internship</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Experience</span>
+                        <input form="find-job-search-form" type="number" min="0" name="requiredExperience" value="<%= filters.requiredExperience %>" placeholder="Years you can meet" />
+                    </label>
+                    <label>
+                        <span>Education</span>
+                        <select form="find-job-search-form" name="educationLevel">
+                            <option value="">Any level</option>
+                            <option value="CERTIFICATE_I" <%= filters.educationLevel === 'CERTIFICATE_I' ? 'selected' : '' %>>Certificate I</option>
+                            <option value="CERTIFICATE_II" <%= filters.educationLevel === 'CERTIFICATE_II' ? 'selected' : '' %>>Certificate II</option>
+                            <option value="CERTIFICATE_III" <%= filters.educationLevel === 'CERTIFICATE_III' ? 'selected' : '' %>>Certificate III</option>
+                            <option value="CERTIFICATE_IV" <%= filters.educationLevel === 'CERTIFICATE_IV' ? 'selected' : '' %>>Certificate IV</option>
+                            <option value="DIPLOMA" <%= filters.educationLevel === 'DIPLOMA' ? 'selected' : '' %>>Diploma</option>
+                            <option value="ADVANCED_DIPLOMA" <%= filters.educationLevel === 'ADVANCED_DIPLOMA' ? 'selected' : '' %>>Advanced Diploma</option>
+                            <option value="ASSOCIATE_DEGREE" <%= filters.educationLevel === 'ASSOCIATE_DEGREE' ? 'selected' : '' %>>Associate Degree</option>
+                            <option value="BACHELORS_DEGREE" <%= filters.educationLevel === 'BACHELORS_DEGREE' ? 'selected' : '' %>>Bachelor's Degree</option>
+                            <option value="GRADUATE_CERTIFICATE" <%= filters.educationLevel === 'GRADUATE_CERTIFICATE' ? 'selected' : '' %>>Graduate Certificate</option>
+                            <option value="GRADUATE_DIPLOMA" <%= filters.educationLevel === 'GRADUATE_DIPLOMA' ? 'selected' : '' %>>Graduate Diploma</option>
+                            <option value="MASTERS_DEGREE" <%= filters.educationLevel === 'MASTERS_DEGREE' ? 'selected' : '' %>>Master's Degree</option>
+                            <option value="DOCTORAL_DEGREE" <%= filters.educationLevel === 'DOCTORAL_DEGREE' ? 'selected' : '' %>>Doctoral Degree</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Salary min</span>
+                        <input form="find-job-search-form" type="number" min="0" name="salaryMin" value="<%= filters.salaryMin %>" placeholder="70000" />
+                    </label>
+                    <label>
+                        <span>Salary max</span>
+                        <input form="find-job-search-form" type="number" min="0" name="salaryMax" value="<%= filters.salaryMax %>" placeholder="120000" />
+                    </label>
+                    <label class="find-job-page__skill-filter">
+                        <span>Skills</span>
+                        <input type="text" placeholder="Type a skill and press Enter" data-filter-skill-input />
+                        <span class="find-job-page__skill-chips" data-filter-skill-list></span>
+                    </label>
+                </section>
+                <div data-filter-skill-values>
+                    <% (filters.skills || []).forEach((skill) => { %>
+                    <input form="find-job-search-form" type="hidden" name="skill" value="<%= skill %>" />
+                    <% }) %>
+                </div>
+                <div class="find-job-page__filter-actions">
+                    <% if (activeFilters.length) { %>
+                    <a href="/candidate/find-a-job">Clear filters</a>
+                    <% } %>
+                    <button type="submit" form="find-job-search-form">Apply filters</button>
+                </div>
+            </section>
+        </div>
 
         <div class="find-job-page__modal" hidden aria-hidden="true" data-job-modal>
             <div class="find-job-page__overlay" data-job-modal-close></div>

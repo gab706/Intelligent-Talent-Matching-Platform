@@ -8,6 +8,7 @@ import EmployerCompaniesHelper from './helpers/employer/companies.js';
 import PublicCompanyHelper from './helpers/company.js';
 import CandidateJobSaveWorker from './workers/candidate/job-save.js';
 import CandidateJobApplyWorker from './workers/candidate/job-apply.js';
+import CandidateJobSearchResultsWorker from './workers/candidate/job-search-results.js';
 
 type Handler = (
 	req: Request,
@@ -35,7 +36,9 @@ router.get('/employer/companies/:companyName/view', PublicHelper, EmployerCompan
 router.get('/employer/companies/:companyName/edit', PublicHelper, EmployerCompaniesHelper);
 router.get('/companies/:companyName', PublicHelper, PublicCompanyHelper);
 router.post('/candidate/jobs/:jobId/save', CandidateJobSaveWorker);
+router.delete('/candidate/jobs/:jobId/save', CandidateJobSaveWorker);
 router.post('/candidate/jobs/:jobId/apply', CandidateJobApplyWorker);
+router.get('/candidate/jobs/search', CandidateJobSearchResultsWorker);
 
 router.get('/images/avatars/:hash', async (req: Request, res: Response, next: NextFunction) => {
 	try {

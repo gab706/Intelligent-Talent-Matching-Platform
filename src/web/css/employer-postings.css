@@ -280,6 +280,14 @@
     background: var(--color-surface);
 }
 
+.employer-postings input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0);
+}
+
+.dark-mode .employer-postings input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
 .employer-postings__modal-close {
     position: absolute;
     top: 14px;

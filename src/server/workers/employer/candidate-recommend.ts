@@ -112,7 +112,7 @@ export default async function candidateRecommendWorker(
                 senderId: req.session.userId,
                 type: 'RECOMMENDATION',
                 title: 'Role Recommendation',
-                message: `A recruiter from ${posting.company.name} thinks you might be a fit for ${posting.jobTitle}.`
+                message: `A recruiter from ${posting.company.name} thinks you might be a fit for the ${posting.jobTitle} role.`
             }
         });
 

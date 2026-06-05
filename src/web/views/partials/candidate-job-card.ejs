@@ -1,6 +1,7 @@
 <%
     const saved = savedJobIds.includes(job.id);
     const applied = appliedJobIds.includes(job.id);
+    const appliedInfo = appliedJobs && appliedJobs[job.id];
 %>
 <article class="find-job-page__job-card" data-job-card data-job-id="<%= job.id %>">
     <div class="find-job-page__job-main">
@@ -24,42 +25,32 @@
         <% if (job.jobType) { %>
         <span><i class="fas fa-clock" aria-hidden="true"></i><%= job.jobType.replace('_', ' ') %></span>
         <% } %>
-        <span><i class="fas fa-user-graduate" aria-hidden="true"></i><%= job.requiredEducationLabel %></span>
-        <span><i class="fas fa-chart-line" aria-hidden="true"></i><%= job.requiredExperience %>+ years</span>
-        <% if (job.salaryRange) { %>
-        <span><i class="fas fa-dollar-sign" aria-hidden="true"></i><%= job.salaryRange %></span>
-        <% } %>
-        <% if (job.closingDateLabel) { %>
-        <span><i class="fas fa-calendar-alt" aria-hidden="true"></i>Closes <%= job.closingDateLabel %></span>
+        <% if (appliedInfo) { %>
+        <span class="find-job-page__applied-meta"><i class="fas fa-calendar-check" aria-hidden="true"></i>Applied <%= appliedInfo.appliedAtLabel %></span>
         <% } %>
     </div>
-
-    <% if (job.skills.length) { %>
-    <div class="find-job-page__skills">
-        <% job.skills.slice(0, 8).forEach((skill) => { %>
-        <span><%= skill %></span>
-        <% }) %>
-    </div>
-    <% } %>
-
-    <p class="find-job-page__description"><%= job.jobDescriptionPreview %><%= job.jobDescription.length > job.jobDescriptionPreview.length ? '...' : '' %></p>
-
-    <% if (showScore && job.explanation) { %>
-    <p class="find-job-page__explanation"><%= job.explanation %></p>
-    <% } %>
 
     <div class="find-job-page__actions">
-        <button type="button" data-save-job="<%= job.id %>" <%= saved ? 'disabled' : '' %>>
+        <% if (!applied) { %>
+        <button class="find-job-page__apply" type="button" data-apply-job="<%= job.id %>">
+            <i class="fas fa-paper-plane" aria-hidden="true"></i>
+            Apply
+        </button>
+        <% if (saved) { %>
+        <button type="button" data-unsave-job="<%= job.id %>">
+            <i class="fas fa-bookmark" aria-hidden="true"></i>
+            Unsave
+        </button>
+        <% } else { %>
+        <button type="button" data-save-job="<%= job.id %>">
             <i class="<%= saved ? 'fas fa-bookmark' : 'far fa-bookmark' %>" aria-hidden="true"></i>
-            <%= saved ? 'Saved' : 'Save' %>
+            Save
         </button>
-        <button class="find-job-page__apply" type="button" data-apply-job="<%= job.id %>" <%= applied ? 'disabled' : '' %>>
-            <i class="<%= applied ? 'fas fa-check' : 'fas fa-paper-plane' %>" aria-hidden="true"></i>
-            <%= applied ? 'Applied' : 'Apply' %>
-        </button>
+        <% } %>
+        <% } %>
         <button type="button" data-view-job="<%= job.id %>">
             <i class="fas fa-eye" aria-hidden="true"></i>
-            View details
+            View
         </button>
     </div>
 </article>

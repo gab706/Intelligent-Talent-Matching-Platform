@@ -50,20 +50,18 @@
                     Select a posting, then move candidates through the hiring pipeline.
                 </p>
             </div>
-            <label class="employer-applications__posting-select">
+            <label class="employer-applications__posting-select" <%= postings && postings.length ? '' : 'hidden' %>>
                 <span>Viewing posting</span>
                 <select data-posting-select></select>
             </label>
         </div>
 
-        <section class="employer-applications__posting-summary" aria-live="polite" data-posting-summary></section>
+        <section class="employer-applications__posting-summary" aria-live="polite" hidden data-posting-summary></section>
 
         <section class="employer-applications__board" aria-label="Application swim lanes" data-application-board></section>
 
-        <div class="employer-applications__empty" hidden data-empty-state>
+        <div class="employer-applications__empty" <%= postings && postings.length ? 'hidden' : '' %> data-empty-state>
             <h2>Well this is awkward, it seems empty here...</h2>
-            <p>Create a posting and wait for candidates to apply before the board can do much.</p>
-            <a href="/employer/postings">Go to postings</a>
         </div>
 
         <div class="employer-applications__modal" hidden aria-hidden="true" data-profile-modal>

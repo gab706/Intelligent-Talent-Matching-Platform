@@ -18,8 +18,7 @@ function statusLabel(value: string): string {
         APPLIED: 'Applied',
         SHORTLISTED: 'Shortlisted',
         HIRED: 'Accepted',
-        REJECTED: 'Rejected',
-        WITHDRAWN: 'Withdrawn'
+        REJECTED: 'Rejected'
     };
 
     return labels[value] || value;
@@ -108,7 +107,7 @@ export default async function candidateHomeHelper(
         if (!user.candidate)
             return res.redirect('/candidate/profile');
 
-        const [applicationCounts, recommendedJobs] = await Promise.all([
+        const [applicationCounts, applications, recommendedJobs] = await Promise.all([
             prisma.jobApplication.groupBy({
                 by: ['status'],
                 where: {
@@ -116,6 +115,14 @@ export default async function candidateHomeHelper(
                 },
                 _count: {
                     status: true
+                }
+            }),
+            prisma.jobApplication.findMany({
+                where: {
+                    candidateId: user.candidate.id
+                },
+                select: {
+                    jobId: true
                 }
             }),
             getRecommendedJobsForCandidate(user.candidate.id, user.isMember)
@@ -144,11 +151,14 @@ export default async function candidateHomeHelper(
             jobLocation: application.job.jobLocation
         }));
 
+        const appliedJobIds = new Set(applications.map((application: { jobId: string }) => application.jobId));
+        const savedJobCount = user.savedJobs.filter((savedJob: { jobId: string }) => !appliedJobIds.has(savedJob.jobId)).length;
+
         return res.render('pages/candidate/home', {
             ...res.payload,
             userId: req.session.userId,
             candidateHome: {
-                savedJobCount: user.savedJobs.length,
+                savedJobCount,
                 recommendedJobCount: recommendedJobs.length,
                 profileCompletion,
                 profileTasks,

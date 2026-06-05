@@ -25,6 +25,14 @@
     white-space: nowrap;
 }
 
+.employer-companies__actions {
+    justify-content: flex-end;
+}
+
+.employer-companies__actions [data-company-back] {
+    margin-right: auto;
+}
+
 .employer-companies__header {
     display: grid;
     grid-template-columns: minmax(0, 1fr) max-content;
@@ -186,6 +194,8 @@
 .employer-companies__empty {
     grid-column: 1 / -1;
     color: var(--color-muted);
+    font-size: 1.05rem;
+    font-weight: 500;
     line-height: 1.6;
 }
 
@@ -549,7 +559,7 @@ body.is-company-create-open {
 }
 
 .employer-companies__edit-actions {
-    justify-content: flex-start;
+    justify-content: flex-end;
     align-items: center;
     gap: 8px;
 }

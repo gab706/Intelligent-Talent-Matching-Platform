@@ -59,6 +59,13 @@
     border-bottom: 1px solid var(--color-border);
 }
 
+.employer-applications__posting-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
 .employer-applications__posting-summary h2 {
     color: var(--color-text);
     font-size: clamp(1.35rem, 2.4vw, 2rem);
@@ -71,6 +78,11 @@
 .employer-applications__posting-summary dl {
     display: flex;
     gap: 18px;
+}
+
+.employer-applications__posting-summary dl div {
+    min-width: 130px;
+    text-align: center;
 }
 
 .employer-applications__posting-summary dt {
@@ -87,11 +99,32 @@
     font-weight: 850;
 }
 
+.employer-applications__status {
+    min-height: 26px;
+    padding: 0 9px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--radius-pill);
+    background: var(--color-surface-soft);
+    color: var(--color-muted);
+    font-size: 0.78rem;
+    font-weight: 850;
+}
+
+.employer-applications__status--ACTIVE {
+    color: #0f766e;
+    background: color-mix(in srgb, #14b8a6 14%, var(--color-surface));
+}
+
+.employer-applications__status--CLOSED {
+    color: #6b7280;
+}
+
 .employer-applications__board {
     min-height: 520px;
     margin-top: 22px;
     display: grid;
-    grid-template-columns: repeat(5, minmax(245px, 1fr));
+    grid-template-columns: repeat(4, minmax(245px, 1fr));
     gap: 14px;
     overflow-x: auto;
     padding-bottom: 10px;
@@ -173,6 +206,11 @@
     cursor: grabbing;
 }
 
+.employer-applications__card.is-read-only,
+.employer-applications__card.is-read-only:active {
+    cursor: default;
+}
+
 .employer-applications__card-main {
     display: grid;
     grid-template-columns: 42px minmax(0, 1fr);
@@ -202,37 +240,15 @@
     line-height: 1.45;
 }
 
-.employer-applications__tags,
-.employer-applications__profile-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-}
-
-.employer-applications__tags {
-    margin-top: 10px;
-}
-
-.employer-applications__tags span,
-.employer-applications__profile-tags span {
-    min-height: 24px;
-    padding: 0 8px;
-    display: inline-flex;
-    align-items: center;
-    border-radius: 999px;
-    background: var(--color-surface-soft);
-    color: var(--color-text);
-    font-size: 0.76rem;
-    font-weight: 800;
-}
-
 .employer-applications__empty {
     padding: 24px 0;
 }
 
 .employer-applications__empty h2 {
-    color: var(--color-text);
-    font-size: 1.5rem;
+    color: var(--color-muted);
+    font-size: 1.05rem;
+    font-weight: 500;
+    line-height: 1.5;
 }
 
 .employer-applications__empty p {
@@ -273,6 +289,166 @@
     background: var(--color-surface);
 }
 
+.employer-applications .candidate-info {
+    display: grid;
+    gap: 0;
+}
+
+.employer-applications .candidate-info__header {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr);
+    gap: 22px;
+    align-items: center;
+    padding: 4px 44px 28px 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.employer-applications .candidate-info__header img {
+    width: 92px;
+    height: 92px;
+    border-radius: 999px;
+    object-fit: cover;
+    background: var(--color-surface-soft);
+}
+
+.employer-applications .candidate-info__header h2 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: clamp(2rem, 3vw, 2.65rem);
+    font-weight: 500;
+    line-height: 1.05;
+}
+
+.employer-applications .candidate-info__header p {
+    margin-top: 28px;
+    color: var(--color-muted);
+    font-size: 1.18rem;
+    line-height: 1.35;
+}
+
+.employer-applications .candidate-info__section {
+    padding: 28px 0;
+    border-top: 1px solid var(--color-border);
+}
+
+.employer-applications .candidate-info__header + .candidate-info__section {
+    border-top: 0;
+}
+
+.employer-applications .candidate-info__section--flush {
+    border-top: 1px solid var(--color-border);
+    padding-bottom: 0;
+}
+
+.employer-applications .candidate-info__header + .candidate-info__section--flush {
+    border-top: 0;
+}
+
+.employer-applications .candidate-info__section--flush + .candidate-info__section {
+    border-top: 0;
+}
+
+.employer-applications .candidate-info__summary p {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.employer-applications .candidate-info__fact-grid {
+    display: grid;
+    gap: 0;
+}
+
+.employer-applications .candidate-info__fact-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    padding: 0 0 34px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.employer-applications .candidate-info__fact-row + .candidate-info__fact-row {
+    padding-top: 24px;
+}
+
+.employer-applications .candidate-info__fact-row--single {
+    grid-template-columns: 1fr;
+}
+
+.employer-applications .candidate-info__fact {
+    min-height: 82px;
+    padding: 0;
+}
+
+.employer-applications .candidate-info__fact span {
+    display: block;
+    margin-bottom: 14px;
+    color: var(--color-muted);
+    font-size: 0.82rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.employer-applications .candidate-info__fact p,
+.employer-applications .candidate-info__row p,
+.employer-applications .candidate-info__row a {
+    color: var(--color-muted);
+    font-size: 1.08rem;
+    line-height: 1.45;
+}
+
+.employer-applications .candidate-info__section h3 {
+    margin: 0 0 20px;
+    color: var(--color-text);
+    font-size: 1.65rem;
+    font-weight: 500;
+}
+
+.employer-applications .candidate-info__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.employer-applications .candidate-info__pills span {
+    min-height: 30px;
+    padding: 0 12px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--radius-pill);
+    background: var(--color-surface-soft);
+    color: var(--color-text);
+    font-size: 0.92rem;
+    font-weight: 500;
+}
+
+.employer-applications .candidate-info__row {
+    padding: 0 0 24px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.employer-applications .candidate-info__row:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.employer-applications .candidate-info__row strong {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--color-text);
+    font-size: 1.16rem;
+    font-weight: 900;
+    line-height: 1.25;
+}
+
+.employer-applications .candidate-info__long-text {
+    margin-top: 8px;
+    white-space: pre-line;
+}
+
 .employer-applications__close {
     position: absolute;
     top: 14px;
@@ -291,6 +467,7 @@
     gap: 16px;
     align-items: center;
     padding-right: 44px;
+    padding-bottom: 10px;
 }
 
 .employer-applications__profile-head img {
@@ -311,8 +488,8 @@
     line-height: 1.55;
 }
 
-.employer-applications__dialog section {
-    padding-top: 18px;
+.employer-applications__dialog section:not(.candidate-info__section) {
+    padding-top: 22px;
     border-top: 1px solid var(--color-border);
 }
 
@@ -343,6 +520,20 @@
 }
 
 @media (max-width: 900px) {
+    .employer-applications .candidate-info__header,
+    .employer-applications .candidate-info__fact-row {
+        grid-template-columns: 1fr;
+    }
+
+    .employer-applications .candidate-info__header {
+        gap: 16px;
+        padding-right: 0;
+    }
+
+    .employer-applications .candidate-info__header p {
+        margin-top: 14px;
+    }
+
     .employer-applications__posting-summary,
     .employer-applications__profile-grid {
         grid-template-columns: 1fr;

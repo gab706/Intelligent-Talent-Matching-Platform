@@ -107,34 +107,6 @@
             </article>
         </section>
 
-        <section class="employer-home__next" aria-labelledby="next-title">
-            <% if (!home.stats.companyCount) { %>
-            <i class="fas fa-building" aria-hidden="true"></i>
-            <div>
-                <p class="account-home__eyebrow">Next step</p>
-                <h2 id="next-title">Create or join a company</h2>
-                <p>Postings need a company profile before hiring can start.</p>
-            </div>
-            <a href="/employer/companies">Manage companies</a>
-            <% } else if (home.stats.activePostingCount) { %>
-            <i class="fas fa-user-tie" aria-hidden="true"></i>
-            <div>
-                <p class="account-home__eyebrow">Next step</p>
-                <h2 id="next-title">Review candidates</h2>
-                <p>Search the candidate pool or use Intelligent Matching from an active posting.</p>
-            </div>
-            <a href="/employer/find-a-candidate">Find candidates</a>
-            <% } else { %>
-            <i class="fas fa-briefcase" aria-hidden="true"></i>
-            <div>
-                <p class="account-home__eyebrow">Next step</p>
-                <h2 id="next-title">Create your first posting</h2>
-                <p>Start with a role title, requirements, and the company it belongs to.</p>
-            </div>
-            <a href="/employer/postings">Open postings</a>
-            <% } %>
-        </section>
-
         <section class="employer-home__panel" aria-labelledby="postings-title">
             <div class="employer-home__section-head">
                 <div>
