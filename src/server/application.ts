@@ -30,6 +30,9 @@ const REQUEST_TIMEOUT_MS = 30000;
 if (!process.env.SESSION_SECRET)
 	throw new Error('SESSION_SECRET is required');
 
+if (!process.env.PORT)
+	throw new Error('PORT is required');
+
 const sessionPostgresPool = new pg.Pool({
 	connectionString: process.env.POSTGRES_URL,
 	max: 10,
