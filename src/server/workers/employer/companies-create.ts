@@ -1,3 +1,9 @@
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
 import { Request, Response, NextFunction } from 'express';
 import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
@@ -5,6 +11,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Prisma } from '../../../../prisma/generated/client.js';
 import { prisma } from '../../database/prisma.js';
+import { parseMultipart, type MultipartFile } from '../../helpers/multipart.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,12 +25,6 @@ const ORGANISATION_TYPES = new Set([
     'NON_PROFIT',
     'STARTUP'
 ]);
-
-type MultipartFile = {
-    filename: string;
-    mimeType: string;
-    buffer: Buffer;
-};
 
 function clean(value: unknown, max = 500): string {
     return String(value || '').trim().slice(0, max);
@@ -41,87 +42,16 @@ function normaliseWebsite(value: unknown): string | null {
     return `https://${website}`;
 }
 
-function getBoundary(contentType: string): string | null {
-    const match = contentType.match(/boundary=(?:"([^"]+)"|([^;]+))/);
-    return match?.[1] || match?.[2] || null;
-}
+function parseMembers(value: unknown): Array<{ employerId?: string; role?: string }> {
+    const rawValue = clean(value, 10000) || '[]';
 
-async function readRequestBuffer(req: Request): Promise<Buffer> {
-    const chunks: Buffer[] = [];
-    let totalBytes = 0;
+    try {
+        const parsed = JSON.parse(rawValue);
 
-    for await (const chunk of req) {
-        const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-        totalBytes += buffer.length;
-
-        if (totalBytes > MAX_UPLOAD_BYTES)
-            throw new Error('Company upload is too large.');
-
-        chunks.push(buffer);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch {
+        throw new Error('Invalid company member list.');
     }
-
-    return Buffer.concat(chunks);
-}
-
-async function parseMultipart(req: Request) {
-    const contentType = String(req.headers['content-type'] || '');
-    const boundaryValue = getBoundary(contentType);
-
-    if (!boundaryValue)
-        throw new Error('Invalid company form submission.');
-
-    const bodyBuffer = await readRequestBuffer(req);
-    const body = bodyBuffer.toString('binary');
-    const boundary = `--${boundaryValue}`;
-    const fields: Record<string, string> = {};
-    const files: Record<string, MultipartFile> = {};
-
-    for (const rawPart of body.split(boundary).slice(1, -1)) {
-        const part = rawPart.replace(/^\r\n/, '').replace(/\r\n$/, '');
-        const headerEnd = part.indexOf('\r\n\r\n');
-
-        if (headerEnd === -1)
-            continue;
-
-        const rawHeaders = part.slice(0, headerEnd);
-        const content = part.slice(headerEnd + 4);
-        const headers = Object.fromEntries(
-            rawHeaders
-                .split('\r\n')
-                .map(header => {
-                    const separatorIndex = header.indexOf(':');
-                    return [
-                        header.slice(0, separatorIndex).trim().toLowerCase(),
-                        header.slice(separatorIndex + 1).trim()
-                    ];
-                })
-                .filter(([name]) => name)
-        );
-        const disposition = headers['content-disposition'] || '';
-        const name = disposition.match(/name="([^"]+)"/)?.[1];
-
-        if (!name)
-            continue;
-
-        const filename = disposition.match(/filename="([^"]*)"/)?.[1];
-        const buffer = Buffer.from(content, 'binary');
-
-        if (filename) {
-            files[name] = {
-                filename,
-                mimeType: headers['content-type'] || '',
-                buffer
-            };
-            continue;
-        }
-
-        fields[name] = buffer.toString('utf8');
-    }
-
-    return {
-        fields,
-        files
-    };
 }
 
 function getImageExtension(file: MultipartFile): string | null {
@@ -203,7 +133,12 @@ export default async function companiesCreateWorker(
             });
         }
 
-        const { fields, files } = await parseMultipart(req);
+        const { fields, files } = await parseMultipart(req, {
+            maxBytes: MAX_UPLOAD_BYTES,
+            invalidMessage: 'Invalid company form submission.',
+            tooLargeMessage: 'Company upload is too large.',
+            timeoutMessage: 'Company upload timed out.'
+        });
         const name = clean(fields.name, 180);
         const description = clean(fields.description, 1000);
         const industry = clean(fields.industry, 160);
@@ -214,10 +149,7 @@ export default async function companiesCreateWorker(
         const brandColour = clean(fields.brandColour, 20);
         const size = clean(fields.size, 80);
         const organisationType = clean(fields.organisationType, 60);
-        const members = JSON.parse(fields.members || '[]') as Array<{
-            employerId?: string;
-            role?: string;
-        }>;
+        const members = parseMembers(fields.members);
 
         if (!name || !description || !industry || !location || !email || !phone || !size || !organisationType) {
             return res.json({

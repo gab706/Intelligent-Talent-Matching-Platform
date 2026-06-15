@@ -1,3 +1,9 @@
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
 $(async function () {
     const $themeToggleButton = $("[data-theme-toggle]");
     const $dropdownTriggers = $("[data-public-dropdown]");
@@ -11,6 +17,8 @@ $(async function () {
     const $profileAvatarInput = $("[data-profile-avatar-input]");
     const $profileAvatarPreview = $("[data-profile-avatar-preview]");
     const $publicHeader = $(".public-header");
+    const $impersonationBanner = $("[data-impersonation-banner]");
+    const $impersonationPin = $("[data-impersonation-pin]");
     const $mobileMenuToggle = $("[data-mobile-menu-toggle]");
     const $dropdownItems = $(".public-header__link-item--dropdown");
     const mobileMenuQuery = window.matchMedia("(max-width: 980px)");
@@ -22,6 +30,21 @@ $(async function () {
 
     $(window).on("scroll", updateHeaderScrollState);
     updateHeaderScrollState();
+
+    if ($impersonationBanner.length) {
+        const storageKey = "talentmatch.impersonationBannerMinimised";
+        const isMinimised = window.localStorage.getItem(storageKey) === "true";
+
+        $impersonationBanner.toggleClass("is-minimised", isMinimised);
+        $impersonationPin.attr("aria-label", isMinimised ? "Expand impersonation banner" : "Minimise impersonation banner");
+
+        $impersonationPin.on("click", function () {
+            const nextMinimised = !$impersonationBanner.hasClass("is-minimised");
+            $impersonationBanner.toggleClass("is-minimised", nextMinimised);
+            window.localStorage.setItem(storageKey, String(nextMinimised));
+            $impersonationPin.attr("aria-label", nextMinimised ? "Expand impersonation banner" : "Minimise impersonation banner");
+        });
+    }
 
     const clearDropdownCloseTimer = function () {
         if (!dropdownCloseTimer)
@@ -207,7 +230,7 @@ $(async function () {
         $saveButton.prop("disabled", true).text("Saving...");
 
         try {
-            const response = await fetch("/user/profile", {
+            const response = await window.guardedFetch("/user/profile", {
                 method: "POST",
                 body: formData
             });
@@ -234,10 +257,10 @@ $(async function () {
             '<p class="public-header__notification-empty">No Notifications From The Last 7 Days</p>'
         );
         $("[data-notification-badge]").remove();
-        $("[data-notification-read-all]")
-            .replaceWith(
-                '<span class="public-header__notification-read-all is-disabled" aria-disabled="true" data-notification-read-all-disabled>Mark all as read</span>'
-            );
+        $("[data-notification-actions]").html(
+            '<span class="public-header__notification-action is-disabled" aria-disabled="true" data-notification-clear-all-disabled>Clear all</span>' +
+            '<span class="public-header__notification-action is-disabled" aria-disabled="true" data-notification-read-all-disabled>Mark all as read</span>'
+        );
     };
 
     const updateNotificationBadge = function (unreadCount) {
@@ -263,7 +286,7 @@ $(async function () {
     };
 
     const markNotificationsRead = async function (payload) {
-        const response = await fetch("/user/notification-read", {
+        const response = await window.guardedFetch("/user/notification-read", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -275,6 +298,25 @@ $(async function () {
 
         if (!response.ok || !data.success)
             throw new Error(data.message || "Unable to update notifications.");
+
+        return data;
+    };
+
+    const clearNotifications = async function () {
+        const response = await window.guardedFetch("/user/notification-clear", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                all: true
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success)
+            throw new Error(data.message || "Unable to clear notifications.");
 
         return data;
     };
@@ -309,7 +351,7 @@ $(async function () {
             if (!$("[data-notification-read]").length)
                 $("[data-notification-read-all]")
                     .replaceWith(
-                        '<span class="public-header__notification-read-all is-disabled" aria-disabled="true" data-notification-read-all-disabled>Mark all as read</span>'
+                        '<span class="public-header__notification-action is-disabled" aria-disabled="true" data-notification-read-all-disabled>Mark all as read</span>'
                     );
         } catch (err) {
             console.error(err);
@@ -342,12 +384,33 @@ $(async function () {
                 .addClass("public-header__notification-item--read")
                 .prop("disabled", true);
             $readAll.replaceWith(
-                '<span class="public-header__notification-read-all is-disabled" aria-disabled="true" data-notification-read-all-disabled>Mark all as read</span>'
+                '<span class="public-header__notification-action is-disabled" aria-disabled="true" data-notification-read-all-disabled>Mark all as read</span>'
             );
         } catch (err) {
             console.error(err);
             $readAll.removeClass("is-disabled").removeAttr("aria-disabled");
             showMessage(err.message || "Unable to update notifications.");
+        }
+    });
+
+    $("[data-public-dropdown-menu]").on("click", "[data-notification-clear-all]", async function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const $clearAll = $(this);
+
+        if ($clearAll.hasClass("is-disabled"))
+            return;
+
+        $clearAll.addClass("is-disabled").attr("aria-disabled", "true");
+
+        try {
+            await clearNotifications();
+            renderEmptyNotifications();
+        } catch (err) {
+            console.error(err);
+            $clearAll.removeClass("is-disabled").removeAttr("aria-disabled");
+            showMessage(err.message || "Unable to clear notifications.");
         }
     });
 
@@ -403,7 +466,7 @@ $(async function () {
             applyTheme(nextTheme);
 
             try {
-                const response = await fetch("/user/update-theme", {
+                const response = await window.guardedFetch("/user/update-theme", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"

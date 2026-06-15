@@ -121,7 +121,10 @@ model User {
   isMember      Boolean       @default(false)
   theme         Theme         @default(LIGHT)
 
-  lastLoginAt DateTime?
+  lastLoginAt                 DateTime?
+  throttledUntil              DateTime?
+  failedLoginAttempts         Int       @default(0)
+  failedLoginWindowStartedAt  DateTime?
 
   candidate Candidate?
   employer  Employer?
@@ -130,6 +133,9 @@ model User {
 
   sentNotifications     Notification[] @relation("NotificationSender")
   receivedNotifications Notification[] @relation("NotificationRecipient")
+  suspensions           Suspension[]   @relation("SuspendedUser")
+  issuedSuspensions     Suspension[]   @relation("SuspensionIssuer")
+  sessions              Session[]
 
   recommendationLogs RecommendationLog[]
   savedJobs          SavedJob[]
@@ -138,9 +144,34 @@ model User {
   updatedAt DateTime @updatedAt
 
   @@index([accountStatus])
+  @@index([throttledUntil])
   @@index([isMember])
   @@index([createdAt])
   @@map("users")
+}
+
+model Suspension {
+  id String @id @default(uuid())
+
+  ipAddress String
+  userId    String?
+  reason    String
+
+  issuedById     String?
+  issuedBySystem Boolean @default(false)
+
+  datetimeAdded DateTime @default(now())
+  datetimeEnd   DateTime
+
+  user     User? @relation("SuspendedUser", fields: [userId], references: [id], onDelete: SetNull)
+  issuedBy User? @relation("SuspensionIssuer", fields: [issuedById], references: [id], onDelete: SetNull)
+
+  @@index([ipAddress])
+  @@index([userId])
+  @@index([issuedById])
+  @@index([datetimeEnd])
+  @@index([issuedBySystem])
+  @@map("suspensions")
 }
 
 model Candidate {
@@ -541,7 +572,13 @@ model Session {
   sid    String   @id @db.VarChar
   sess   Json
   expire DateTime
+  userId String?
+  updatedAt DateTime @default(now()) @updatedAt
 
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([updatedAt])
   @@index([expire])
   @@map("sessions")
 }

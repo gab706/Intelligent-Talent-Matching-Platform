@@ -1,3 +1,9 @@
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
 import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../../database/prisma.js';
 
@@ -15,17 +21,6 @@ const QUALIFICATION_LABELS: Record<string, string> = {
     MASTERS_DEGREE: "Master's Degree",
     DOCTORAL_DEGREE: 'Doctoral Degree'
 };
-
-function dateLabel(value: Date | null): string {
-    if (!value)
-        return '';
-
-    return new Intl.DateTimeFormat('en-AU', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
-    }).format(value);
-}
 
 function statusLabel(value: string): string {
     const labels: Record<string, string> = {
@@ -58,7 +53,7 @@ function formatJob(job: any) {
             ? [job.salaryMin ? `$${job.salaryMin.toLocaleString('en-AU')}` : '', job.salaryMax ? `$${job.salaryMax.toLocaleString('en-AU')}` : ''].filter(Boolean).join(' - ')
             : '',
         closingDate: job.closingDate ? job.closingDate.toISOString().slice(0, 10) : '',
-        closingDateLabel: dateLabel(job.closingDate),
+        closingDateLabel: job.closingDate ? job.closingDate.toISOString() : '',
         status: job.status,
         isActive: job.isActive,
         skills: job.skills.map((item: any) => item.skill.name)
@@ -72,8 +67,7 @@ function formatApplication(application: any) {
         statusLabel: statusLabel(application.status),
         coverLetter: application.coverLetter || '',
         appliedAt: application.createdAt.toISOString(),
-        appliedAtLabel: dateLabel(application.createdAt),
-        updatedAtLabel: dateLabel(application.updatedAt),
+        updatedAt: application.updatedAt.toISOString(),
         canWithdraw: false,
         job: formatJob(application.job)
     };
@@ -83,7 +77,6 @@ function formatSavedJob(savedJob: any) {
     return {
         id: savedJob.id,
         savedAt: savedJob.createdAt.toISOString(),
-        savedAtLabel: dateLabel(savedJob.createdAt),
         job: formatJob(savedJob.job)
     };
 }

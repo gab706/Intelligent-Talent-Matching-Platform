@@ -1,3 +1,9 @@
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
 import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../database/prisma.js';
 
@@ -30,6 +36,8 @@ export default async function SharedController(req: Request, res: Response, next
 	res.payload.avatarPath = '/images/avatar/default.png';
 	res.payload.notifications = [];
 	res.payload.unreadNotificationCount = 0;
+	res.payload.isImpersonating = Boolean(req.session.impersonatorUserId && req.session.impersonatedUserName);
+	res.payload.impersonatedUserName = req.session.impersonatedUserName;
 
 	if (req.session.isAuthenticated && req.session.userId) {
 		const notificationCutoff = new Date();

@@ -1,9 +1,22 @@
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
 import { Request, Response, NextFunction } from 'express';
 import argon2 from 'argon2';
 import { prisma } from '../../database/prisma.js';
+import { getRequestIp } from '../../helpers/request-ip.js';
+import { linkSessionToUser } from '../../helpers/session-links.js';
 
 const SHORT_SESSION_MS = 1000 * 60 * 60 * 2; // 2 hours
 const LONG_SESSION_MS = 1000 * 60 * 60 * 24 * 30; // 30 days
+const FAILED_LOGIN_WINDOW_MS = 1000 * 60 * 15; // 15 minutes
+const LOGIN_THROTTLE_MS = 1000 * 60 * 15; // 15 minutes
+const MAX_FAILED_LOGIN_ATTEMPTS = 5;
+const LOGIN_FAILED_MESSAGE = 'Unable to log in with those credentials.';
+const LOGIN_THROTTLED_MESSAGE = 'Unable to log in right now. Please try again later.';
 
 function isValidEmail(email: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -25,6 +38,62 @@ function getAccountType(user: {
     return 1;
 }
 
+async function recordFailedLogin(user: {
+    id: string;
+    failedLoginAttempts: number;
+    failedLoginWindowStartedAt: Date | null;
+}, ipAddress: string, now: Date): Promise<void> {
+    const windowStartedAt = user.failedLoginWindowStartedAt;
+    const isInsideWindow = Boolean(
+        windowStartedAt &&
+        now.getTime() - windowStartedAt.getTime() <= FAILED_LOGIN_WINDOW_MS
+    );
+    const failedLoginAttempts = isInsideWindow
+        ? user.failedLoginAttempts + 1
+        : 1;
+    const nextWindowStartedAt = isInsideWindow
+        ? windowStartedAt
+        : now;
+
+    if (failedLoginAttempts < MAX_FAILED_LOGIN_ATTEMPTS) {
+        await prisma.user.update({
+            where: {
+                id: user.id
+            },
+            data: {
+                failedLoginAttempts,
+                failedLoginWindowStartedAt: nextWindowStartedAt,
+                throttledUntil: null
+            }
+        });
+        return;
+    }
+
+    const datetimeEnd = new Date(now.getTime() + LOGIN_THROTTLE_MS);
+
+    await prisma.$transaction([
+        prisma.user.update({
+            where: {
+                id: user.id
+            },
+            data: {
+                failedLoginAttempts: 0,
+                failedLoginWindowStartedAt: null,
+                throttledUntil: datetimeEnd
+            }
+        }),
+        prisma.suspension.create({
+            data: {
+                ipAddress,
+                userId: user.id,
+                reason: `Automatic login throttle after ${MAX_FAILED_LOGIN_ATTEMPTS} failed attempts.`,
+                issuedBySystem: true,
+                datetimeEnd
+            }
+        })
+    ]);
+}
+
 export default async function loginWorker(
     req: Request,
     res: Response,
@@ -34,25 +103,47 @@ export default async function loginWorker(
         const email = String(req.body?.email || '').trim().toLowerCase();
         const password = String(req.body?.password || '');
         const remember = req.body?.remember === 'true' || req.body?.remember === 'on';
+        const ipAddress = getRequestIp(req);
+        const now = new Date();
+
+        const activeIpSuspension = await prisma.suspension.findFirst({
+            where: {
+                ipAddress,
+                issuedBySystem: true,
+                datetimeEnd: {
+                    gt: now
+                }
+            },
+            select: {
+                id: true
+            }
+        });
+
+        if (activeIpSuspension) {
+            return res.json({
+                success: false,
+                message: LOGIN_THROTTLED_MESSAGE
+            });
+        }
 
         if (!email || !password) {
             return res.json({
                 success: false,
-                message: 'Email and password are required.'
+                message: LOGIN_FAILED_MESSAGE
             });
         }
 
         if (!isValidEmail(email)) {
             return res.json({
                 success: false,
-                message: 'Please enter a valid email address.'
+                message: LOGIN_FAILED_MESSAGE
             });
         }
 
         if (password.length < 8) {
             return res.json({
                 success: false,
-                message: 'Password must be at least 8 characters.'
+                message: LOGIN_FAILED_MESSAGE
             });
         }
 
@@ -67,6 +158,9 @@ export default async function loginWorker(
                 role: true,
                 accountStatus: true,
                 theme: true,
+                throttledUntil: true,
+                failedLoginAttempts: true,
+                failedLoginWindowStartedAt: true,
                 candidate: {
                     select: {
                         id: true
@@ -83,21 +177,57 @@ export default async function loginWorker(
         if (!user) {
             return res.json({
                 success: false,
-                message: 'Email address does not exist.'
+                message: LOGIN_FAILED_MESSAGE
             });
         }
 
-        if (user.accountStatus === 'SUSPENDED') {
+        if (user.throttledUntil && user.throttledUntil > now) {
             return res.json({
                 success: false,
-                message: 'This account has been suspended.'
+                message: LOGIN_THROTTLED_MESSAGE
             });
         }
 
-        if (user.accountStatus === 'DELETED') {
+        let accountStatus = user.accountStatus;
+
+        if (accountStatus === 'SUSPENDED') {
+            const activeSuspension = await prisma.suspension.findFirst({
+                where: {
+                    userId: user.id,
+                    issuedById: {
+                        not: null
+                    },
+                    datetimeEnd: {
+                        gt: now
+                    }
+                },
+                select: {
+                    id: true
+                }
+            });
+
+            if (activeSuspension) {
+                return res.json({
+                    success: false,
+                    message: LOGIN_FAILED_MESSAGE
+                });
+            }
+
+            await prisma.user.update({
+                where: {
+                    id: user.id
+                },
+                data: {
+                    accountStatus: 'ACTIVE'
+                }
+            });
+            accountStatus = 'ACTIVE';
+        }
+
+        if (accountStatus === 'DELETED') {
             return res.json({
                 success: false,
-                message: 'This account has been deleted.'
+                message: LOGIN_FAILED_MESSAGE
             });
         }
 
@@ -107,9 +237,11 @@ export default async function loginWorker(
         );
 
         if (!passwordMatches) {
+            await recordFailedLogin(user, ipAddress, now);
+
             return res.json({
                 success: false,
-                message: 'Incorrect password.'
+                message: LOGIN_FAILED_MESSAGE
             });
         }
 
@@ -143,7 +275,10 @@ export default async function loginWorker(
                     id: user.id
                 },
                 data: {
-                    lastLoginAt: new Date()
+                    lastLoginAt: new Date(),
+                    failedLoginAttempts: 0,
+                    failedLoginWindowStartedAt: null,
+                    throttledUntil: null
                 }
             });
 
@@ -156,11 +291,13 @@ export default async function loginWorker(
                         ? '/employer/home'
                         : '/candidate/home';
 
-                return res.json({
-                    success: true,
-                    message: 'Logged in successfully.',
-                    redirectTo
-                });
+                linkSessionToUser(req.sessionID, user.id)
+                    .then(() => res.json({
+                        success: true,
+                        message: 'Logged in successfully.',
+                        redirectTo
+                    }))
+                    .catch(next);
             });
         });
     } catch (err) {

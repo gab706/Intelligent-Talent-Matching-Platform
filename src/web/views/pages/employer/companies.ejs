@@ -1,3 +1,11 @@
+<%#
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
+%>
 <!DOCTYPE html>
 <html lang="en-AU">
 <head>
@@ -158,47 +166,47 @@
                 <input type="hidden" name="companyId" data-edit-company-id />
                 <label class="employer-companies__logo-upload employer-companies__logo-upload--edit" data-edit-logo-upload>
                     <span>Company Logo</span>
-                    <input name="logo" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-logo-input />
+                    <input id="company-edit-logo" name="logo" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-logo-input />
                     <span class="employer-companies__logo-preview" data-edit-logo-preview>
                         <i class="fas fa-image" aria-hidden="true"></i>
                     </span>
                 </label>
                 <label class="employer-companies__field">
                     <span>Company Name</span>
-                    <input name="name" type="text" required data-edit-name />
+                    <input id="company-edit-name" name="name" type="text" required autocomplete="organization" data-edit-name />
                 </label>
                 <label class="employer-companies__field">
                     <span>Short Company Description</span>
-                    <textarea name="description" rows="4" required data-edit-description></textarea>
+                    <textarea id="company-edit-description" name="description" rows="4" required autocomplete="off" data-edit-description></textarea>
                 </label>
                 <div class="employer-companies__grid">
                     <label class="employer-companies__field">
                         <span>Industry</span>
-                        <input name="industry" type="text" required data-edit-industry />
+                        <input id="company-edit-industry" name="industry" type="text" required autocomplete="off" data-edit-industry />
                     </label>
                     <label class="employer-companies__field">
                         <span>Company Location</span>
-                        <input name="location" type="text" required data-edit-location />
+                        <input id="company-edit-location" name="location" type="text" required autocomplete="address-level1" data-edit-location />
                     </label>
                     <label class="employer-companies__field">
                         <span>Contact Email</span>
-                        <input name="email" type="email" required data-edit-email />
+                        <input id="company-edit-email" name="email" type="email" required autocomplete="email" data-edit-email />
                     </label>
                     <label class="employer-companies__field">
                         <span>Contact Phone</span>
-                        <input name="phone" type="tel" required data-edit-phone />
+                        <input id="company-edit-phone" name="phone" type="tel" required autocomplete="tel" data-edit-phone />
                     </label>
                     <label class="employer-companies__field">
                         <span>Company Website</span>
-                        <input name="website" type="text" placeholder="www.example.com.au" data-edit-website />
+                        <input id="company-edit-website" name="website" type="text" placeholder="www.example.com.au" autocomplete="url" data-edit-website />
                     </label>
                     <label class="employer-companies__field">
                         <span>Brand Colour</span>
-                        <input name="brandColour" type="color" value="#2563eb" data-edit-brand-colour />
+                        <input id="company-edit-brand-colour" name="brandColour" type="color" value="#2563eb" autocomplete="off" data-edit-brand-colour />
                     </label>
                     <label class="employer-companies__field">
                         <span>Company Size</span>
-                        <select name="size" required data-edit-size>
+                        <select id="company-edit-size" name="size" required autocomplete="off" data-edit-size>
                             <option value="">Select size</option>
                             <option>1-10 Employees</option>
                             <option>11-50 Employees</option>
@@ -209,7 +217,7 @@
                     </label>
                     <label class="employer-companies__field">
                         <span>Organisation Type</span>
-                        <select name="organisationType" required data-edit-organisation-type>
+                        <select id="company-edit-organisation-type" name="organisationType" required autocomplete="off" data-edit-organisation-type>
                             <option value="">Select type</option>
                             <option value="PRIVATE_COMPANY">Private Company</option>
                             <option value="PUBLIC_COMPANY">Public Company</option>
@@ -251,20 +259,20 @@
                         <legend>Company details</legend>
                         <label class="employer-companies__field">
                             <span>Company Name</span>
-                            <input name="name" type="text" required />
+                            <input id="company-create-name" name="name" type="text" required autocomplete="organization" />
                         </label>
                         <label class="employer-companies__field">
                             <span>Short Company Description</span>
-                            <textarea name="description" rows="4" required></textarea>
+                            <textarea id="company-create-description" name="description" rows="4" required autocomplete="off"></textarea>
                         </label>
                         <div class="employer-companies__grid">
                             <label class="employer-companies__field">
                                 <span>Industry</span>
-                                <input name="industry" type="text" required />
+                                <input id="company-create-industry" name="industry" type="text" required autocomplete="off" />
                             </label>
                             <label class="employer-companies__field">
                                 <span>Company Location</span>
-                                <input name="location" type="text" required />
+                                <input id="company-create-location" name="location" type="text" required autocomplete="address-level1" />
                             </label>
                         </div>
                     </fieldset>
@@ -274,21 +282,21 @@
                         <div class="employer-companies__grid">
                             <label class="employer-companies__field">
                                 <span>Contact Email</span>
-                                <input name="email" type="email" required />
+                                <input id="company-create-email" name="email" type="email" required autocomplete="email" />
                             </label>
                             <label class="employer-companies__field">
                                 <span>Contact Phone</span>
-                                <input name="phone" type="tel" required />
+                                <input id="company-create-phone" name="phone" type="tel" required autocomplete="tel" />
                             </label>
                         </div>
                         <label class="employer-companies__field">
                             <span>Company Website</span>
-                            <input name="website" type="text" placeholder="www.example.com.au" />
+                            <input id="company-create-website" name="website" type="text" placeholder="www.example.com.au" autocomplete="url" />
                         </label>
                         <div class="employer-companies__grid">
                             <label class="employer-companies__field">
                                 <span>Company Size</span>
-                                <select name="size" required>
+                                <select id="company-create-size" name="size" required autocomplete="off">
                                     <option value="">Select size</option>
                                     <option>1-10 Employees</option>
                                     <option>11-50 Employees</option>
@@ -299,7 +307,7 @@
                             </label>
                             <label class="employer-companies__field">
                                 <span>Organisation Type</span>
-                                <select name="organisationType" required>
+                                <select id="company-create-organisation-type" name="organisationType" required autocomplete="off">
                                     <option value="">Select type</option>
                                     <option value="PRIVATE_COMPANY">Private Company</option>
                                     <option value="PUBLIC_COMPANY">Public Company</option>
@@ -316,14 +324,14 @@
                         <legend>Branding</legend>
                         <label class="employer-companies__logo-upload" data-company-logo-upload>
                             <span>Company Logo</span>
-                            <input name="logo" type="file" required accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-company-logo-input />
+                            <input id="company-create-logo" name="logo" type="file" required accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" autocomplete="off" data-company-logo-input />
                             <span class="employer-companies__logo-preview" data-company-logo-preview>
                                 <i class="fas fa-image" aria-hidden="true"></i>
                             </span>
                         </label>
                         <label class="employer-companies__field employer-companies__field--colour">
                             <span>Brand Colour</span>
-                            <input name="brandColour" type="color" value="#2563eb" required />
+                            <input id="company-create-brand-colour" name="brandColour" type="color" value="#2563eb" required autocomplete="off" />
                         </label>
                     </fieldset>
 
@@ -345,7 +353,7 @@
                 <div data-employee-search-panel>
                     <label class="employer-companies__field">
                         <span>Search by name</span>
-                        <input type="text" data-company-member-search placeholder="Start typing a name" autocomplete="off" />
+                        <input id="company-member-search" type="text" data-company-member-search placeholder="Start typing a name" autocomplete="off" />
                     </label>
                     <div class="employer-companies__suggestions" data-company-member-suggestions></div>
                 </div>

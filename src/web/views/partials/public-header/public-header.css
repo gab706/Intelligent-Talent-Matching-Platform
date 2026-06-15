@@ -1,3 +1,141 @@
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
+.public-header__impersonation-banner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    min-height: 44px;
+    max-height: 56px;
+    padding: 8px 18px;
+    overflow: hidden;
+    background: #e0f2fe;
+    color: #0f3f66;
+    border-bottom: 1px solid #bae6fd;
+    font-weight: 850;
+    transition: max-height 180ms ease, min-height 180ms ease, padding 180ms ease;
+}
+
+body.dark-mode .public-header__impersonation-banner {
+    background: #0f2741;
+    color: #dff4ff;
+    border-bottom-color: #1e4d72;
+}
+
+.public-header__impersonation-banner.is-minimised span {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+.public-header__impersonation-banner.is-minimised {
+    min-height: 7px;
+    max-height: 7px;
+    padding-top: 0;
+    padding-bottom: 0;
+    cursor: pointer;
+}
+
+.public-header__impersonation-banner.is-minimised:hover,
+.public-header__impersonation-banner.is-minimised:focus-within {
+    min-height: 44px;
+    max-height: 56px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.public-header__impersonation-banner.is-minimised:hover span,
+.public-header__impersonation-banner.is-minimised:focus-within span {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.public-header__impersonation-banner span {
+    transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.public-header__impersonation-banner form {
+    margin: 0;
+}
+
+.public-header__impersonation-banner button,
+.public-header__impersonation-pin {
+    width: 30px;
+    height: 30px;
+    min-height: 30px;
+    padding: 0;
+    display: inline-grid;
+    place-items: center;
+    border-radius: 999px;
+    border: 1px solid rgba(15, 63, 102, 0.16);
+    background: rgba(255, 255, 255, 0.58);
+    color: inherit;
+    font-weight: 850;
+    line-height: 1;
+    transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+body.dark-mode .public-header__impersonation-banner button,
+body.dark-mode .public-header__impersonation-pin {
+    border-color: rgba(223, 244, 255, 0.22);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.public-header__impersonation-banner button:hover,
+.public-header__impersonation-banner button:focus-visible,
+.public-header__impersonation-pin:hover,
+.public-header__impersonation-pin:focus-visible {
+    background: rgba(255, 255, 255, 0.76);
+    border-color: rgba(15, 63, 102, 0.32);
+    transform: translateY(-1px);
+}
+
+body.dark-mode .public-header__impersonation-banner button:hover,
+body.dark-mode .public-header__impersonation-banner button:focus-visible,
+body.dark-mode .public-header__impersonation-pin:hover,
+body.dark-mode .public-header__impersonation-pin:focus-visible {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.public-header__impersonation-close {
+    display: inline-grid;
+    place-items: center;
+}
+
+.public-header__impersonation-close i {
+    font-size: 0.86rem;
+}
+
+.public-header__impersonation-pin i {
+    font-size: 0.82rem;
+    transform: rotate(-28deg);
+}
+
+.public-header__impersonation-banner.is-minimised .public-header__impersonation-pin i {
+    transform: rotate(0deg);
+}
+
+.public-header__impersonation-banner.is-minimised button,
+.public-header__impersonation-banner.is-minimised form {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.public-header__impersonation-banner.is-minimised:hover button,
+.public-header__impersonation-banner.is-minimised:focus-within button,
+.public-header__impersonation-banner.is-minimised:hover form,
+.public-header__impersonation-banner.is-minimised:focus-within form {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
 .public-header {
     --public-header-bg: color-mix(in srgb, var(--color-surface) 92%, transparent);
 
@@ -564,24 +702,33 @@ body.dark-mode .public-header {
     font-weight: 700;
 }
 
-.public-header__notification-read-all {
+.public-header__notification-actions {
     margin-top: 4px;
     padding: 10px 12px 2px;
-
-    display: block;
-
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
     border-top: 1px solid var(--color-border);
+}
+
+.public-header__notification-action,
+.public-header__notification-read-all {
     color: var(--color-primary);
     font-size: 0.84rem;
     font-weight: 800;
-    text-align: right;
+    text-decoration: none;
+    white-space: nowrap;
 }
 
+.public-header__notification-action:hover,
+.public-header__notification-action:focus-visible,
 .public-header__notification-read-all:hover,
 .public-header__notification-read-all:focus-visible {
     color: var(--color-primary-hover);
 }
 
+.public-header__notification-action.is-disabled,
 .public-header__notification-read-all.is-disabled {
     color: var(--color-muted);
     cursor: default;

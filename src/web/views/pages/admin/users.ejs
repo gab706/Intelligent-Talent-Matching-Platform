@@ -1,3 +1,11 @@
+<%#
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
+%>
 <!DOCTYPE html>
 <html lang="en-AU">
 <head>
@@ -61,34 +69,26 @@
                 <tr>
                     <th>Name</th>
                     <th>Role</th>
-                    <th>Type</th>
                     <th>Member</th>
-                    <th>Last Active</th>
-                    <th>Manage</th>
+                    <th>Active</th>
                 </tr>
                 </thead>
                 <tbody>
                 <% users.forEach(user => { %>
                 <tr data-user-row="<%= user.id %>">
-                    <td><%= user.name %></td>
-                    <td><%= user.role %></td>
-                    <td><%= user.type %></td>
+                    <td>
+                        <button class="admin-users__name-link" type="button" data-user-open="<%= user.id %>"><%= user.name %></button>
+                    </td>
+                    <td>
+                        <span class="admin-users__role" data-tooltip="<%= user.role === 'ADMIN' ? 'Admin' : 'User' %>" aria-label="<%= user.role === 'ADMIN' ? 'Admin' : 'User' %>">
+                            <i class="fas <%= user.role === 'ADMIN' ? 'fa-crown' : 'fa-user' %>" aria-hidden="true"></i>
+                        </span>
+                    </td>
                     <td class="admin-users__member">
-                        <% if (user.isMember) { %>
-                        <i class="fas fa-check" aria-label="Member"></i>
-                        <% } %>
+                        <input type="checkbox" disabled <%= user.isMember ? 'checked' : '' %> aria-label="<%= user.isMember ? 'Member' : 'Not a member' %>" />
                     </td>
                     <td>
-                        <span class="<%= user.isActiveNow ? 'admin-users__active-now' : '' %>"><%= user.lastActiveLabel %></span>
-                    </td>
-                    <td>
-                        <div class="admin-users__manage" aria-label="Manage <%= user.name %>">
-                            <% if (!user.isCurrentUser) { %>
-                            <button type="button" aria-label="<%= user.isSuspended ? 'Unlock' : 'Lock' %> account for <%= user.name %>" data-user-status-toggle="<%= user.id %>" data-user-name="<%= user.name %>" data-is-suspended="<%= user.isSuspended ? 'true' : 'false' %>">
-                                <i class="fas <%= user.isSuspended ? 'fa-unlock' : 'fa-lock' %>" aria-hidden="true"></i>
-                            </button>
-                            <% } %>
-                        </div>
+                        <span class="<%= user.isActiveNow ? 'admin-users__active-now' : user.isOffline ? 'admin-users__offline' : '' %>"><%= user.lastActiveLabel %></span>
                     </td>
                 </tr>
                 <% }) %>
@@ -107,6 +107,70 @@
         <% } %>
     </section>
 </main>
+
+<div class="admin-users__modal" hidden data-user-modal>
+    <div class="admin-users__modal-overlay" data-user-modal-close></div>
+    <section class="admin-users__dialog admin-users__dialog--user" role="dialog" aria-modal="true" aria-labelledby="user-modal-title">
+        <button class="admin-users__modal-close" type="button" aria-label="Close user details" data-user-modal-close>
+            <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+        <div class="admin-users__modal-heading">
+            <img src="/images/avatar/default.png" alt="" data-user-avatar />
+            <div>
+                <h2 id="user-modal-title" data-user-title>User details</h2>
+                <p data-user-subtitle></p>
+            </div>
+        </div>
+        <div class="admin-users__suspension-banner" hidden data-user-suspension-banner></div>
+        <div class="admin-users__details" data-user-details></div>
+        <div class="admin-users__modal-actions admin-users__modal-actions--main">
+            <button type="button" data-user-suspend-action></button>
+            <button type="button" data-user-impersonate>Impersonate</button>
+        </div>
+    </section>
+</div>
+
+<div class="admin-users__modal admin-users__modal--suspend" hidden data-suspend-modal>
+    <div class="admin-users__modal-overlay" data-suspend-modal-close></div>
+    <section class="admin-users__dialog admin-users__dialog--suspend" role="dialog" aria-modal="true" aria-labelledby="suspend-modal-title">
+        <button class="admin-users__modal-close" type="button" aria-label="Close suspension form" data-suspend-modal-close>
+            <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+        <div class="admin-users__suspend-heading">
+            <p class="account-home__eyebrow">Suspend user</p>
+            <h2 id="suspend-modal-title">Suspend User</h2>
+            <p data-suspend-user-name></p>
+        </div>
+        <form class="admin-users__suspend-form" data-suspend-form>
+            <label class="admin-users__field" for="suspend-reason">
+                <span>Reason</span>
+                <textarea id="suspend-reason" name="reason" rows="4"></textarea>
+            </label>
+            <label class="admin-users__field" for="suspend-duration">
+                <span>Duration</span>
+                <span class="admin-users__select-wrap">
+                    <select id="suspend-duration" name="duration">
+                        <option value="1h">1 hour</option>
+                        <option value="6h">6 hours</option>
+                        <option value="12h">12 hours</option>
+                        <option value="24h">24 hours</option>
+                        <option value="7d">7 days</option>
+                        <option value="30d">30 days</option>
+                        <option value="permanent">Permanent</option>
+                    </select>
+                    <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                </span>
+            </label>
+            <div class="admin-users__modal-actions">
+                <button type="submit" data-suspend-submit>Confirm suspension</button>
+            </div>
+        </form>
+    </section>
+</div>
+
+<script>
+    window.__adminUsers = <%- usersJson %>;
+</script>
 <script src="/js/global.js"></script>
 <script src="/js/admin-users.js"></script>
 </body>

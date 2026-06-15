@@ -1,3 +1,9 @@
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
 $(function () {
     if (typeof toastr !== "undefined") {
         toastr.options = {
@@ -658,7 +664,7 @@ $(function () {
         const $button = $(this);
         $button.prop("disabled", true).text("Matching...");
         try {
-            const response = await fetch("/employer/candidate-matches", {
+            const response = await window.guardedFetch("/employer/candidate-matches", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ postingId })
@@ -682,7 +688,7 @@ $(function () {
         const $button = $(this);
         $button.prop("disabled", true).text("Sending...");
         try {
-            const response = await fetch("/employer/candidate-recommend", {
+            const response = await window.guardedFetch("/employer/candidate-recommend", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

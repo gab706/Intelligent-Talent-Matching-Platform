@@ -1,3 +1,11 @@
+<%#
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
+%>
 <link rel="stylesheet" href="/partials/public-header/public-header.css" />
 <%
     const headerIsAuthenticated = typeof isAuthenticated !== 'undefined' && isAuthenticated;
@@ -18,8 +26,23 @@
     const renderedAccountLabel = typeof accountLabel !== 'undefined' && accountLabel ? accountLabel : 'Candidate';
     const renderedNotifications = typeof notifications !== 'undefined' && notifications ? notifications : [];
     const renderedUnreadNotificationCount = typeof unreadNotificationCount !== 'undefined' ? unreadNotificationCount : 0;
+    const renderedIsImpersonating = typeof isImpersonating !== 'undefined' && isImpersonating;
+    const renderedImpersonatedUserName = typeof impersonatedUserName !== 'undefined' && impersonatedUserName ? impersonatedUserName : 'this user';
     const accountHomeHref = headerCurrentPath.startsWith('/employer') ? '/employer/home' : '/candidate/home';
 %>
+<% if (renderedIsImpersonating) { %>
+<div class="public-header__impersonation-banner" role="status" data-impersonation-banner>
+    <button class="public-header__impersonation-pin" type="button" aria-label="Minimise impersonation banner" data-impersonation-pin>
+        <i class="fas fa-thumbtack" aria-hidden="true"></i>
+    </button>
+    <span>You are viewing the page as "<%= renderedImpersonatedUserName %>"</span>
+    <form method="post" action="/admin/impersonation-stop" aria-label="Return to main account">
+        <button class="public-header__impersonation-close" type="submit" aria-label="Return to main account">
+            <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+    </form>
+</div>
+<% } %>
 <header class="public-header">
     <nav class="public-header__nav" aria-label="Public navigation">
         <a href="<%= showAccountHomeHeader ? accountHomeHref : '/index' %>" class="public-header__brand" aria-label="TalentMatch Home">
@@ -67,15 +90,26 @@
                                 </p>
                                 <% } %>
                             </div>
-                            <% if (renderedUnreadNotificationCount > 0) { %>
-                            <a class="public-header__notification-read-all" href="#" data-notification-read-all>
-                                Mark all as read
-                            </a>
-                            <% } else { %>
-                            <span class="public-header__notification-read-all is-disabled" aria-disabled="true" data-notification-read-all-disabled>
-                                Mark all as read
-                            </span>
-                            <% } %>
+                            <div class="public-header__notification-actions" data-notification-actions>
+                                <% if (renderedNotifications.length) { %>
+                                <a class="public-header__notification-action" href="#" data-notification-clear-all>
+                                    Clear all
+                                </a>
+                                <% } else { %>
+                                <span class="public-header__notification-action is-disabled" aria-disabled="true" data-notification-clear-all-disabled>
+                                    Clear all
+                                </span>
+                                <% } %>
+                                <% if (renderedUnreadNotificationCount > 0) { %>
+                                <a class="public-header__notification-action" href="#" data-notification-read-all>
+                                    Mark all as read
+                                </a>
+                                <% } else { %>
+                                <span class="public-header__notification-action is-disabled" aria-disabled="true" data-notification-read-all-disabled>
+                                    Mark all as read
+                                </span>
+                                <% } %>
+                            </div>
                         </div>
                     </div>
                     <div class="public-header__link-item public-header__link-item--dropdown public-header__avatar-menu">

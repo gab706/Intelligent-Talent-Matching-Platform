@@ -1,3 +1,9 @@
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
 import 'express';
 
 declare global {
@@ -17,6 +23,8 @@ declare global {
 				phone?: string;
 				isMember?: boolean;
 				isAdmin?: boolean;
+				isImpersonating?: boolean;
+				impersonatedUserName?: string;
 				accountLabel?: string;
 				isAccountHomePage?: boolean;
 				notifications?: Array<{

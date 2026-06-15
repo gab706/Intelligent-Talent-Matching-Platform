@@ -1,3 +1,9 @@
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
 $(function () {
     toastr.options = {
         closeButton: true,
@@ -48,7 +54,7 @@ $(function () {
             applyTheme(nextTheme);
 
             try {
-                const response = await fetch("/user/update-theme", {
+                const response = await window.guardedFetch("/user/update-theme", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -78,7 +84,7 @@ $(function () {
             const remember = $("input[name='remember']").is(":checked");
 
             try {
-                const response = await fetch("/user/login", {
+                const response = await window.guardedFetch("/user/login", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"

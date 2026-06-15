@@ -1,9 +1,16 @@
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
 import { Request, Response, NextFunction } from 'express';
 import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { prisma } from '../../database/prisma.js';
+import { parseMultipart, type MultipartFile } from '../../helpers/multipart.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,12 +24,6 @@ const ORGANISATION_TYPES = new Set([
     'NON_PROFIT',
     'STARTUP'
 ]);
-
-type MultipartFile = {
-    filename: string;
-    mimeType: string;
-    buffer: Buffer;
-};
 
 function clean(value: unknown, max = 500): string {
     return String(value || '').trim().slice(0, max);
@@ -38,89 +39,6 @@ function normaliseWebsite(value: unknown): string | null {
         return website;
 
     return `https://${website}`;
-}
-
-function getBoundary(contentType: string): string | null {
-    const match = contentType.match(/boundary=(?:"([^"]+)"|([^;]+))/);
-    return match?.[1] || match?.[2] || null;
-}
-
-async function readRequestBuffer(req: Request): Promise<Buffer> {
-    const chunks: Buffer[] = [];
-    let totalBytes = 0;
-
-    for await (const chunk of req) {
-        const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-        totalBytes += buffer.length;
-
-        if (totalBytes > MAX_UPLOAD_BYTES)
-            throw new Error('Company upload is too large.');
-
-        chunks.push(buffer);
-    }
-
-    return Buffer.concat(chunks);
-}
-
-async function parseMultipart(req: Request) {
-    const contentType = String(req.headers['content-type'] || '');
-    const boundaryValue = getBoundary(contentType);
-
-    if (!boundaryValue)
-        throw new Error('Invalid company form submission.');
-
-    const bodyBuffer = await readRequestBuffer(req);
-    const body = bodyBuffer.toString('binary');
-    const boundary = `--${boundaryValue}`;
-    const fields: Record<string, string> = {};
-    const files: Record<string, MultipartFile> = {};
-
-    for (const rawPart of body.split(boundary).slice(1, -1)) {
-        const part = rawPart.replace(/^\r\n/, '').replace(/\r\n$/, '');
-        const headerEnd = part.indexOf('\r\n\r\n');
-
-        if (headerEnd === -1)
-            continue;
-
-        const rawHeaders = part.slice(0, headerEnd);
-        const content = part.slice(headerEnd + 4);
-        const headers = Object.fromEntries(
-            rawHeaders
-                .split('\r\n')
-                .map(header => {
-                    const separatorIndex = header.indexOf(':');
-                    return [
-                        header.slice(0, separatorIndex).trim().toLowerCase(),
-                        header.slice(separatorIndex + 1).trim()
-                    ];
-                })
-                .filter(([name]) => name)
-        );
-        const disposition = headers['content-disposition'] || '';
-        const name = disposition.match(/name="([^"]+)"/)?.[1];
-
-        if (!name)
-            continue;
-
-        const filename = disposition.match(/filename="([^"]*)"/)?.[1];
-        const buffer = Buffer.from(content, 'binary');
-
-        if (filename) {
-            files[name] = {
-                filename,
-                mimeType: headers['content-type'] || '',
-                buffer
-            };
-            continue;
-        }
-
-        fields[name] = buffer.toString('utf8');
-    }
-
-    return {
-        fields,
-        files
-    };
 }
 
 function getImageExtension(file: MultipartFile): string | null {
@@ -181,7 +99,12 @@ export default async function companyUpdateWorker(
 
         const isMultipart = String(req.headers['content-type'] || '').includes('multipart/form-data');
         const parsed = isMultipart
-            ? await parseMultipart(req)
+            ? await parseMultipart(req, {
+                maxBytes: MAX_UPLOAD_BYTES,
+                invalidMessage: 'Invalid company form submission.',
+                tooLargeMessage: 'Company upload is too large.',
+                timeoutMessage: 'Company upload timed out.'
+            })
             : {
                 fields: req.body || {},
                 files: {}

@@ -1,17 +1,15 @@
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
 import { Request, Response, NextFunction } from 'express';
 import type { Prisma } from '../../../../prisma/generated/client.js';
 import { prisma } from '../../database/prisma.js';
 
 function clean(value: unknown, max = 120): string {
     return String(value || '').trim().slice(0, max);
-}
-
-function dateLabel(value: Date): string {
-    return new Intl.DateTimeFormat('en-AU', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-    }).format(value);
 }
 
 export default async function candidateJobApplyWorker(
@@ -125,7 +123,7 @@ export default async function candidateJobApplyWorker(
         return res.json({
             success: true,
             message: 'Application submitted.',
-            appliedAtLabel: dateLabel(application.createdAt)
+            appliedAt: application.createdAt.toISOString()
         });
     } catch (err) {
         return next(err);

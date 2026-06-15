@@ -1,3 +1,9 @@
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
 $(function () {
     if (typeof toastr !== "undefined") {
         toastr.options = {
@@ -55,7 +61,7 @@ $(function () {
     };
 
     const renderJobDetails = function (job, context = {}) {
-        const appliedLabel = context.appliedAtLabel || "";
+        const appliedLabel = window.formatClientDate(context.appliedAt, "");
 
         $("[data-application-detail]").html(`
             <div class="candidate-applications__detail-head">
@@ -115,7 +121,7 @@ $(function () {
                         <h2>${escapeHtml(job.jobTitle)}</h2>
                         <p>${escapeHtml(job.companyName)}${job.companyIndustry ? ` | ${escapeHtml(job.companyIndustry)}` : ""}</p>
                     </div>
-                    ${renderJobMeta(job, `<span><i class="fas fa-calendar-check" aria-hidden="true"></i>Applied ${escapeHtml(application.appliedAtLabel)}</span>`)}
+                    ${renderJobMeta(job, `<span><i class="fas fa-calendar-check" aria-hidden="true"></i>Applied ${escapeHtml(window.formatClientDate(application.appliedAt, ""))}</span>`)}
                     <div class="candidate-applications__actions">
                         <button type="button" data-view-application="${escapeHtml(application.id)}">
                             <i class="fas fa-eye" aria-hidden="true"></i>
@@ -139,7 +145,7 @@ $(function () {
                         <h2>${escapeHtml(job.jobTitle)}</h2>
                         <p>${escapeHtml(job.companyName)}${job.companyIndustry ? ` | ${escapeHtml(job.companyIndustry)}` : ""}</p>
                     </div>
-                    ${renderJobMeta(job, `<span><i class="fas fa-bookmark" aria-hidden="true"></i>Saved ${escapeHtml(savedJob.savedAtLabel)}</span>`)}
+                    ${renderJobMeta(job, `<span><i class="fas fa-bookmark" aria-hidden="true"></i>Saved ${escapeHtml(window.formatClientDate(savedJob.savedAt, ""))}</span>`)}
                     <div class="candidate-applications__actions">
                         <button class="candidate-applications__primary-action" type="button" data-apply-saved-job="${escapeHtml(job.id)}" ${alreadyApplied ? "disabled" : ""}>
                             <i class="fas fa-paper-plane" aria-hidden="true"></i>
@@ -207,7 +213,7 @@ $(function () {
         const savedJob = findSavedJob(String($(this).attr("data-view-saved-job") || ""));
         if (savedJob) renderJobDetails(savedJob.job, {
             savedJobId: savedJob.id,
-            savedAtLabel: savedJob.savedAtLabel
+            savedAt: savedJob.savedAt
         });
     });
 
@@ -219,7 +225,7 @@ $(function () {
         const $buttons = $(`[data-apply-saved-job='${jobId}']`);
         $buttons.prop("disabled", true);
         try {
-            const response = await fetch(`/candidate/jobs/${encodeURIComponent(jobId)}/apply`, {
+            const response = await window.guardedFetch(`/candidate/jobs/${encodeURIComponent(jobId)}/apply`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" }
             });
@@ -252,7 +258,7 @@ $(function () {
         const $buttons = $(`[data-unsave-job='${jobId}']`);
         $buttons.prop("disabled", true);
         try {
-            const response = await fetch(`/candidate/jobs/${encodeURIComponent(jobId)}/save`, {
+            const response = await window.guardedFetch(`/candidate/jobs/${encodeURIComponent(jobId)}/save`, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" }
             });

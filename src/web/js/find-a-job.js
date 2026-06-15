@@ -1,3 +1,9 @@
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
 $(function () {
     if (typeof toastr !== "undefined") {
         toastr.options = {
@@ -85,10 +91,13 @@ $(function () {
         const saved = data.savedJobIds.includes(job.id);
         const applied = data.appliedJobIds.includes(job.id);
         const appliedInfo = data.appliedJobs && data.appliedJobs[job.id];
+        const appliedLabel = appliedInfo
+            ? window.formatClientDate(appliedInfo.appliedAt, "today")
+            : "";
         const industry = job.companyIndustry ? `<span>| ${escapeHtml(job.companyIndustry)}</span>` : "";
         const jobType = job.jobType ? `<span><i class="fas fa-clock" aria-hidden="true"></i>${escapeHtml(label(job.jobType))}</span>` : "";
         const appliedMeta = appliedInfo
-            ? `<span class="find-job-page__applied-meta"><i class="fas fa-calendar-check" aria-hidden="true"></i>Applied ${escapeHtml(appliedInfo.appliedAtLabel)}</span>`
+            ? `<span class="find-job-page__applied-meta"><i class="fas fa-calendar-check" aria-hidden="true"></i>Applied ${escapeHtml(appliedLabel)}</span>`
             : "";
         const actionButtons = applied
             ? ""
@@ -158,7 +167,7 @@ $(function () {
         liveSearchRequest = new AbortController();
 
         try {
-            const response = await fetch(apiUrl, {
+            const response = await window.guardedFetch(apiUrl, {
                 headers: { "Accept": "application/json" },
                 signal: liveSearchRequest.signal
             });
@@ -232,8 +241,8 @@ $(function () {
             .html('<i class="far fa-bookmark" aria-hidden="true"></i> Save');
     };
 
-    const setApplied = function (jobId, appliedAtLabel) {
-        const labelText = appliedAtLabel || "today";
+    const setApplied = function (jobId, appliedAt) {
+        const labelText = window.formatClientDate(appliedAt, "today");
         const $cards = $(`[data-job-card][data-job-id="${jobId}"]`);
         $cards.each(function () {
             const $card = $(this);
@@ -252,7 +261,8 @@ $(function () {
     const renderDetails = function (job) {
         const isApplied = data.appliedJobIds.includes(job.id);
         const isSaved = data.savedJobIds.includes(job.id);
-        const appliedLabel = data.appliedJobs && data.appliedJobs[job.id] && data.appliedJobs[job.id].appliedAtLabel;
+        const appliedAt = data.appliedJobs && data.appliedJobs[job.id] && data.appliedJobs[job.id].appliedAt;
+        const appliedLabel = window.formatClientDate(appliedAt, "today");
 
         $("[data-job-detail]").html(`
             <div class="find-job-page__detail-head">
@@ -297,7 +307,7 @@ $(function () {
         const $button = $(this);
         $button.prop("disabled", true);
         try {
-            const response = await fetch(`/candidate/jobs/${encodeURIComponent(jobId)}/save`, {
+            const response = await window.guardedFetch(`/candidate/jobs/${encodeURIComponent(jobId)}/save`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" }
             });
@@ -323,7 +333,7 @@ $(function () {
         const $button = $(this);
         $button.prop("disabled", true);
         try {
-            const response = await fetch(`/candidate/jobs/${encodeURIComponent(jobId)}/save`, {
+            const response = await window.guardedFetch(`/candidate/jobs/${encodeURIComponent(jobId)}/save`, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" }
             });
@@ -348,7 +358,7 @@ $(function () {
         const $button = $(this);
         $button.prop("disabled", true);
         try {
-            const response = await fetch(`/candidate/jobs/${encodeURIComponent(jobId)}/apply`, {
+            const response = await window.guardedFetch(`/candidate/jobs/${encodeURIComponent(jobId)}/apply`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" }
             });
@@ -362,9 +372,9 @@ $(function () {
                 data.appliedJobIds.push(jobId);
             data.appliedJobs = data.appliedJobs || {};
             data.appliedJobs[jobId] = {
-                appliedAtLabel: result.appliedAtLabel || "today"
+                appliedAt: result.appliedAt || new Date().toISOString()
             };
-            setApplied(jobId, data.appliedJobs[jobId].appliedAtLabel);
+            setApplied(jobId, data.appliedJobs[jobId].appliedAt);
             showMessage(result.message || "Application submitted.", "success");
         } catch (err) {
             console.error(err);

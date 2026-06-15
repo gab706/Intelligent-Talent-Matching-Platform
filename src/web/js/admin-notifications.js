@@ -1,3 +1,9 @@
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
 $(function () {
     if (typeof toastr !== "undefined") {
         toastr.options = {
@@ -35,9 +41,15 @@ $(function () {
 
         $button.prop("disabled", true);
 
-        $.post("/admin/notification-delete", {
-            notificationId
-        }).done(response => {
+        window.guardedFetch("/admin/notification-delete", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                notificationId
+            })
+        }).then(response => response.json()).then(response => {
             if (!response || !response.success) {
                 showMessage(response && response.message ? response.message : "Could not delete notification.", "error");
                 return;
@@ -46,9 +58,10 @@ $(function () {
             $(`[data-notification-row="${notificationId}"]`).remove();
             updateCount();
             showMessage(response.message || "Notification deleted.", "success");
-        }).fail(() => {
-            showMessage("Could not delete notification.", "error");
-        }).always(() => {
+        }).catch(err => {
+            console.error(err);
+            showMessage(window.getRequestErrorMessage(err, "Could not delete notification."), "error");
+        }).finally(() => {
             $button.prop("disabled", false);
         });
     });

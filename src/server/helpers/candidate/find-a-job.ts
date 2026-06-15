@@ -1,3 +1,9 @@
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
 import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../../database/prisma.js';
 import {
@@ -6,17 +12,6 @@ import {
     normaliseFilters,
     searchJobs
 } from './job-search.js';
-
-function dateLabel(value: Date | null): string {
-    if (!value)
-        return '';
-
-    return new Intl.DateTimeFormat('en-AU', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-    }).format(value);
-}
 
 export default async function candidateFindJobHelper(
     req: Request,
@@ -88,9 +83,9 @@ export default async function candidateFindJobHelper(
         ]);
         const jobs = searchJobs(activeJobs, filters);
         const savedJobIds = user.savedJobs.map((savedJob: { jobId: string }) => savedJob.jobId);
-        const appliedJobs = applications.reduce((result: Record<string, { appliedAtLabel: string }>, application: { jobId: string; createdAt: Date }) => {
+        const appliedJobs = applications.reduce((result: Record<string, { appliedAt: string }>, application: { jobId: string; createdAt: Date }) => {
             result[application.jobId] = {
-                appliedAtLabel: dateLabel(application.createdAt)
+                appliedAt: application.createdAt.toISOString()
             };
             return result;
         }, {});

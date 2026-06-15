@@ -1,3 +1,9 @@
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
 import { prisma } from '../../database/prisma.js';
 
 const QUALIFICATION_LABELS: Record<string, string> = {
@@ -157,17 +163,6 @@ function normaliseStringList(value: unknown): string[] {
         });
 }
 
-function dateLabel(value: Date | null): string {
-    if (!value)
-        return '';
-
-    return new Intl.DateTimeFormat('en-AU', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
-    }).format(value);
-}
-
 function parseExperienceDate(value: Date | null): Date | null {
     return value && !Number.isNaN(value.getTime()) ? value : null;
 }
@@ -232,7 +227,7 @@ export function formatJob(job: any) {
             ? [job.salaryMin ? `$${job.salaryMin.toLocaleString('en-AU')}` : '', job.salaryMax ? `$${job.salaryMax.toLocaleString('en-AU')}` : ''].filter(Boolean).join(' - ')
             : '',
         closingDate: job.closingDate ? job.closingDate.toISOString().slice(0, 10) : '',
-        closingDateLabel: dateLabel(job.closingDate),
+        closingDateLabel: job.closingDate ? job.closingDate.toISOString() : '',
         skills: job.skills.map((item: any) => item.skill.name),
         searchableText: searchableJobText(job)
     };

@@ -1,3 +1,9 @@
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
 $(function () {
     if (typeof toastr !== "undefined") {
         toastr.options = {
@@ -81,7 +87,7 @@ $(function () {
     };
 
     const searchEmployers = async function (query) {
-        const response = await fetch("/employer/search-employers", {
+        const response = await window.guardedFetch("/employer/search-employers", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -173,7 +179,7 @@ $(function () {
                         <input type="hidden" name="companyId" value="${escapeHtml(company.id)}" />
                         <label class="employer-companies__logo-upload employer-companies__logo-upload--edit">
                             <span>Company Logo</span>
-                            <input name="logo" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-logo-input />
+                            <input id="company-page-edit-logo" name="logo" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" autocomplete="off" data-logo-input />
                             <span class="employer-companies__logo-preview">
                                 ${company.logoUrl
                                     ? `<img src="${escapeHtml(company.logoUrl)}" alt="" />`
@@ -182,40 +188,40 @@ $(function () {
                         </label>
                         <label class="employer-companies__field">
                             <span>Company Name</span>
-                            <input name="name" type="text" required value="${escapeHtml(company.name || "")}" />
+                            <input id="company-page-edit-name" name="name" type="text" required autocomplete="organization" value="${escapeHtml(company.name || "")}" />
                         </label>
                         <label class="employer-companies__field">
                             <span>Short Company Description</span>
-                            <textarea name="description" rows="4" required>${escapeHtml(company.description || "")}</textarea>
+                            <textarea id="company-page-edit-description" name="description" rows="4" required autocomplete="off">${escapeHtml(company.description || "")}</textarea>
                         </label>
                         <div class="employer-companies__grid">
                             <label class="employer-companies__field">
                                 <span>Industry</span>
-                                <input name="industry" type="text" required value="${escapeHtml(company.industry || "")}" />
+                                <input id="company-page-edit-industry" name="industry" type="text" required autocomplete="off" value="${escapeHtml(company.industry || "")}" />
                             </label>
                             <label class="employer-companies__field">
                                 <span>Company Location</span>
-                                <input name="location" type="text" required value="${escapeHtml(company.location || "")}" />
+                                <input id="company-page-edit-location" name="location" type="text" required autocomplete="address-level1" value="${escapeHtml(company.location || "")}" />
                             </label>
                             <label class="employer-companies__field">
                                 <span>Contact Email</span>
-                                <input name="email" type="email" required value="${escapeHtml(company.email || "")}" />
+                                <input id="company-page-edit-email" name="email" type="email" required autocomplete="email" value="${escapeHtml(company.email || "")}" />
                             </label>
                             <label class="employer-companies__field">
                                 <span>Contact Phone</span>
-                                <input name="phone" type="tel" required value="${escapeHtml(company.phone || "")}" />
+                                <input id="company-page-edit-phone" name="phone" type="tel" required autocomplete="tel" value="${escapeHtml(company.phone || "")}" />
                             </label>
                             <label class="employer-companies__field">
                                 <span>Company Website</span>
-                                <input name="website" type="text" placeholder="www.example.com.au" value="${escapeHtml(company.website || "")}" />
+                                <input id="company-page-edit-website" name="website" type="text" placeholder="www.example.com.au" autocomplete="url" value="${escapeHtml(company.website || "")}" />
                             </label>
                             <label class="employer-companies__field">
                                 <span>Brand Colour</span>
-                                <input name="brandColour" type="color" value="${escapeHtml(company.brandColour || "#2563eb")}" />
+                                <input id="company-page-edit-brand-colour" name="brandColour" type="color" autocomplete="off" value="${escapeHtml(company.brandColour || "#2563eb")}" />
                             </label>
                             <label class="employer-companies__field">
                                 <span>Company Size</span>
-                                <select name="size" required>
+                                <select id="company-page-edit-size" name="size" required autocomplete="off">
                                     <option value="">Select size</option>
                                     ${["1-10 Employees", "11-50 Employees", "51-200 Employees", "201-1000 Employees", "1000+"].map(size =>
                                         `<option ${company.size === size ? "selected" : ""}>${escapeHtml(size)}</option>`
@@ -224,7 +230,7 @@ $(function () {
                             </label>
                             <label class="employer-companies__field">
                                 <span>Organisation Type</span>
-                                <select name="organisationType" required>
+                                <select id="company-page-edit-organisation-type" name="organisationType" required autocomplete="off">
                                     ${Object.entries({
                                         PRIVATE_COMPANY: "Private Company",
                                         PUBLIC_COMPANY: "Public Company",
@@ -741,7 +747,7 @@ $(function () {
             return;
 
         const role = $("[data-selected-employee-role]").val() || "USER";
-        const response = await fetch("/employer/company-members", {
+        const response = await window.guardedFetch("/employer/company-members", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -769,7 +775,7 @@ $(function () {
             return;
 
         const invitationId = $(this).closest("[data-company-invitation-id]").attr("data-company-invitation-id");
-        const response = await fetch("/employer/company-members", {
+        const response = await window.guardedFetch("/employer/company-members", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -798,7 +804,7 @@ $(function () {
         const $member = $(this).closest("[data-company-member-id]");
         const employerId = $member.attr("data-company-member-id");
         const role = String($(this).val() || "USER");
-        const response = await fetch("/employer/company-members", {
+        const response = await window.guardedFetch("/employer/company-members", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -831,7 +837,7 @@ $(function () {
         if (!window.confirm("Remove this member from the company?"))
             return;
 
-        const response = await fetch("/employer/company-members", {
+        const response = await window.guardedFetch("/employer/company-members", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -867,7 +873,7 @@ $(function () {
         $("[data-company-next]").prop("disabled", true).text("Creating...");
 
         try {
-            const response = await fetch("/employer/companies-create", {
+            const response = await window.guardedFetch("/employer/companies-create", {
                 method: "POST",
                 body: formData
             });
@@ -882,7 +888,7 @@ $(function () {
             window.location.reload();
         } catch (err) {
             console.error(err);
-            showMessage("Unable to create company.");
+            showMessage(window.getRequestErrorMessage(err, "Unable to create company."));
         } finally {
             $("[data-company-next]").prop("disabled", false);
             updateStep();
@@ -894,7 +900,7 @@ $(function () {
 
         const formData = new FormData(this);
         const values = Object.fromEntries(formData.entries());
-        const response = await fetch("/employer/company-update", {
+        const response = await window.guardedFetch("/employer/company-update", {
             method: "POST",
             body: formData
         });
@@ -913,7 +919,7 @@ $(function () {
         const $invite = $(this).closest("[data-invitation-id]");
         const invitationId = $invite.attr("data-invitation-id");
         const action = $(this).attr("data-invitation-action");
-        const response = await fetch("/employer/company-invitation", {
+        const response = await window.guardedFetch("/employer/company-invitation", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -941,7 +947,7 @@ $(function () {
         if (action === "delete" && !window.confirm("Delete this company?"))
             return;
 
-        const response = await fetch("/employer/company-action", {
+        const response = await window.guardedFetch("/employer/company-action", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

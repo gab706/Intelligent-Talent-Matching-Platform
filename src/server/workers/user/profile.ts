@@ -1,3 +1,9 @@
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
 import { Request, Response, NextFunction } from 'express';
 import argon2 from 'argon2';
 import crypto from 'node:crypto';
@@ -6,30 +12,15 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Prisma } from '../../../../prisma/generated/client.js';
 import { prisma } from '../../database/prisma.js';
+import { parseMultipart, type MultipartFile } from '../../helpers/multipart.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const avatarsDir = path.join(__dirname, '../../../web/images/avatars');
 const MAX_PROFILE_UPLOAD_BYTES = 1024 * 1024 * 8;
 
-type MultipartFile = {
-    filename: string;
-    mimeType: string;
-    buffer: Buffer;
-};
-
-type MultipartPayload = {
-    fields: Record<string, string>;
-    files: Record<string, MultipartFile>;
-};
-
 function isValidEmail(email: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-function getBoundary(contentType: string): string | null {
-    const match = contentType.match(/boundary=(?:"([^"]+)"|([^;]+))/);
-    return match?.[1] || match?.[2] || null;
 }
 
 function getAllowedAvatarExtension(file: MultipartFile): string | null {
@@ -56,89 +47,6 @@ function getAllowedAvatarExtension(file: MultipartFile): string | null {
     return null;
 }
 
-async function readRequestBuffer(req: Request): Promise<Buffer> {
-    const chunks: Buffer[] = [];
-    let totalBytes = 0;
-
-    for await (const chunk of req) {
-        const buffer = Buffer.isBuffer(chunk)
-            ? chunk
-            : Buffer.from(chunk);
-
-        totalBytes += buffer.length;
-
-        if (totalBytes > MAX_PROFILE_UPLOAD_BYTES)
-            throw new Error('Profile upload is too large.');
-
-        chunks.push(buffer);
-    }
-
-    return Buffer.concat(chunks);
-}
-
-async function parseMultipart(req: Request): Promise<MultipartPayload> {
-    const contentType = String(req.headers['content-type'] || '');
-    const boundaryValue = getBoundary(contentType);
-
-    if (!boundaryValue)
-        throw new Error('Invalid profile form submission.');
-
-    const bodyBuffer = await readRequestBuffer(req);
-    const body = bodyBuffer.toString('binary');
-    const boundary = `--${boundaryValue}`;
-    const fields: Record<string, string> = {};
-    const files: Record<string, MultipartFile> = {};
-
-    for (const rawPart of body.split(boundary).slice(1, -1)) {
-        const part = rawPart.replace(/^\r\n/, '').replace(/\r\n$/, '');
-        const headerEnd = part.indexOf('\r\n\r\n');
-
-        if (headerEnd === -1)
-            continue;
-
-        const rawHeaders = part.slice(0, headerEnd);
-        const content = part.slice(headerEnd + 4);
-        const headers = Object.fromEntries(
-            rawHeaders
-                .split('\r\n')
-                .map(header => {
-                    const separatorIndex = header.indexOf(':');
-
-                    return [
-                        header.slice(0, separatorIndex).trim().toLowerCase(),
-                        header.slice(separatorIndex + 1).trim()
-                    ];
-                })
-                .filter(([name]) => name)
-        );
-
-        const disposition = headers['content-disposition'] || '';
-        const name = disposition.match(/name="([^"]+)"/)?.[1];
-
-        if (!name)
-            continue;
-
-        const filename = disposition.match(/filename="([^"]*)"/)?.[1];
-        const buffer = Buffer.from(content, 'binary');
-
-        if (filename) {
-            files[name] = {
-                filename,
-                mimeType: headers['content-type'] || '',
-                buffer
-            };
-            continue;
-        }
-
-        fields[name] = buffer.toString('utf8');
-    }
-
-    return {
-        fields,
-        files
-    };
-}
-
 export default async function profileWorker(
     req: Request,
     res: Response,
@@ -152,7 +60,12 @@ export default async function profileWorker(
             });
         }
 
-        const { fields, files } = await parseMultipart(req);
+        const { fields, files } = await parseMultipart(req, {
+            maxBytes: MAX_PROFILE_UPLOAD_BYTES,
+            invalidMessage: 'Invalid profile form submission.',
+            tooLargeMessage: 'Profile upload is too large.',
+            timeoutMessage: 'Profile upload timed out.'
+        });
         const firstName = String(fields.firstName || '').trim();
         const lastName = String(fields.lastName || '').trim();
         const email = String(fields.email || '').trim().toLowerCase();

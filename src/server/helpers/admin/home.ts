@@ -1,3 +1,9 @@
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
 import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../../database/prisma.js';
 
@@ -17,15 +23,6 @@ type RecentNotification = {
 
 function formatUser(user: { firstName: string; lastName: string; email: string }): string {
     return `${user.firstName} ${user.lastName}`.trim() || user.email;
-}
-
-function formatDateTime(value: Date): string {
-    return new Intl.DateTimeFormat('en-AU', {
-        day: 'numeric',
-        month: 'short',
-        hour: 'numeric',
-        minute: '2-digit'
-    }).format(value);
 }
 
 export default async function adminHomeHelper(
@@ -138,7 +135,7 @@ export default async function adminHomeHelper(
                 message: notification.message,
                 isRead: notification.isRead,
                 recipient: formatUser(notification.recipient),
-                createdAtLabel: formatDateTime(notification.createdAt)
+                createdAt: notification.createdAt.toISOString()
             }))
         });
     } catch (err) {

@@ -1,3 +1,9 @@
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
 @import url('./fonts.css');
 :root {
     --color-bg: #ffffff;
@@ -72,6 +78,11 @@ ul, ol {
 a {
     text-decoration: none;
     color: inherit;
+}
+
+[data-local-date],
+[data-local-datetime] {
+    white-space: nowrap;
 }
 
 input, button, textarea, select {

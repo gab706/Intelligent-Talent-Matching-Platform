@@ -1,6 +1,13 @@
+/**
+ * @license
+ * ITMP License Version 1.0 – June 2026
+ * This source code is licensed under a custom license.
+ * See the LICENSE.md file in the root directory of this source tree for full details.
+ */
 import { Request, Response, NextFunction } from 'express';
 import argon2 from 'argon2';
 import { prisma } from '../../database/prisma.js';
+import { linkSessionToUser } from '../../helpers/session-links.js';
 
 const SESSION_MS = 1000 * 60 * 60 * 24 * 7;
 const CANDIDATE_ACCOUNT_TYPE = 1;
@@ -191,17 +198,19 @@ export default async function registerWorker(
                 if (saveErr)
                     return next(saveErr);
 
-                return res.json({
-                    success: true,
-                    message:
-                        accountType === EMPLOYER_ACCOUNT_TYPE
-                            ? 'Employer account created successfully.'
-                            : 'Candidate account created successfully.',
-                    redirectTo:
-                        accountType === EMPLOYER_ACCOUNT_TYPE
-                            ? '/employer/home'
-                            : '/candidate/home'
-                });
+                linkSessionToUser(req.sessionID, user.id)
+                    .then(() => res.json({
+                        success: true,
+                        message:
+                            accountType === EMPLOYER_ACCOUNT_TYPE
+                                ? 'Employer account created successfully.'
+                                : 'Candidate account created successfully.',
+                        redirectTo:
+                            accountType === EMPLOYER_ACCOUNT_TYPE
+                                ? '/employer/home'
+                                : '/candidate/home'
+                    }))
+                    .catch(next);
             });
         });
     } catch (err) {
