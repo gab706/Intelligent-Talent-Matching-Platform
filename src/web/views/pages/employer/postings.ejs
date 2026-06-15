@@ -13,8 +13,8 @@
     <link rel="stylesheet" href="/css/global.css" />
     <link rel="stylesheet" href="/css/account-home.css" />
     <link rel="stylesheet" href="/css/employer-postings.css" />
-    <script src="/lib/js/jquery.min.js"></script>
-    <script src="/lib/js/toastr.min.js"></script>
+    <script data-cfasync="false" src="/lib/js/jquery.min.js"></script>
+    <script data-cfasync="false" src="/lib/js/toastr.min.js"></script>
 </head>
 <body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
 <%- include('../../partials/public-header/public-header'); %>
@@ -224,7 +224,7 @@
 <script>
     window.__employerPostings = <%- employerPostingsJson %>;
 </script>
-<script src="/js/global.js"></script>
-<script src="/js/employer-postings.js"></script>
+<script data-cfasync="false" src="/js/global.js"></script>
+<script data-cfasync="false" src="/js/employer-postings.js"></script>
 </body>
 </html>

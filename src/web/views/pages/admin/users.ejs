@@ -15,8 +15,8 @@
     <link rel="stylesheet" href="/css/employer-candidates.css" />
     <link rel="stylesheet" href="/css/admin-home.css" />
     <link rel="stylesheet" href="/css/admin-users.css" />
-    <script src="/lib/js/jquery.min.js"></script>
-    <script src="/lib/js/toastr.min.js"></script>
+    <script data-cfasync="false" src="/lib/js/jquery.min.js"></script>
+    <script data-cfasync="false" src="/lib/js/toastr.min.js"></script>
 </head>
 <body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
 <%- include('../../partials/public-header/public-header'); %>
@@ -165,7 +165,7 @@
 <script>
     window.__adminUsers = <%- usersJson %>;
 </script>
-<script src="/js/global.js"></script>
-<script src="/js/admin-users.js"></script>
+<script data-cfasync="false" src="/js/global.js"></script>
+<script data-cfasync="false" src="/js/admin-users.js"></script>
 </body>
 </html>

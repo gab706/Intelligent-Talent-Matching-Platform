@@ -13,8 +13,8 @@
     <link rel="stylesheet" href="/css/global.css" />
     <link rel="stylesheet" href="/css/account-home.css" />
     <link rel="stylesheet" href="/css/candidate-applications.css" />
-    <script src="/lib/js/jquery.min.js"></script>
-    <script src="/lib/js/toastr.min.js"></script>
+    <script data-cfasync="false" src="/lib/js/jquery.min.js"></script>
+    <script data-cfasync="false" src="/lib/js/toastr.min.js"></script>
 </head>
 <body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
 <%- include('../../partials/public-header/public-header'); %>
@@ -113,7 +113,7 @@
 <script>
     window.__candidateApplications = <%- candidateApplicationsJson %>;
 </script>
-<script src="/js/global.js"></script>
-<script src="/js/candidate-applications.js"></script>
+<script data-cfasync="false" src="/js/global.js"></script>
+<script data-cfasync="false" src="/js/candidate-applications.js"></script>
 </body>
 </html>

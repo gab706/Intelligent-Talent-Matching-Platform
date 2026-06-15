@@ -15,8 +15,8 @@
     <link rel="stylesheet" href="/css/employer-candidates.css" />
     <link rel="stylesheet" href="/css/admin-home.css" />
     <link rel="stylesheet" href="/css/admin-notifications.css" />
-    <script src="/lib/js/jquery.min.js"></script>
-    <script src="/lib/js/toastr.min.js"></script>
+    <script data-cfasync="false" src="/lib/js/jquery.min.js"></script>
+    <script data-cfasync="false" src="/lib/js/toastr.min.js"></script>
 </head>
 <body class="<%= theme === 'DARK' ? 'dark-mode' : '' %>">
 <%- include('../../partials/public-header/public-header'); %>
@@ -84,7 +84,7 @@
         <p class="employer-candidates__empty admin-notifications__empty" <%= notifications.length ? 'hidden' : '' %> data-notification-empty>No notifications found.</p>
     </section>
 </main>
-<script src="/js/global.js"></script>
-<script src="/js/admin-notifications.js"></script>
+<script data-cfasync="false" src="/js/global.js"></script>
+<script data-cfasync="false" src="/js/admin-notifications.js"></script>
 </body>
 </html>
