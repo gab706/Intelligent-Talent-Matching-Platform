@@ -26,6 +26,7 @@ const app: Application = express();
 const partialsStatic = express.static(partialsPath);
 const PgSession = connectPgSimple(session);
 const REQUEST_TIMEOUT_MS = 30000;
+const PROFILE_UPLOAD_LIMIT_BYTES = 1024 * 1024 * 8;
 
 if (!process.env.SESSION_SECRET)
 	throw new Error('SESSION_SECRET is required');
@@ -60,6 +61,24 @@ app.use(express.static(webPath, {
 }));
 
 app.use(cookieParser());
+
+app.use('/user/profile', (req: Request, res: Response, next: NextFunction) => {
+	if (req.method !== 'POST')
+		return next();
+
+	const contentLength = Number(req.headers['content-length'] || 0);
+
+	if (Number.isFinite(contentLength) && contentLength > PROFILE_UPLOAD_LIMIT_BYTES) {
+		res.setHeader('Connection', 'close');
+
+		return res.status(413).json({
+			success: false,
+			message: 'Profile upload is too large. Please choose an avatar smaller than 8 MB.'
+		});
+	}
+
+	return next();
+});
 
 app.use(express.urlencoded({
 	extended: true,

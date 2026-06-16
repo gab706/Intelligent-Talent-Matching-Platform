@@ -243,6 +243,24 @@ $(async function () {
         return ALLOWED_AVATAR_TYPES.has(file.type) || ["jpg", "jpeg", "png", "heic"].includes(extension);
     };
 
+    const validateAvatarFile = function (file) {
+        if (!file) {
+            return true;
+        }
+
+        if (file.size > MAX_AVATAR_UPLOAD_BYTES) {
+            showMessage(`Avatar must be smaller than ${MAX_AVATAR_UPLOAD_LABEL}.`);
+            return false;
+        }
+
+        if (!isAllowedAvatarFile(file)) {
+            showMessage("Avatar must be a JPG, PNG, or HEIC image.");
+            return false;
+        }
+
+        return true;
+    };
+
     $profileOpenButtons.on("click", openProfileModal);
     $profileCloseButtons.on("click", closeProfileModal);
 
@@ -252,14 +270,7 @@ $(async function () {
         if (!file)
             return;
 
-        if (file.size > MAX_AVATAR_UPLOAD_BYTES) {
-            showMessage(`Avatar must be smaller than ${MAX_AVATAR_UPLOAD_LABEL}.`);
-            this.value = "";
-            return;
-        }
-
-        if (!isAllowedAvatarFile(file)) {
-            showMessage("Avatar must be a JPG, PNG, or HEIC image.");
+        if (!validateAvatarFile(file)) {
             this.value = "";
             return;
         }
@@ -271,6 +282,13 @@ $(async function () {
         event.preventDefault();
 
         const $saveButton = $profileForm.find("[data-profile-save]");
+        const avatarFile = $profileAvatarInput[0]?.files?.[0];
+
+        if (!validateAvatarFile(avatarFile)) {
+            $profileAvatarInput.val("");
+            return;
+        }
+
         const formData = new FormData(this);
 
         $saveButton.prop("disabled", true).text("Saving...");
