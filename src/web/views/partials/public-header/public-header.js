@@ -5,6 +5,14 @@
  * See the LICENSE.md file in the root directory of this source tree for full details.
  */
 $(async function () {
+    const MAX_AVATAR_UPLOAD_BYTES = 1024 * 1024 * 8;
+    const MAX_AVATAR_UPLOAD_LABEL = "8 MB";
+    const ALLOWED_AVATAR_TYPES = new Set([
+        "image/jpeg",
+        "image/png",
+        "image/heic",
+        "image/heif"
+    ]);
     const $themeToggleButton = $("[data-theme-toggle]");
     const $dropdownTriggers = $("[data-public-dropdown]");
     const $helpModal = $("[data-help-modal]");
@@ -209,6 +217,32 @@ $(async function () {
         $("body").removeClass("is-profile-modal-open");
     };
 
+    const getResponsePayload = async function (response) {
+        const contentType = response.headers.get("content-type") || "";
+
+        if (contentType.includes("application/json")) {
+            return response.json();
+        }
+
+        if (response.status === 413) {
+            return {
+                success: false,
+                message: `Profile upload is too large. Please choose an avatar smaller than ${MAX_AVATAR_UPLOAD_LABEL}.`
+            };
+        }
+
+        return {
+            success: false,
+            message: "Unable to save your profile."
+        };
+    };
+
+    const isAllowedAvatarFile = function (file) {
+        const extension = String(file.name || "").split(".").pop().toLowerCase();
+
+        return ALLOWED_AVATAR_TYPES.has(file.type) || ["jpg", "jpeg", "png", "heic"].includes(extension);
+    };
+
     $profileOpenButtons.on("click", openProfileModal);
     $profileCloseButtons.on("click", closeProfileModal);
 
@@ -217,6 +251,18 @@ $(async function () {
 
         if (!file)
             return;
+
+        if (file.size > MAX_AVATAR_UPLOAD_BYTES) {
+            showMessage(`Avatar must be smaller than ${MAX_AVATAR_UPLOAD_LABEL}.`);
+            this.value = "";
+            return;
+        }
+
+        if (!isAllowedAvatarFile(file)) {
+            showMessage("Avatar must be a JPG, PNG, or HEIC image.");
+            this.value = "";
+            return;
+        }
 
         $profileAvatarPreview.attr("src", URL.createObjectURL(file));
     });
@@ -232,10 +278,13 @@ $(async function () {
         try {
             const response = await window.guardedFetch("/user/profile", {
                 method: "POST",
+                headers: {
+                    Accept: "application/json"
+                },
                 body: formData
             });
 
-            const data = await response.json();
+            const data = await getResponsePayload(response);
 
             if (!response.ok || !data.success) {
                 showMessage(data.message || "Unable to save your profile.");

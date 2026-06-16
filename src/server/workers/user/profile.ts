@@ -235,7 +235,16 @@ export default async function profileWorker(
         });
     } catch (err) {
         if (err instanceof Error) {
-            return res.json({
+            const statusCode =
+                err.message === 'Profile upload is too large.'
+                    ? 413
+                    : err.message === 'Invalid profile form submission.'
+                        ? 400
+                        : err.message === 'Profile upload timed out.'
+                            ? 408
+                            : 200;
+
+            return res.status(statusCode).json({
                 success: false,
                 message: err.message
             });
