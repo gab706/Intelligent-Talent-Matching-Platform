@@ -18,6 +18,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const avatarsDir = path.join(__dirname, '../../../web/images/avatars');
 const MAX_PROFILE_UPLOAD_BYTES = 1024 * 1024 * 8;
+const PROFILE_UPLOAD_TIMEOUT_MS = 120000;
 
 function isValidEmail(email: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -62,6 +63,7 @@ export default async function profileWorker(
 
         const { fields, files } = await parseMultipart(req, {
             maxBytes: MAX_PROFILE_UPLOAD_BYTES,
+            timeoutMs: PROFILE_UPLOAD_TIMEOUT_MS,
             invalidMessage: 'Invalid profile form submission.',
             tooLargeMessage: 'Profile upload is too large.',
             timeoutMessage: 'Profile upload timed out.'

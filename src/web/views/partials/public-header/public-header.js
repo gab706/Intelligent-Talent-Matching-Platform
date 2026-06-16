@@ -7,6 +7,9 @@
 $(async function () {
     const MAX_AVATAR_UPLOAD_BYTES = 1024 * 1024 * 8;
     const MAX_AVATAR_UPLOAD_LABEL = "8 MB";
+    const AVATAR_OUTPUT_SIZE = 512;
+    const AVATAR_OUTPUT_QUALITY = 0.86;
+    const PROFILE_UPLOAD_TIMEOUT_MS = 120000;
     const ALLOWED_AVATAR_TYPES = new Set([
         "image/jpeg",
         "image/png",
@@ -24,6 +27,9 @@ $(async function () {
     const $profileForm = $("[data-profile-form]");
     const $profileAvatarInput = $("[data-profile-avatar-input]");
     const $profileAvatarPreview = $("[data-profile-avatar-preview]");
+    const $passwordToggle = $("[data-profile-password-toggle]");
+    const $passwordFields = $("[data-profile-password-fields]");
+    const $passwordInputs = $("[data-profile-password-input]");
     const $publicHeader = $(".public-header");
     const $impersonationBanner = $("[data-impersonation-banner]");
     const $impersonationPin = $("[data-impersonation-pin]");
@@ -261,8 +267,96 @@ $(async function () {
         return true;
     };
 
+    const canResizeAvatarFile = function (file) {
+        return ["image/jpeg", "image/png"].includes(file.type);
+    };
+
+    const readImageFromFile = function (file) {
+        return new Promise((resolve, reject) => {
+            const image = new Image();
+            const imageUrl = URL.createObjectURL(file);
+
+            image.onload = function () {
+                URL.revokeObjectURL(imageUrl);
+                resolve(image);
+            };
+
+            image.onerror = function () {
+                URL.revokeObjectURL(imageUrl);
+                reject(new Error("Unable to read avatar image."));
+            };
+
+            image.src = imageUrl;
+        });
+    };
+
+    const resizeAvatarFile = async function (file) {
+        if (!file || !canResizeAvatarFile(file)) {
+            return file;
+        }
+
+        const image = await readImageFromFile(file);
+        const sourceSize = Math.min(image.naturalWidth || image.width, image.naturalHeight || image.height);
+        const sourceX = Math.max(((image.naturalWidth || image.width) - sourceSize) / 2, 0);
+        const sourceY = Math.max(((image.naturalHeight || image.height) - sourceSize) / 2, 0);
+        const canvas = document.createElement("canvas");
+        canvas.width = AVATAR_OUTPUT_SIZE;
+        canvas.height = AVATAR_OUTPUT_SIZE;
+
+        const context = canvas.getContext("2d");
+
+        if (!context) {
+            return file;
+        }
+
+        context.drawImage(
+            image,
+            sourceX,
+            sourceY,
+            sourceSize,
+            sourceSize,
+            0,
+            0,
+            AVATAR_OUTPUT_SIZE,
+            AVATAR_OUTPUT_SIZE
+        );
+
+        const blob = await new Promise((resolve) => {
+            canvas.toBlob(resolve, "image/jpeg", AVATAR_OUTPUT_QUALITY);
+        });
+
+        if (!blob || blob.size >= file.size) {
+            return file;
+        }
+
+        return new File(
+            [blob],
+            `${String(file.name || "avatar").replace(/\.[^.]+$/, "")}.jpg`,
+            {
+                type: "image/jpeg",
+                lastModified: Date.now()
+            }
+        );
+    };
+
+    const enablePasswordFields = function () {
+        $passwordFields.prop("hidden", false);
+        $passwordToggle.prop("hidden", true);
+
+        $passwordInputs.each(function () {
+            const $input = $(this);
+            $input
+                .prop("disabled", false)
+                .attr("name", $input.data("name"))
+                .attr("autocomplete", $input.data("autocomplete"));
+        });
+
+        $passwordInputs.first().trigger("focus");
+    };
+
     $profileOpenButtons.on("click", openProfileModal);
     $profileCloseButtons.on("click", closeProfileModal);
+    $passwordToggle.on("click", enablePasswordFields);
 
     $profileAvatarInput.on("change", function () {
         const file = this.files && this.files[0];
@@ -289,17 +383,25 @@ $(async function () {
             return;
         }
 
-        const formData = new FormData(this);
-
-        $saveButton.prop("disabled", true).text("Saving...");
+        $saveButton.prop("disabled", true).text(avatarFile ? "Preparing..." : "Saving...");
 
         try {
+            const formData = new FormData(this);
+
+            if (avatarFile) {
+                const uploadAvatarFile = await resizeAvatarFile(avatarFile);
+                formData.set("avatar", uploadAvatarFile, uploadAvatarFile.name);
+            }
+
+            $saveButton.text("Saving...");
+
             const response = await window.guardedFetch("/user/profile", {
                 method: "POST",
                 headers: {
                     Accept: "application/json"
                 },
-                body: formData
+                body: formData,
+                timeoutMs: PROFILE_UPLOAD_TIMEOUT_MS
             });
 
             const data = await getResponsePayload(response);
@@ -313,7 +415,9 @@ $(async function () {
             window.location.reload();
         } catch (err) {
             console.error(err);
-            showMessage("An unexpected error occurred. Please try again.");
+            showMessage(window.getRequestErrorMessage
+                ? window.getRequestErrorMessage(err, "Unable to save your profile. Please try again.")
+                : "Unable to save your profile. Please try again.");
         } finally {
             $saveButton.prop("disabled", false).text("Save");
         }

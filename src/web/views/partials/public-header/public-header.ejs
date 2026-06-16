@@ -339,19 +339,22 @@
                 <span>Phone</span>
                 <input id="public-profile-phone" name="phone" type="tel" autocomplete="tel" value="<%= renderedPhone %>" required />
             </label>
-            <div class="public-profile-modal__password-group">
+            <button class="public-profile-modal__password-toggle" type="button" data-profile-password-toggle>
+                Change password
+            </button>
+            <div class="public-profile-modal__password-group" hidden data-profile-password-fields>
                 <p>Change password</p>
                 <label class="public-profile-modal__field" for="public-profile-old-password">
                     <span>Old password</span>
-                    <input id="public-profile-old-password" name="oldPassword" type="password" autocomplete="current-password" />
+                    <input id="public-profile-old-password" type="password" autocomplete="off" data-name="oldPassword" data-autocomplete="current-password" data-profile-password-input disabled />
                 </label>
                 <label class="public-profile-modal__field" for="public-profile-new-password">
                     <span>New password</span>
-                    <input id="public-profile-new-password" name="newPassword" type="password" autocomplete="new-password" />
+                    <input id="public-profile-new-password" type="password" autocomplete="off" data-name="newPassword" data-autocomplete="new-password" data-profile-password-input disabled />
                 </label>
                 <label class="public-profile-modal__field" for="public-profile-confirm-password">
                     <span>Confirm new password</span>
-                    <input id="public-profile-confirm-password" name="confirmPassword" type="password" autocomplete="new-password" />
+                    <input id="public-profile-confirm-password" type="password" autocomplete="off" data-name="confirmPassword" data-autocomplete="new-password" data-profile-password-input disabled />
                 </label>
             </div>
             <button class="public-profile-modal__save" type="submit" data-profile-save>
@@ -361,4 +364,4 @@
     </section>
 </div>
 <% } %>
-<script data-cfasync="false" src="/partials/public-header/public-header.js?v=20260616-profile-upload-2"></script>
+<script data-cfasync="false" src="/partials/public-header/public-header.js?v=20260616-profile-upload-3"></script>
