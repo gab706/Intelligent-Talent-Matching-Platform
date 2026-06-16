@@ -306,7 +306,7 @@
                 <span>
                     Change avatar
                 </span>
-                <input id="public-profile-avatar" name="avatar" type="file" accept=".jpg,.jpeg,.png,.heic,image/jpeg,image/png,image/heic,image/heif" data-profile-avatar-input />
+                <input id="public-profile-avatar" name="avatar" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" data-profile-avatar-input />
             </label>
             <div class="public-profile-modal__settings-pair">
                 <div class="public-profile-modal__setting public-profile-modal__setting--account">
@@ -339,24 +339,31 @@
                 <span>Phone</span>
                 <input id="public-profile-phone" name="phone" type="tel" autocomplete="tel" value="<%= renderedPhone %>" required />
             </label>
-            <button class="public-profile-modal__password-toggle" type="button" data-profile-password-toggle>
-                Change password
-            </button>
-            <div class="public-profile-modal__password-group" hidden data-profile-password-fields>
-                <p>Change password</p>
-                <label class="public-profile-modal__field" for="public-profile-old-password">
-                    <span>Old password</span>
-                    <input id="public-profile-old-password" type="password" autocomplete="off" data-name="oldPassword" data-autocomplete="current-password" data-profile-password-input disabled />
-                </label>
-                <label class="public-profile-modal__field" for="public-profile-new-password">
-                    <span>New password</span>
-                    <input id="public-profile-new-password" type="password" autocomplete="off" data-name="newPassword" data-autocomplete="new-password" data-profile-password-input disabled />
-                </label>
-                <label class="public-profile-modal__field" for="public-profile-confirm-password">
-                    <span>Confirm new password</span>
-                    <input id="public-profile-confirm-password" type="password" autocomplete="off" data-name="confirmPassword" data-autocomplete="new-password" data-profile-password-input disabled />
-                </label>
-            </div>
+            <section class="public-profile-modal__security" aria-labelledby="public-profile-security-title">
+                <div class="public-profile-modal__security-heading">
+                    <div>
+                        <span class="public-profile-modal__security-label">Security</span>
+                        <h3 id="public-profile-security-title">Password</h3>
+                    </div>
+                    <button class="public-profile-modal__password-toggle" type="button" data-profile-password-toggle>
+                        Update password
+                    </button>
+                </div>
+                <div class="public-profile-modal__password-group" hidden data-profile-password-fields>
+                    <label class="public-profile-modal__field" for="public-profile-old-password">
+                        <span>Old password</span>
+                        <input id="public-profile-old-password" type="password" autocomplete="off" data-name="oldPassword" data-autocomplete="current-password" data-profile-password-input disabled />
+                    </label>
+                    <label class="public-profile-modal__field" for="public-profile-new-password">
+                        <span>New password</span>
+                        <input id="public-profile-new-password" type="password" autocomplete="off" data-name="newPassword" data-autocomplete="new-password" data-profile-password-input disabled />
+                    </label>
+                    <label class="public-profile-modal__field" for="public-profile-confirm-password">
+                        <span>Confirm new password</span>
+                        <input id="public-profile-confirm-password" type="password" autocomplete="off" data-name="confirmPassword" data-autocomplete="new-password" data-profile-password-input disabled />
+                    </label>
+                </div>
+            </section>
             <button class="public-profile-modal__save" type="submit" data-profile-save>
                 Save
             </button>
@@ -364,4 +371,4 @@
     </section>
 </div>
 <% } %>
-<script data-cfasync="false" src="/partials/public-header/public-header.js?v=20260616-profile-upload-3"></script>
+<script data-cfasync="false" src="/partials/public-header/public-header.js"></script>

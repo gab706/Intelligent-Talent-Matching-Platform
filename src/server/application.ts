@@ -27,6 +27,7 @@ const partialsStatic = express.static(partialsPath);
 const PgSession = connectPgSimple(session);
 const REQUEST_TIMEOUT_MS = 30000;
 const PROFILE_UPLOAD_LIMIT_BYTES = 1024 * 1024 * 8;
+const PROFILE_UPLOAD_TIMEOUT_MS = 120000;
 
 if (!process.env.SESSION_SECRET)
 	throw new Error('SESSION_SECRET is required');
@@ -47,7 +48,12 @@ app.set('views', viewsPath);
 app.disable('x-powered-by');
 
 app.use((req: Request, _res, next: NextFunction) => {
-	req.setTimeout(REQUEST_TIMEOUT_MS, () => {
+	const timeoutMs =
+		req.method === 'POST' && req.path === '/user/profile'
+			? PROFILE_UPLOAD_TIMEOUT_MS
+			: REQUEST_TIMEOUT_MS;
+
+	req.setTimeout(timeoutMs, () => {
 		req.destroy(new Error('Request timed out.'));
 	});
 	next();

@@ -5,16 +5,15 @@
  * See the LICENSE.md file in the root directory of this source tree for full details.
  */
 $(async function () {
-    const MAX_AVATAR_UPLOAD_BYTES = 1024 * 1024 * 8;
-    const MAX_AVATAR_UPLOAD_LABEL = "8 MB";
+    const MAX_AVATAR_SOURCE_BYTES = 1024 * 1024 * 8;
+    const MAX_AVATAR_SOURCE_LABEL = "8 MB";
+    const MAX_AVATAR_UPLOAD_BYTES = 1024 * 1024;
+    const MAX_AVATAR_UPLOAD_LABEL = "1 MB";
     const AVATAR_OUTPUT_SIZE = 512;
     const AVATAR_OUTPUT_QUALITY = 0.86;
-    const PROFILE_UPLOAD_TIMEOUT_MS = 120000;
     const ALLOWED_AVATAR_TYPES = new Set([
         "image/jpeg",
-        "image/png",
-        "image/heic",
-        "image/heif"
+        "image/png"
     ]);
     const $themeToggleButton = $("[data-theme-toggle]");
     const $dropdownTriggers = $("[data-public-dropdown]");
@@ -233,7 +232,7 @@ $(async function () {
         if (response.status === 413) {
             return {
                 success: false,
-                message: `Profile upload is too large. Please choose an avatar smaller than ${MAX_AVATAR_UPLOAD_LABEL}.`
+                message: `Profile upload is too large. Please choose a JPG or PNG smaller than ${MAX_AVATAR_SOURCE_LABEL}.`
             };
         }
 
@@ -246,7 +245,7 @@ $(async function () {
     const isAllowedAvatarFile = function (file) {
         const extension = String(file.name || "").split(".").pop().toLowerCase();
 
-        return ALLOWED_AVATAR_TYPES.has(file.type) || ["jpg", "jpeg", "png", "heic"].includes(extension);
+        return ALLOWED_AVATAR_TYPES.has(file.type) || ["jpg", "jpeg", "png"].includes(extension);
     };
 
     const validateAvatarFile = function (file) {
@@ -254,21 +253,17 @@ $(async function () {
             return true;
         }
 
-        if (file.size > MAX_AVATAR_UPLOAD_BYTES) {
-            showMessage(`Avatar must be smaller than ${MAX_AVATAR_UPLOAD_LABEL}.`);
+        if (file.size > MAX_AVATAR_SOURCE_BYTES) {
+            showMessage(`Avatar must be smaller than ${MAX_AVATAR_SOURCE_LABEL}.`);
             return false;
         }
 
         if (!isAllowedAvatarFile(file)) {
-            showMessage("Avatar must be a JPG, PNG, or HEIC image.");
+            showMessage("Avatar must be a JPG or PNG image.");
             return false;
         }
 
         return true;
-    };
-
-    const canResizeAvatarFile = function (file) {
-        return ["image/jpeg", "image/png"].includes(file.type);
     };
 
     const readImageFromFile = function (file) {
@@ -291,7 +286,7 @@ $(async function () {
     };
 
     const resizeAvatarFile = async function (file) {
-        if (!file || !canResizeAvatarFile(file)) {
+        if (!file) {
             return file;
         }
 
@@ -325,8 +320,8 @@ $(async function () {
             canvas.toBlob(resolve, "image/jpeg", AVATAR_OUTPUT_QUALITY);
         });
 
-        if (!blob || blob.size >= file.size) {
-            return file;
+        if (!blob) {
+            throw new Error("Unable to prepare avatar image.");
         }
 
         return new File(
@@ -337,6 +332,20 @@ $(async function () {
                 lastModified: Date.now()
             }
         );
+    };
+
+    const prepareAvatarFile = async function (file) {
+        if (!file) {
+            return null;
+        }
+
+        const resizedFile = await resizeAvatarFile(file);
+
+        if (resizedFile.size > MAX_AVATAR_UPLOAD_BYTES) {
+            throw new Error(`Avatar could not be compressed below ${MAX_AVATAR_UPLOAD_LABEL}. Please choose a smaller JPG or PNG.`);
+        }
+
+        return resizedFile;
     };
 
     const enablePasswordFields = function () {
@@ -389,19 +398,18 @@ $(async function () {
             const formData = new FormData(this);
 
             if (avatarFile) {
-                const uploadAvatarFile = await resizeAvatarFile(avatarFile);
+                const uploadAvatarFile = await prepareAvatarFile(avatarFile);
                 formData.set("avatar", uploadAvatarFile, uploadAvatarFile.name);
             }
 
             $saveButton.text("Saving...");
 
-            const response = await window.guardedFetch("/user/profile", {
+            const response = await fetch("/user/profile", {
                 method: "POST",
                 headers: {
                     Accept: "application/json"
                 },
-                body: formData,
-                timeoutMs: PROFILE_UPLOAD_TIMEOUT_MS
+                body: formData
             });
 
             const data = await getResponsePayload(response);
@@ -415,8 +423,8 @@ $(async function () {
             window.location.reload();
         } catch (err) {
             console.error(err);
-            showMessage(window.getRequestErrorMessage
-                ? window.getRequestErrorMessage(err, "Unable to save your profile. Please try again.")
+            showMessage(err instanceof Error && err.message
+                ? err.message
                 : "Unable to save your profile. Please try again.");
         } finally {
             $saveButton.prop("disabled", false).text("Save");

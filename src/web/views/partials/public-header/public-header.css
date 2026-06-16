@@ -1212,7 +1212,7 @@ body.dark-mode .public-profile-modal__dialog {
 
 .public-profile-modal__setting-label,
 .public-profile-modal__field span,
-.public-profile-modal__password-group p {
+.public-profile-modal__security-label {
     color: var(--color-muted);
     font-size: 0.84rem;
     font-weight: 800;
@@ -1295,14 +1295,39 @@ body.dark-mode .public-profile-modal__dialog {
     box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 18%, transparent);
 }
 
+.public-profile-modal__security {
+    display: grid;
+    gap: 14px;
+    margin-top: 8px;
+    padding: 16px;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-soft);
+}
+
+.public-profile-modal__security-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.public-profile-modal__security-heading h3 {
+    margin: 3px 0 0;
+    color: var(--color-text);
+    font-size: 1rem;
+    line-height: 1.2;
+}
+
 .public-profile-modal__password-toggle {
     min-height: 44px;
     padding: 0 14px;
-    justify-self: start;
+    flex: 0 0 auto;
 
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
-    background: var(--color-surface-soft);
+    background: var(--color-surface);
     color: var(--color-text);
     font-weight: 800;
 }
@@ -1316,8 +1341,7 @@ body.dark-mode .public-profile-modal__dialog {
 .public-profile-modal__password-group {
     display: grid;
     gap: 14px;
-    margin-top: 18px;
-    padding-top: 22px;
+    padding-top: 16px;
     border-top: 1px solid var(--color-border);
 }
 
